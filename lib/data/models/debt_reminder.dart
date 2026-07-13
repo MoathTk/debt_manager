@@ -1,3 +1,8 @@
+/// Represents a debt collection reminder for a customer.
+///
+/// Reminders help merchants track when to follow up on outstanding debts.
+/// Each reminder is tied to a customer and has a scheduled date.
+/// Merchants can mark reminders as completed once the follow-up is done.
 class DebtReminder {
   final int? id;
   final int customerId;
@@ -13,8 +18,11 @@ class DebtReminder {
     this.message,
   });
 
+  /// Check if this reminder has been completed
   bool get completed => isCompleted == 1;
 
+  /// Converts the DebtReminder instance to a Map for SQLite insertion.
+  /// The Map keys match the column names in the 'debt_reminders' table.
   Map<String, dynamic> toMap() {
     return {
       'id': id,
@@ -25,6 +33,8 @@ class DebtReminder {
     };
   }
 
+  /// Creates a DebtReminder instance from a SQLite query result Map.
+  /// Used when reading data from the database.
   factory DebtReminder.fromMap(Map<String, dynamic> map) {
     return DebtReminder(
       id: map['id'] as int?,
@@ -35,6 +45,8 @@ class DebtReminder {
     );
   }
 
+  /// Creates a new DebtReminder with selectively replaced fields.
+  /// Useful for updates where only some fields change.
   DebtReminder copyWith({
     int? id,
     int? customerId,

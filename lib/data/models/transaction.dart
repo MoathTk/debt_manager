@@ -1,3 +1,10 @@
+/// Represents a financial transaction (debt or payment) for a customer.
+///
+/// Transaction types:
+/// - [debt] (0): Money owed by the customer (increases their balance)
+/// - [payment] (1): Money paid by the customer (decreases their balance)
+///
+/// The [firebaseId] field is reserved for future cloud sync with Firebase.
 class Transaction {
   final int? id;
   final int customerId;
@@ -17,12 +24,18 @@ class Transaction {
     this.firebaseId,
   });
 
+  /// Type constants for the 'type' field
   static const int debt = 0;
   static const int payment = 1;
 
+  /// Check if this transaction is a debt
   bool get isDebt => type == debt;
+
+  /// Check if this transaction is a payment
   bool get isPayment => type == payment;
 
+  /// Converts the Transaction instance to a Map for SQLite insertion.
+  /// The Map keys match the column names in the 'transactions' table.
   Map<String, dynamic> toMap() {
     return {
       'id': id,
@@ -35,6 +48,8 @@ class Transaction {
     };
   }
 
+  /// Creates a Transaction instance from a SQLite query result Map.
+  /// Used when reading data from the database.
   factory Transaction.fromMap(Map<String, dynamic> map) {
     return Transaction(
       id: map['id'] as int?,
@@ -47,6 +62,8 @@ class Transaction {
     );
   }
 
+  /// Creates a new Transaction with selectively replaced fields.
+  /// Useful for updates where only some fields change.
   Transaction copyWith({
     int? id,
     int? customerId,

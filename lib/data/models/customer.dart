@@ -1,3 +1,8 @@
+/// Represents a customer in the debt management system.
+///
+/// Customers are the primary entities who owe debts or make payments.
+/// Each customer can have multiple transactions and debt reminders.
+/// The [firebaseId] field is reserved for future cloud sync with Firebase.
 class Customer {
   final int? id;
   final String name;
@@ -8,11 +13,13 @@ class Customer {
   const Customer({
     this.id,
     required this.name,
-    required this.phone,
+    this.phone,
     required this.createdAt,
     this.firebaseId,
   });
 
+  /// Converts the Customer instance to a Map for SQLite insertion.
+  /// The Map keys match the column names in the 'customers' table.
   Map<String, dynamic> toMap() {
     return {
       'id': id,
@@ -23,6 +30,8 @@ class Customer {
     };
   }
 
+  /// Creates a Customer instance from a SQLite query result Map.
+  /// Used when reading data from the database.
   factory Customer.fromMap(Map<String, dynamic> map) {
     return Customer(
       id: map['id'] as int?,
@@ -33,6 +42,8 @@ class Customer {
     );
   }
 
+  /// Creates a new Customer with selectively replaced fields.
+  /// Useful for updates where only some fields change.
   Customer copyWith({
     int? id,
     String? name,
