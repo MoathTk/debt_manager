@@ -131,14 +131,45 @@ final dashboardStatsProvider = FutureProvider<DashboardStats>((ref) async {
   final totalDebts = await transactionRepo.getTotalDebts();
   final totalPayments = await transactionRepo.getTotalPayments();
   final pendingReminders = await reminderRepo.getPendingCount();
+  final periodic = await transactionRepo.getPeriodicData();
+  final topDebtors = await transactionRepo.getTopDebtors(5);
 
   return DashboardStats(
     customerCount: customerCount,
     totalDebts: totalDebts,
     totalPayments: totalPayments,
     pendingReminders: pendingReminders,
+    periodicData: periodic,
+    topDebtors: topDebtors,
   );
 });
+
+/// Provider for periodic data with week/month toggle.
+final periodicDataProvider =
+    FutureProvider.family<List<Map<String, dynamic>>, bool>((
+      ref,
+      isWeekly,
+    ) async {
+      final repo = ref.watch(transactionRepositoryProvider);
+      return repo.getPeriodicData(isWeekly: isWeekly);
+    });
+
+/// Provider for top debtors.
+final topDebtorsProvider = FutureProvider<List<Map<String, dynamic>>>((
+  ref,
+) async {
+  final repo = ref.watch(transactionRepositoryProvider);
+  return repo.getTopDebtors(5);
+});
+
+/// Provider for total debts/payments in a date range.
+/// Family key is "startIso|endIso".
+final totalsByDateRangeProvider =
+    FutureProvider.family<Map<String, double>, String>((ref, key) async {
+      final parts = key.split('|');
+      final repo = ref.watch(transactionRepositoryProvider);
+      return repo.getTotalsByDateRange(parts[0], parts[1]);
+    });
 
 // ============================================================================
 // DATA CLASSES
@@ -147,23 +178,23 @@ final dashboardStatsProvider = FutureProvider<DashboardStats>((ref) async {
 /// Aggregated statistics for the dashboard.
 /// Contains summary data from all three database tables.
 class DashboardStats {
-  /// Total number of registered customers
   final int customerCount;
-
-  /// Sum of all debt amounts across all customers
   final double totalDebts;
-
-  /// Sum of all payment amounts across all customers
   final double totalPayments;
-
-  /// Number of pending (uncompleted) debt reminders
   final int pendingReminders;
+  final List<Map<String, dynamic>> periodicData;
+  final List<Map<String, dynamic>> topDebtors;
+
+  double get collectionRate =>
+      totalDebts > 0 ? totalPayments / totalDebts : 0.0;
 
   DashboardStats({
     required this.customerCount,
     required this.totalDebts,
     required this.totalPayments,
     required this.pendingReminders,
+    this.periodicData = const [],
+    this.topDebtors = const [],
   });
 }
 
@@ -202,13 +233,15 @@ Future<void> updateCustomer(
   String? phone,
 }) async {
   final repo = ref.read(customerRepositoryProvider);
-  await repo.update(Customer(
-    id: customer.id,
-    name: name,
-    phone: phone,
-    createdAt: customer.createdAt,
-    firebaseId: customer.firebaseId,
-  ));
+  await repo.update(
+    Customer(
+      id: customer.id,
+      name: name,
+      phone: phone,
+      createdAt: customer.createdAt,
+      firebaseId: customer.firebaseId,
+    ),
+  );
   ref.invalidate(customersProvider);
   ref.invalidate(customerByIdProvider(customer.id!));
   ref.invalidate(dashboardStatsProvider);

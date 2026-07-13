@@ -182,4 +182,69 @@ class TransactionRepository {
     ''', [debtId]);
     return (result.first['total'] as num?)?.toDouble() ?? 0.0;
   }
+
+  /// Returns total debts and payments within a date range.
+  /// Both dates should be in ISO 8601 format.
+  Future<Map<String, double>> getTotalsByDateRange(
+      String startDate, String endDate) async {
+    final db = await _dbHelper.database;
+    final result = await db.rawQuery('''
+      SELECT
+        COALESCE(SUM(CASE WHEN type = 0 THEN amount ELSE 0 END), 0) as debts,
+        COALESCE(SUM(CASE WHEN type = 1 THEN amount ELSE 0 END), 0) as payments
+      FROM transactions
+      WHERE date BETWEEN ? AND ?
+    ''', [startDate, endDate]);
+    return {
+      'debts': (result.first['debts'] as num?)?.toDouble() ?? 0.0,
+      'payments': (result.first['payments'] as num?)?.toDouble() ?? 0.0,
+    };
+  }
+
+  /// Returns aggregated debt/payment data grouped by period.
+  /// If [isWeekly] is true, groups by ISO week; otherwise by month.
+  /// Returns last 6 periods, each with: label, debts, payments.
+  Future<List<Map<String, dynamic>>> getPeriodicData({
+    bool isWeekly = false,
+  }) async {
+    final db = await _dbHelper.database;
+    final groupExpr = isWeekly
+        ? "strftime('%Y-W%W', date)"
+        : "strftime('%Y-%m', date)";
+    final labelExpr = isWeekly
+        ? "strftime('%W', date)"
+        : "strftime('%m', date)";
+    final result = await db.rawQuery('''
+      SELECT
+        $groupExpr as period,
+        $labelExpr as label,
+        COALESCE(SUM(CASE WHEN type = 0 THEN amount ELSE 0 END), 0) as debts,
+        COALESCE(SUM(CASE WHEN type = 1 THEN amount ELSE 0 END), 0) as payments
+      FROM transactions
+      GROUP BY period
+      ORDER BY period DESC
+      LIMIT 6
+    ''');
+    return result.reversed.toList();
+  }
+
+  /// Returns top [limit] customers by outstanding balance.
+  /// Each entry: {customer_id, name, outstanding}.
+  Future<List<Map<String, dynamic>>> getTopDebtors(int limit) async {
+    final db = await _dbHelper.database;
+    return await db.rawQuery('''
+      SELECT
+        t.customer_id,
+        c.name,
+        COALESCE(SUM(CASE WHEN t.type = 0 THEN t.amount ELSE 0 END), 0) -
+        COALESCE(SUM(CASE WHEN t.type = 1 THEN t.amount ELSE 0 END), 0)
+          as outstanding
+      FROM transactions t
+      JOIN customers c ON c.id = t.customer_id
+      GROUP BY t.customer_id
+      HAVING outstanding > 0
+      ORDER BY outstanding DESC
+      LIMIT ?
+    ''', [limit]);
+  }
 }

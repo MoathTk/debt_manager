@@ -20,8 +20,8 @@ A mobile Flutter application for local merchants in Al-Anbar, Iraq to digitize p
 lib/
   main.dart                              # App entry point, MaterialApp config
   l10n/
-    intl_en.arb                          # English translation keys (72 keys)
-    app_ar.arb                           # Arabic translation keys (72 keys)
+    intl_en.arb                          # English translation keys (88 keys)
+    app_ar.arb                           # Arabic translation keys (88 keys)
     app_localizations.dart               # GENERATED: AppLocalizations class
     app_localizations_en.dart            # GENERATED: English delegate
     app_localizations_ar.dart            # GENERATED: Arabic delegate
@@ -33,7 +33,7 @@ lib/
       debt_reminder.dart                 # DebtReminder model
     repositories/
       customer_repository.dart           # Customer CRUD + search
-      transaction_repository.dart        # Transaction CRUD + balance/stats + debt allocation
+      transaction_repository.dart        # Transaction CRUD + balance/stats + debt allocation + periodic data + top debtors
       debt_reminder_repository.dart      # Reminder CRUD + due/pending
   Providers/
     database_provider.dart               # Riverpod providers + mutations + DashboardStats
@@ -41,7 +41,8 @@ lib/
     locale_provider.dart                 # AR/EN Locale provider
   screens/
     home_screen.dart                     # Bottom nav shell + settings drawer
-    dashboard_screen.dart                # Stats grid + recent transactions
+    dashboard_screen.dart                # Stats grid + analytics entry + recent transactions (≤100 lines)
+    analytics_screen.dart                # Full chart dashboard with week/month toggle (≤100 lines)
     customers_screen.dart                # Customer list + search + FAB → Customer Detail
     customer_detail_screen.dart          # Header, balance, transactions, action bar
     all_transactions_screen.dart         # All transactions with search/filter/sort (≤100 lines)
@@ -68,6 +69,14 @@ lib/
     edit_payment_sheet.dart              # Edit/delete payment (validates amount <= debt remaining)
     edit_customer_sheet.dart            # Edit customer name/phone (pre-filled form)
     app_snackbar.dart                    # Reusable themed SnackBar helpers
+    collection_progress_ring.dart        # Circular progress ring (collection rate %)
+    debt_payment_trend_chart.dart        # Line chart (debts vs payments trend)
+    monthly_breakdown_chart.dart         # Grouped bar chart (debts vs payments per period)
+    debt_payment_ratio_chart.dart        # Donut/pie chart (debt vs payment ratio)
+    top_debtors_chart.dart               # Horizontal bar chart (top 5 debtors)
+    time_range_selector.dart             # Week/Month toggle for chart data
+  utils/
+    seed_database.dart                   # Demo data seeder (50 customers, 200 debts, 150 payments, 30 reminders)
   generated/                             # GENERATED: intl message files
 test/
   widget_test.dart                       # Basic smoke test
@@ -172,6 +181,8 @@ Deleting a customer cascade-deletes all their transactions and reminders.
 | `getTransactionCount()` | `int` | Total transaction count |
 | `getDebtsWithRemaining(customerId)` | `List<Map>` | Debts with remaining balance (subquery, unpaid only) |
 | `getPaymentsForDebt(debtId)` | `double` | Total payments linked to a specific debt |
+| `getPeriodicData(isWeekly)` | `List<Map>` | Aggregated debt/payment data by week or month (last 6 periods) |
+| `getTopDebtors(limit)` | `List<Map>` | Top N customers by outstanding balance (joined with customers) |
 
 ### DebtReminderRepository (`lib/data/repositories/debt_reminder_repository.dart`)
 | Method | Returns | Description |
@@ -212,10 +223,15 @@ Deleting a customer cascade-deletes all their transactions and reminders.
 | `debtsWithRemainingProvider` | `FutureProvider.family<List<Map>, int>` | Debts with remaining balance per customer |
 | `pendingRemindersProvider` | `FutureProvider<List<DebtReminder>>` | All pending reminders |
 | `dueTodayProvider` | `FutureProvider<List<DebtReminder>>` | Reminders due today |
-| `dashboardStatsProvider` | `FutureProvider<DashboardStats>` | Aggregated dashboard stats |
+| `dashboardStatsProvider` | `FutureProvider<DashboardStats>` | Aggregated dashboard stats (includes periodic + top debtors) |
+| `periodicDataProvider` | `FutureProvider.family<List<Map>, bool>` | Periodic data (weekly/monthly toggle) |
+| `topDebtorsProvider` | `FutureProvider<List<Map>>` | Top 5 debtors by outstanding balance |
 
 ### DashboardStats class
 - `customerCount` (int), `totalDebts` (double), `totalPayments` (double), `pendingReminders` (int)
+- `periodicData` (List<Map>) — monthly/weekly aggregated data for charts
+- `topDebtors` (List<Map>) — top 5 customers by outstanding balance
+- `collectionRate` (double) — computed: totalPayments / totalDebts
 
 ### Mutation Helpers
 - `addCustomer(ref, {name, phone})` — inserts customer and invalidates providers
@@ -245,7 +261,7 @@ Deleting a customer cascade-deletes all their transactions and reminders.
 - ARB files: `lib/l10n/intl_en.arb` (English), `lib/l10n/app_ar.arb` (Arabic)
 - Generated: `AppLocalizations` class in `lib/l10n/`
 
-### Translation Keys (72 keys)
+### Translation Keys (88 keys)
 | Key | English | Arabic |
 |---|---|---|
 | appTitle | Debt Management | إدارة الديون |
@@ -316,6 +332,20 @@ Deleting a customer cascade-deletes all their transactions and reminders.
 | amountHighest | Amount (highest first) | المبلغ (الأعلى أولاً) |
 | amountLowest | Amount (lowest first) | المبلغ (الأدنى أولاً) |
 | clearFilters | Clear filters | مسح الفلاتر |
+| collectionRate | Collection Rate | نسبة التحصيل |
+| topDebtors | Top Debtors | أكبر المدينين |
+| monthlyTrend | Trend | الاتجاه |
+| outstanding | Outstanding | المتبقي |
+| noChartData | No data yet | لا توجد بيانات بعد |
+| weekly | Weekly | أسبوعي |
+| monthly | Monthly | شهري |
+| noTopDebtors | No outstanding debts | لا توجد ديون مستحقة |
+| ofTotalDebts | of total debts | من إجمالي الديون |
+| analytics | Analytics | التحليلات |
+| seedDemoData | Seed Demo Data | تحميل بيانات تجريبية |
+| clearDemoData | Clear Demo Data | مسح البيانات التجريبية |
+| demoDataSeeded | Demo data loaded! | تم تحميل البيانات التجريبية! |
+| demoDataCleared | Demo data cleared! | تم مسح البيانات التجريبية! |
 
 ---
 
@@ -323,13 +353,24 @@ Deleting a customer cascade-deletes all their transactions and reminders.
 
 ### HomeScreen (`lib/screens/home_screen.dart`)
 - Custom floating bottom nav bar (`_ModernNavBar`) with animated pill indicator
-- Settings drawer (half-width) with language + theme segmented buttons
+- Settings drawer (half-width) with language + theme segmented buttons + seed/clear demo data buttons
 - IndexedStack preserves scroll state across tabs
 
 ### DashboardScreen (`lib/screens/dashboard_screen.dart`)
 - 2x2 GridView of StatCard widgets (Total Debts, Total Payments, Pending Reminders, Customers)
-- Recent transactions section with "See All" arrow → navigates to AllTransactionsScreen
+- Analytics card with collection rate preview → navigates to AnalyticsScreen
+- Recent transactions section with "See All" arrow → AllTransactionsScreen
 - Pull-to-refresh support
+
+### AnalyticsScreen (`lib/screens/analytics_screen.dart`)
+- Full chart dashboard with AppBar
+- Collection Progress Ring (% of total debt paid off)
+- Time range selector (Weekly / Monthly toggle)
+- Debt vs Payment Trend — line chart (last 6 periods)
+- Monthly Breakdown — grouped bar chart (last 6 periods)
+- Debt-to-Payment Ratio — donut chart
+- Top Debtors — horizontal bar chart (top 5)
+- All charts powered by `fl_chart` library
 
 ### AllTransactionsScreen (`lib/screens/all_transactions_screen.dart`)
 - ConsumerStatefulWidget with local filter/sort state
@@ -438,6 +479,43 @@ Deleting a customer cascade-deletes all their transactions and reminders.
 - `showErrorSnackBar(context, message)` — floating, error color, error icon
 - Reusable across all widgets, theme-aware
 
+### CollectionProgressRing (`lib/widgets/collection_progress_ring.dart`)
+- Circular progress indicator showing collection rate (payments/debts %)
+- Color-coded: green (≥70%), yellow (≥40%), red (<40%)
+- Shows percentage in center with label
+
+### DebtPaymentTrendChart (`lib/widgets/debt_payment_trend_chart.dart`)
+- Line chart with 2 curved lines: debts (red) + payments (green)
+- Gradient fill below each line
+- Supports weekly/monthly data via parent toggle
+- Shows dot markers at data points
+
+### MonthlyBreakdownChart (`lib/widgets/monthly_breakdown_chart.dart`)
+- Grouped bar chart with side-by-side bars per period
+- Red bars = debts, Green bars = payments
+- Rounded top corners on bars
+
+### DebtPaymentRatioChart (`lib/widgets/debt_payment_ratio_chart.dart`)
+- Donut/pie chart showing debt vs payment ratio
+- Legend with percentage labels
+- Empty state when no data
+
+### TopDebtorsChart (`lib/widgets/top_debtors_chart.dart`)
+- Horizontal bar chart of top 5 debtors
+- Name + amount + progress bar
+- Sorted by outstanding balance descending
+
+### TimeRangeSelector (`lib/widgets/time_range_selector.dart`)
+- Animated toggle between Weekly / Monthly
+- Pill-shaped selector with smooth transitions
+
+### SeedDatabase (`lib/utils/seed_database.dart`)
+- `seedDemoData()` — inserts 50 customers, 200 debts, 150 payments, 30 reminders
+- `clearDemoData()` — deletes all data from all tables
+- Arabic names, IQD amounts (10k–500k), dates spanning last 6 months
+- Edge cases: fully/partially/unpaid debts, linked payments, varied notes
+- Triggered via Settings Drawer buttons
+
 ---
 
 ## Number Formatting
@@ -476,6 +554,7 @@ Smart decimal format used across all display files:
 | `path` | ^1.9.1 | File path utilities |
 | `flutter_riverpod` | ^2.6.1 | State management |
 | `intl` | ^0.20.2 | Date/number formatting |
+| `fl_chart` | ^0.70.2 | Charts (line, bar, pie/donut) |
 | `cupertino_icons` | ^1.0.8 | iOS-style icons |
 
 ---
@@ -492,7 +571,8 @@ Smart decimal format used across all display files:
 - Database layer: ✅ COMPLETE (models, helper v2, repositories, providers, debt allocation)
 - Localization: ✅ COMPLETE (57 keys, ARB files, generated AppLocalizations, locale provider)
 - Theme: ✅ COMPLETE (Light + Dark mode, theme provider)
-- Dashboard screen: ✅ COMPLETE
+- Dashboard screen: ✅ COMPLETE (stat cards, charts, recent transactions)
+- Dashboard charts: ✅ COMPLETE (progress ring, trend line, bar breakdown, donut ratio, top debtors, week/month toggle)
 - Customers screen: ✅ COMPLETE (list, search, add customer, edit customer)
 - Customer Detail screen: ✅ COMPLETE (header, balance card, transaction list)
 - Transaction entry: ✅ COMPLETE (add debt, record payment with debt linking)

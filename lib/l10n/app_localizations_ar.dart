@@ -211,4 +211,70 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get clearFilters => 'مسح الفلاتر';
+
+  @override
+  String get collectionRate => 'نسبة التحصيل';
+
+  @override
+  String get topDebtors => 'أكبر المدينين';
+
+  @override
+  String get monthlyTrend => 'الاتجاه';
+
+  @override
+  String get outstanding => 'المتبقي';
+
+  @override
+  String get noChartData => 'لا توجد بيانات بعد';
+
+  @override
+  String get weekly => 'أسبوعي';
+
+  @override
+  String get monthly => 'شهري';
+
+  @override
+  String get noTopDebtors => 'لا توجد ديون مستحقة';
+
+  @override
+  String get ofTotalDebts => 'من إجمالي الديون';
+
+  @override
+  String get analytics => 'التحليلات';
+
+  @override
+  String get seedDemoData => 'تحميل بيانات تجريبية';
+
+  @override
+  String get clearDemoData => 'مسح البيانات التجريبية';
+
+  @override
+  String get demoDataSeeded => 'تم تحميل البيانات التجريبية!';
+
+  @override
+  String get demoDataCleared => 'تم مسح البيانات التجريبية!';
+
+  @override
+  String get day => 'يوم';
+
+  @override
+  String get week => 'أسبوع';
+
+  @override
+  String get month => 'شهر';
+
+  @override
+  String get year => 'سنة';
+
+  @override
+  String get periodDebts => 'الديون';
+
+  @override
+  String get periodPayments => 'المدفوعات';
+
+  @override
+  String get periodTotals => 'المجاميع حسب الفترة';
+
+  @override
+  String get currentPeriod => 'الحالي';
 }

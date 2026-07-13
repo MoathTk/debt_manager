@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
 import 'animated_counter.dart';
+import '../utils/number_formatter.dart';
 
 /// Premium stat card for the dashboard grid.
 ///
-/// Features a colored gradient background with white text,
-/// a circular icon badge, and an animated counter.
-/// Designed for maximum readability across all age groups.
+/// When [compact] is true, the number is displayed as simplified text
+/// (e.g. "1.25 مليون") without animation — for large currency values.
 class StatCard extends StatelessWidget {
   final IconData icon;
   final String label;
   final double numValue;
   final Color color;
+  final bool compact;
 
   const StatCard({
     super.key,
@@ -18,6 +19,7 @@ class StatCard extends StatelessWidget {
     required this.label,
     required this.numValue,
     required this.color,
+    this.compact = false,
   });
 
   @override
@@ -49,8 +51,9 @@ class StatCard extends StatelessWidget {
             FittedBox(
               child: AnimatedCounter(
                 targetValue: numValue,
-                style: const TextStyle(
-                  fontSize: 32,
+                formatter: compact ? NumberFormatter.compact : null,
+                style: TextStyle(
+                  fontSize: compact ? 22 : 32,
                   fontWeight: FontWeight.w800,
                   color: Colors.white,
                   height: 1.1,

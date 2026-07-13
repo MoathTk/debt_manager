@@ -212,4 +212,70 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get clearFilters => 'Clear filters';
+
+  @override
+  String get collectionRate => 'Collection Rate';
+
+  @override
+  String get topDebtors => 'Top Debtors';
+
+  @override
+  String get monthlyTrend => 'Trend';
+
+  @override
+  String get outstanding => 'Outstanding';
+
+  @override
+  String get noChartData => 'No data yet';
+
+  @override
+  String get weekly => 'Weekly';
+
+  @override
+  String get monthly => 'Monthly';
+
+  @override
+  String get noTopDebtors => 'No outstanding debts';
+
+  @override
+  String get ofTotalDebts => 'of total debts';
+
+  @override
+  String get analytics => 'Analytics';
+
+  @override
+  String get seedDemoData => 'Seed Demo Data';
+
+  @override
+  String get clearDemoData => 'Clear Demo Data';
+
+  @override
+  String get demoDataSeeded => 'Demo data loaded!';
+
+  @override
+  String get demoDataCleared => 'Demo data cleared!';
+
+  @override
+  String get day => 'Day';
+
+  @override
+  String get week => 'Week';
+
+  @override
+  String get month => 'Month';
+
+  @override
+  String get year => 'Year';
+
+  @override
+  String get periodDebts => 'Debts';
+
+  @override
+  String get periodPayments => 'Payments';
+
+  @override
+  String get periodTotals => 'Period Totals';
+
+  @override
+  String get currentPeriod => 'Current';
 }

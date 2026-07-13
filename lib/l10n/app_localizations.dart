@@ -505,6 +505,138 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Clear filters'**
   String get clearFilters;
+
+  /// No description provided for @collectionRate.
+  ///
+  /// In en, this message translates to:
+  /// **'Collection Rate'**
+  String get collectionRate;
+
+  /// No description provided for @topDebtors.
+  ///
+  /// In en, this message translates to:
+  /// **'Top Debtors'**
+  String get topDebtors;
+
+  /// No description provided for @monthlyTrend.
+  ///
+  /// In en, this message translates to:
+  /// **'Trend'**
+  String get monthlyTrend;
+
+  /// No description provided for @outstanding.
+  ///
+  /// In en, this message translates to:
+  /// **'Outstanding'**
+  String get outstanding;
+
+  /// No description provided for @noChartData.
+  ///
+  /// In en, this message translates to:
+  /// **'No data yet'**
+  String get noChartData;
+
+  /// No description provided for @weekly.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekly'**
+  String get weekly;
+
+  /// No description provided for @monthly.
+  ///
+  /// In en, this message translates to:
+  /// **'Monthly'**
+  String get monthly;
+
+  /// No description provided for @noTopDebtors.
+  ///
+  /// In en, this message translates to:
+  /// **'No outstanding debts'**
+  String get noTopDebtors;
+
+  /// No description provided for @ofTotalDebts.
+  ///
+  /// In en, this message translates to:
+  /// **'of total debts'**
+  String get ofTotalDebts;
+
+  /// No description provided for @analytics.
+  ///
+  /// In en, this message translates to:
+  /// **'Analytics'**
+  String get analytics;
+
+  /// No description provided for @seedDemoData.
+  ///
+  /// In en, this message translates to:
+  /// **'Seed Demo Data'**
+  String get seedDemoData;
+
+  /// No description provided for @clearDemoData.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear Demo Data'**
+  String get clearDemoData;
+
+  /// No description provided for @demoDataSeeded.
+  ///
+  /// In en, this message translates to:
+  /// **'Demo data loaded!'**
+  String get demoDataSeeded;
+
+  /// No description provided for @demoDataCleared.
+  ///
+  /// In en, this message translates to:
+  /// **'Demo data cleared!'**
+  String get demoDataCleared;
+
+  /// No description provided for @day.
+  ///
+  /// In en, this message translates to:
+  /// **'Day'**
+  String get day;
+
+  /// No description provided for @week.
+  ///
+  /// In en, this message translates to:
+  /// **'Week'**
+  String get week;
+
+  /// No description provided for @month.
+  ///
+  /// In en, this message translates to:
+  /// **'Month'**
+  String get month;
+
+  /// No description provided for @year.
+  ///
+  /// In en, this message translates to:
+  /// **'Year'**
+  String get year;
+
+  /// No description provided for @periodDebts.
+  ///
+  /// In en, this message translates to:
+  /// **'Debts'**
+  String get periodDebts;
+
+  /// No description provided for @periodPayments.
+  ///
+  /// In en, this message translates to:
+  /// **'Payments'**
+  String get periodPayments;
+
+  /// No description provided for @periodTotals.
+  ///
+  /// In en, this message translates to:
+  /// **'Period Totals'**
+  String get periodTotals;
+
+  /// No description provided for @currentPeriod.
+  ///
+  /// In en, this message translates to:
+  /// **'Current'**
+  String get currentPeriod;
 }
 
 class _AppLocalizationsDelegate

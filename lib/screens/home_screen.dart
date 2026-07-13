@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../l10n/app_localizations.dart';
 import '../Providers/theme_provider.dart';
 import '../Providers/locale_provider.dart';
+import '../Providers/database_provider.dart';
+import '../utils/seed_database.dart';
 import 'dashboard_screen.dart';
 import 'customers_screen.dart';
 
@@ -252,6 +254,65 @@ class _SettingsDrawer extends StatelessWidget {
                 ref.read(themeProvider.notifier).setTheme(selected.first);
                 onClose();
               },
+            ),
+            const SizedBox(height: 24),
+            const Divider(),
+            const SizedBox(height: 8),
+            OutlinedButton.icon(
+              onPressed: () async {
+                await SeedDatabase.seedDemoData();
+                ref.invalidate(dashboardStatsProvider);
+                ref.invalidate(customersProvider);
+                ref.invalidate(transactionsProvider);
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text(l10n.demoDataSeeded)),
+                  );
+                }
+              },
+              icon: const Icon(Icons.dataset_outlined),
+              label: Text(l10n.seedDemoData),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: Theme.of(context).colorScheme.primary,
+              ),
+            ),
+            const SizedBox(height: 8),
+            OutlinedButton.icon(
+              onPressed: () async {
+                final confirm = await showDialog<bool>(
+                  context: context,
+                  builder: (_) => AlertDialog(
+                    title: Text(l10n.clearDemoData),
+                    content: Text(l10n.confirmDelete),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context, false),
+                        child: Text(l10n.cancel),
+                      ),
+                      TextButton(
+                        onPressed: () => Navigator.pop(context, true),
+                        child: Text(l10n.save),
+                      ),
+                    ],
+                  ),
+                );
+                if (confirm == true) {
+                  await SeedDatabase.clearDemoData();
+                  ref.invalidate(dashboardStatsProvider);
+                  ref.invalidate(customersProvider);
+                  ref.invalidate(transactionsProvider);
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text(l10n.demoDataCleared)),
+                    );
+                  }
+                }
+              },
+              icon: const Icon(Icons.delete_outline),
+              label: Text(l10n.clearDemoData),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: Theme.of(context).colorScheme.error,
+              ),
             ),
           ],
         ),

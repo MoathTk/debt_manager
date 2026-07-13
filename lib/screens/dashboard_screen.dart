@@ -5,42 +5,28 @@ import '../Providers/database_provider.dart';
 import '../widgets/stat_card.dart';
 import '../widgets/recent_transactions_list.dart';
 import 'all_transactions_screen.dart';
+import 'analytics_screen.dart';
 
-/// Dashboard screen showing business overview statistics.
-///
-/// Displays a 2x2 grid of stat cards and recent transactions.
-/// Pull-to-refresh supported for quick data refresh.
 class DashboardScreen extends ConsumerWidget {
   const DashboardScreen({super.key});
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final statsAsync = ref.watch(dashboardStatsProvider);
     final l10n = AppLocalizations.of(context)!;
-
     return RefreshIndicator(
       onRefresh: () async {
         ref.invalidate(dashboardStatsProvider);
         ref.invalidate(transactionsProvider);
       },
       child: statsAsync.when(
-        data: (stats) => _DashboardContent(stats: stats, l10n: l10n),
+        data: (s) => _body(context, l10n, s),
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(child: Text('Error: $e')),
       ),
     );
   }
-}
 
-/// Content builder for the dashboard when stats are loaded.
-class _DashboardContent extends StatelessWidget {
-  final DashboardStats stats;
-  final AppLocalizations l10n;
-
-  const _DashboardContent({required this.stats, required this.l10n});
-
-  @override
-  Widget build(BuildContext context) {
+  Widget _body(BuildContext ctx, AppLocalizations l10n, DashboardStats s) {
     return SingleChildScrollView(
       physics: const AlwaysScrollableScrollPhysics(),
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
@@ -58,49 +44,109 @@ class _DashboardContent extends StatelessWidget {
               StatCard(
                 icon: Icons.money_off,
                 label: l10n.totalDebts,
-                numValue: stats.totalDebts,
+                numValue: s.totalDebts,
                 color: const Color(0xFFE53935),
+                compact: true,
               ),
               StatCard(
                 icon: Icons.payments,
                 label: l10n.totalPayments,
-                numValue: stats.totalPayments,
+                numValue: s.totalPayments,
                 color: const Color(0xFF43A047),
+                compact: true,
               ),
               StatCard(
                 icon: Icons.people,
                 label: l10n.customers,
-                numValue: stats.customerCount.toDouble(),
+                numValue: s.customerCount.toDouble(),
                 color: const Color(0xFF1E88E5),
               ),
               StatCard(
                 icon: Icons.notifications_active,
                 label: l10n.pendingReminders,
-                numValue: stats.pendingReminders.toDouble(),
+                numValue: s.pendingReminders.toDouble(),
                 color: const Color(0xFFF9A825),
               ),
             ],
           ),
+          const SizedBox(height: 16),
+          _analyticsCard(ctx, l10n, s),
           const SizedBox(height: 24),
           Row(
             children: [
               Expanded(
                 child: Text(
                   l10n.recentTransactions,
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
+                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700),
                 ),
               ),
               IconButton(
                 icon: const Icon(Icons.arrow_forward_rounded, size: 22),
-                tooltip: l10n.allTransactions,
-                onPressed: () => Navigator.push(context,
-                  MaterialPageRoute(builder: (_) => const AllTransactionsScreen())),
+                onPressed: () => Navigator.push(
+                  ctx,
+                  MaterialPageRoute(
+                    builder: (_) => const AllTransactionsScreen(),
+                  ),
+                ),
               ),
             ],
           ),
           const SizedBox(height: 12),
           const RecentTransactionsList(),
         ],
+      ),
+    );
+  }
+
+  Widget _analyticsCard(
+    BuildContext ctx,
+    AppLocalizations l10n,
+    DashboardStats s,
+  ) {
+    final cs = Theme.of(ctx).colorScheme;
+    final rate = (s.collectionRate * 100).clamp(0, 100).toInt();
+    return GestureDetector(
+      onTap: () => Navigator.push(
+        ctx,
+        MaterialPageRoute(builder: (_) => const AnalyticsScreen()),
+      ),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              cs.primaryContainer,
+              cs.primaryContainer.withValues(alpha: 0.5),
+            ],
+          ),
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Row(
+          children: [
+            Icon(Icons.analytics_rounded, color: cs.primary, size: 28),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    l10n.analytics,
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w700,
+                      color: cs.onSurface,
+                    ),
+                  ),
+                  Text(
+                    '${l10n.collectionRate}: $rate%',
+                    style: TextStyle(fontSize: 12, color: cs.onSurfaceVariant),
+                  ),
+                ],
+              ),
+            ),
+            Icon(Icons.arrow_forward_ios_rounded, size: 16, color: cs.primary),
+          ],
+        ),
       ),
     );
   }

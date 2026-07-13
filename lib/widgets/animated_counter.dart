@@ -4,17 +4,19 @@ import 'package:flutter/material.dart';
 ///
 /// Uses [AnimationController] with [CurvedAnimation] for smooth easing.
 /// The number animates over [duration] when the widget first builds.
-/// Useful for dashboard stat cards to draw user attention.
+/// An optional [formatter] transforms the raw value before display.
 class AnimatedCounter extends StatefulWidget {
   final double targetValue;
   final Duration duration;
   final TextStyle? style;
+  final String Function(double value)? formatter;
 
   const AnimatedCounter({
     super.key,
     required this.targetValue,
     this.duration = const Duration(milliseconds: 6000),
     this.style,
+    this.formatter,
   });
 
   @override
@@ -60,7 +62,11 @@ class _AnimatedCounterState extends State<AnimatedCounter>
     return AnimatedBuilder(
       animation: _animation,
       builder: (context, child) {
-        return Text(_animation.value.toStringAsFixed(0), style: widget.style);
+        final val = _animation.value;
+        final text = widget.formatter != null
+            ? widget.formatter!(val)
+            : val.toStringAsFixed(0);
+        return Text(text, style: widget.style);
       },
     );
   }
