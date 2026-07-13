@@ -80,7 +80,7 @@ class _BodyState extends ConsumerState<_AddDebtBody> {
             ),
           ),
           const SizedBox(height: 24),
-          _Field(ctrl: _amount, label: l10n.amount, decimal: true),
+          _Field(ctrl: _amount, label: l10n.amount, decimal: true, autofocus: true),
           const SizedBox(height: 16),
           _Field(ctrl: _note, label: l10n.noteOptional),
           const SizedBox(height: 24),
@@ -123,12 +123,14 @@ class _Field extends StatelessWidget {
   final TextEditingController ctrl;
   final String label;
   final bool decimal;
-  const _Field({required this.ctrl, required this.label, this.decimal = false});
+  final bool autofocus;
+  const _Field({required this.ctrl, required this.label, this.decimal = false, this.autofocus = false});
 
   @override
   Widget build(BuildContext context) {
     return TextField(
       controller: ctrl,
+      autofocus: autofocus,
       keyboardType: decimal
           ? const TextInputType.numberWithOptions(decimal: true)
           : null,

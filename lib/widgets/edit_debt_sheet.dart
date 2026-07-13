@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../l10n/app_localizations.dart';
 import '../data/models/transaction.dart' as model;
 import '../Providers/database_provider.dart';
+import 'app_snackbar.dart';
 
 /// Bottom sheet for editing or deleting an existing debt.
 void showEditDebtSheet(
@@ -60,12 +61,7 @@ class _BodyState extends ConsumerState<_EditDebtBody> {
     if (val < totalPaid) {
       if (mounted) {
         final l10n = AppLocalizations.of(context)!;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(l10n.amountCannotExceedRemaining),
-            backgroundColor: Theme.of(context).colorScheme.error,
-          ),
-        );
+        showErrorSnackBar(context, l10n.amountCannotExceedRemaining);
       }
       return;
     }
@@ -126,7 +122,7 @@ class _BodyState extends ConsumerState<_EditDebtBody> {
             ),
           ),
           const SizedBox(height: 24),
-          _Field(ctrl: _amount, label: l10n.amount, decimal: true),
+          _Field(ctrl: _amount, label: l10n.amount, decimal: true, autofocus: true),
           const SizedBox(height: 16),
           _Field(ctrl: _note, label: l10n.noteOptional),
           const SizedBox(height: 24),
@@ -188,12 +184,14 @@ class _Field extends StatelessWidget {
   final TextEditingController ctrl;
   final String label;
   final bool decimal;
-  const _Field({required this.ctrl, required this.label, this.decimal = false});
+  final bool autofocus;
+  const _Field({required this.ctrl, required this.label, this.decimal = false, this.autofocus = false});
 
   @override
   Widget build(BuildContext context) {
     return TextField(
       controller: ctrl,
+      autofocus: autofocus,
       keyboardType: decimal
           ? const TextInputType.numberWithOptions(decimal: true)
           : null,

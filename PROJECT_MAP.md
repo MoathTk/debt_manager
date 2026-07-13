@@ -4,11 +4,12 @@
 A mobile Flutter application for local merchants in Al-Anbar, Iraq to digitize paper-based debt records. Offline-first architecture with SQLite, bilingual (AR/EN) support with RTL, and a roadmap to cloud sync via Firebase.
 
 - **State Management**: Riverpod
-- **Database**: SQLite (sqflite)
-- **UI Framework**: Material 3
+- **Database**: SQLite (sqflite) with 3 tables
+- **UI Framework**: Material 3, teal seed color
 - **Language**: Bilingual (Arabic + English) with RTL/LTR switching
-- **Number Format**: Western numerals (0-9)
-- **Theme**: Light + Dark mode with teal seed color
+- **Number Format**: Western numerals (0-9), smart decimal formatting
+- **Theme**: Light + Dark mode via themeProvider
+- **Locale**: Defaults to Arabic (ar), toggleable via localeProvider
 - **Accessibility**: Large text (18px body), high contrast, generous tap targets
 
 ---
@@ -19,43 +20,56 @@ A mobile Flutter application for local merchants in Al-Anbar, Iraq to digitize p
 lib/
   main.dart                              # App entry point, MaterialApp config
   l10n/
-    app_en.arb                           # English translation keys
-    app_ar.arb                           # Arabic translation keys
+    intl_en.arb                          # English translation keys (57 keys)
+    app_ar.arb                           # Arabic translation keys (57 keys)
     app_localizations.dart               # GENERATED: AppLocalizations class
     app_localizations_en.dart            # GENERATED: English delegate
     app_localizations_ar.dart            # GENERATED: Arabic delegate
   data/
-    database_helper.dart                 # SQLite singleton (init, create, close)
+    database_helper.dart                 # SQLite singleton (v2, migrations)
     models/
       customer.dart                      # Customer model
-      transaction.dart                   # Transaction model (aliased as 'model')
+      transaction.dart                   # Transaction model (has debtId field)
       debt_reminder.dart                 # DebtReminder model
     repositories/
       customer_repository.dart           # Customer CRUD + search
-      transaction_repository.dart        # Transaction CRUD + balance/stats
+      transaction_repository.dart        # Transaction CRUD + balance/stats + debt allocation
       debt_reminder_repository.dart      # Reminder CRUD + due/pending
   Providers/
-    database_provider.dart               # Riverpod providers + addCustomer helper
+    database_provider.dart               # Riverpod providers + mutations + DashboardStats
     theme_provider.dart                  # Light/Dark ThemeMode provider + ThemeData
     locale_provider.dart                 # AR/EN Locale provider
   screens/
-    home_screen.dart                     # Bottom nav shell (2 tabs: Home, Customers)
+    home_screen.dart                     # Bottom nav shell + settings drawer
     dashboard_screen.dart                # Stats grid + recent transactions
-    customers_screen.dart                # Customer list + search + FAB
+    customers_screen.dart                # Customer list + search + FAB → Customer Detail
+    customer_detail_screen.dart          # Header, balance, transactions, action bar
   widgets/
+    animated_counter.dart                # Smooth number counter animation
     stat_card.dart                       # Reusable stat card (icon, label, value)
-    customer_tile.dart                   # Customer list tile with balance
+    customer_tile.dart                   # Customer list tile with balance badge
     empty_state.dart                     # Empty state placeholder
     recent_transactions_list.dart        # Last 5 transactions section
     add_customer_sheet.dart              # Bottom sheet form for new customer
-  Modules/                               # (empty - future feature modules)
+    customer_header.dart                 # Gradient avatar, name, phone, join date
+    balance_card.dart                    # Net balance with owes/overpaid/settled status
+    transaction_tile.dart                # Transaction row with type icon, amount, remaining
+    debt_selector_tile.dart              # Radio-selectable debt tile for payment linking
+    add_debt_sheet.dart                  # Simple debt entry (amount + note)
+    record_payment_sheet.dart            # DraggableScrollableSheet with debt selector
+    action_bar.dart                      # 3-button floating bar (Debt, Payment, Edit Records)
+    records_list_sheet.dart              # List of all debts + payments, tappable to edit
+    edit_debt_sheet.dart                 # Edit/delete debt (validates amount >= total paid)
+    edit_payment_sheet.dart              # Edit/delete payment (validates amount <= debt remaining)
+    app_snackbar.dart                    # Reusable themed SnackBar helpers
+  generated/                             # GENERATED: intl message files
 test/
   widget_test.dart                       # Basic smoke test
 ```
 
 ---
 
-## Database Schema (SQLite v1)
+## Database Schema (SQLite v2)
 
 ### Table: `customers`
 | Column | Type | Constraints |
@@ -66,7 +80,7 @@ test/
 | created_at | TEXT | NOT NULL |
 | firebase_id | TEXT | NULL (reserved for cloud sync) |
 
-### Table: `transactions`
+### Table: `transactions` (v2 — has `debt_id` column)
 | Column | Type | Constraints |
 |---|---|---|
 | id | INTEGER | PRIMARY KEY AUTOINCREMENT |
@@ -75,9 +89,11 @@ test/
 | type | INTEGER | NOT NULL (0=Debt, 1=Payment) |
 | note | TEXT | NULL |
 | date | TEXT | NOT NULL |
+| debt_id | INTEGER | NULL, FK -> transactions(id) — links payment to specific debt |
 | firebase_id | TEXT | NULL (reserved for cloud sync) |
 
 **Indexes**: `idx_transactions_customer_id`, `idx_transactions_type`
+**Migration**: v1→v2 adds `debt_id` column via `onUpgrade`
 
 ### Table: `debt_reminders`
 | Column | Type | Constraints |
@@ -94,6 +110,7 @@ test/
 ```
 customers (1) ----< (many) transactions
 customers (1) ----< (many) debt_reminders
+transactions (1) ----< (many) transactions [via debt_id]
 ```
 Deleting a customer cascade-deletes all their transactions and reminders.
 
@@ -106,11 +123,11 @@ Deleting a customer cascade-deletes all their transactions and reminders.
 - Methods: `toMap()`, `fromMap()`, `copyWith()`
 
 ### Transaction (`lib/data/models/transaction.dart`)
-- Fields: `id?`, `customerId`, `amount`, `type`, `note?`, `date`, `firebaseId?`
+- Fields: `id?`, `customerId`, `amount`, `type`, `note?`, `date`, `debtId?`, `firebaseId?`
 - Constants: `Transaction.debt = 0`, `Transaction.payment = 1`
 - Getters: `isDebt`, `isPayment`
 - Methods: `toMap()`, `fromMap()`, `copyWith()`
-- **Note**: Imported as `import '../models/transaction.dart' as model` in repositories to avoid collision with sqflite
+- **Note**: Imported as `import '../models/transaction.dart' as model` in repositories and widgets
 
 ### DebtReminder (`lib/data/models/debt_reminder.dart`)
 - Fields: `id?`, `customerId`, `reminderDate`, `isCompleted`, `message?`
@@ -144,9 +161,11 @@ Deleting a customer cascade-deletes all their transactions and reminders.
 | `getByType(type)` | `List<Transaction>` | Filter by debt (0) or payment (1) |
 | `getByDateRange(start, end)` | `List<Transaction>` | Filter by date range |
 | `getCustomerBalance(customerId)` | `double` | Net balance (debts - payments) |
-| `getTotalDebts()` | `double` | Sum of all debt amounts |
-| `getTotalPayments()` | `double` | Sum of all payment amounts |
+| `getTotalDebts()` | `double` | Sum of all debt amounts (all customers) |
+| `getTotalPayments()` | `double` | Sum of all payment amounts (all customers) |
 | `getTransactionCount()` | `int` | Total transaction count |
+| `getDebtsWithRemaining(customerId)` | `List<Map>` | Debts with remaining balance (subquery, unpaid only) |
+| `getPaymentsForDebt(debtId)` | `double` | Total payments linked to a specific debt |
 
 ### DebtReminderRepository (`lib/data/repositories/debt_reminder_repository.dart`)
 | Method | Returns | Description |
@@ -184,6 +203,7 @@ Deleting a customer cascade-deletes all their transactions and reminders.
 | `transactionsProvider` | `FutureProvider<List<Transaction>>` | All transactions |
 | `transactionsByCustomerProvider` | `FutureProvider.family<List<Transaction>, int>` | Transactions per customer |
 | `customerBalanceProvider` | `FutureProvider.family<double, int>` | Balance per customer |
+| `debtsWithRemainingProvider` | `FutureProvider.family<List<Map>, int>` | Debts with remaining balance per customer |
 | `pendingRemindersProvider` | `FutureProvider<List<DebtReminder>>` | All pending reminders |
 | `dueTodayProvider` | `FutureProvider<List<DebtReminder>>` | Reminders due today |
 | `dashboardStatsProvider` | `FutureProvider<DashboardStats>` | Aggregated dashboard stats |
@@ -218,7 +238,7 @@ Deleting a customer cascade-deletes all their transactions and reminders.
 - ARB files: `lib/l10n/intl_en.arb` (English), `lib/l10n/app_ar.arb` (Arabic)
 - Generated: `AppLocalizations` class in `lib/l10n/`
 
-### Translation Keys (35 keys)
+### Translation Keys (57 keys)
 | Key | English | Arabic |
 |---|---|---|
 | appTitle | Debt Management | إدارة الديون |
@@ -254,53 +274,140 @@ Deleting a customer cascade-deletes all their transactions and reminders.
 | cancel | Cancel | إلغاء |
 | phone | Phone | الهاتف |
 | name | Name | الاسم |
+| customerDetail | Customer Detail | تفاصيل العميل |
+| addDebt | Add Debt | إضافة دين |
+| recordPayment | Record Payment | تسجيل دفعة |
+| noTransactionsForCustomer | No transactions yet | لا توجد معاملات بعد |
+| noTransactionsMessage | Record a debt or payment to get started | سجّل ديناً أو دفعة للبدء |
+| totalOwed | Total Owed | إجمالي المستحق |
+| totalPaid | Total Paid | إجمالي المدفوع |
+| deleteCustomer | Delete Customer | حذف العميل |
+| confirmDelete | Are you sure you want to delete this customer? | هل أنت متأكد من حذف هذا العميل؟ |
+| selectDebt | Select a debt to pay | اختر الدين للسداد |
+| remaining | Remaining | المتبقي |
+| paidTo | Paid to | مدفوع لـ |
+| fullyPaid | Fully Paid | مدفوع بالكامل |
+| noOutstandingDebts | No outstanding debts | لا توجد ديون مستحقة |
+| noOutstandingDebtsMessage | All debts are settled | جميع الديون مسددة |
+| editPayment | Edit Payment | تعديل الدفعة |
+| deletePayment | Delete Payment | حذف الدفعة |
+| amountCannotExceedRemaining | Amount cannot exceed remaining balance | المبلغ لا يمكن أن يتجاوز المتبقي |
+| editRecords | Edit Records | تعديل السجلات |
+| editDebt | Edit Debt | تعديل الدين |
+| deleteDebt | Delete Debt | حذف الدين |
 
 ---
 
 ## Screens
 
-### HomeScreen (`lib/screens/home_screen.dart`) ~45 lines
-- BottomNavigationBar with 2 tabs (Home, Customers)
+### HomeScreen (`lib/screens/home_screen.dart`)
+- Custom floating bottom nav bar (`_ModernNavBar`) with animated pill indicator
+- Settings drawer (half-width) with language + theme segmented buttons
 - IndexedStack preserves scroll state across tabs
-- AppBar with app title
 
-### DashboardScreen (`lib/screens/dashboard_screen.dart`) ~85 lines
-- 2x2 GridView of StatCard widgets
+### DashboardScreen (`lib/screens/dashboard_screen.dart`)
+- 2x2 GridView of StatCard widgets (Total Debts, Total Payments, Pending Reminders, Customers)
 - Recent transactions section below
 - Pull-to-refresh support
 
-### CustomersScreen (`lib/screens/customers_screen.dart`) ~85 lines
+### CustomersScreen (`lib/screens/customers_screen.dart`)
 - Search bar at top (filters by name/phone)
 - ListView.builder with CustomerTile widgets
 - EmptyState when no customers
 - FAB opens AddCustomerSheet
+- Tap tile → navigates to Customer Detail
+
+### CustomerDetailScreen (`lib/screens/customer_detail_screen.dart`)
+- CustomScrollView with CustomerHeader, BalanceCard, transaction list
+- Professional action bar at bottom (3 buttons: Debt, Payment, Edit Records)
+- Balance card shows net balance with owes/overpaid/settled status
+- Transaction list shows remaining for debts, "Paid to" for payments
 
 ---
 
 ## Widgets
 
-### StatCard (`lib/widgets/stat_card.dart`) ~45 lines
+### AnimatedCounter (`lib/widgets/animated_counter.dart`)
+- Smooth number counter animation with TweenAnimationBuilder
+
+### StatCard (`lib/widgets/stat_card.dart`)
 - Rounded card with icon, label, value, color
 - Used in the dashboard stats grid
 
-### CustomerTile (`lib/widgets/customer_tile.dart`) ~85 lines
+### CustomerTile (`lib/widgets/customer_tile.dart`)
 - ListTile with avatar, name, phone, balance
 - Color-coded balance: red (owes), green (settled), teal (overpaid)
 - Watches `customerBalanceProvider` for live balance
 
-### EmptyState (`lib/widgets/empty_state.dart`) ~40 lines
+### EmptyState (`lib/widgets/empty_state.dart`)
 - Icon + title + optional message centered on screen
 - Used for empty lists
 
-### RecentTransactionsList (`lib/widgets/recent_transactions_list.dart`) ~75 lines
+### RecentTransactionsList (`lib/widgets/recent_transactions_list.dart`)
 - Shows last 5 transactions
 - Color-coded by type (red=debt, green=payment)
-- Empty state when no transactions
 
-### AddCustomerSheet (`lib/widgets/add_customer_sheet.dart`) ~85 lines
+### AddCustomerSheet (`lib/widgets/add_customer_sheet.dart`)
 - Bottom sheet form with name (required) + phone (optional)
 - Form validation on name field
-- Inserts customer and shows confirmation SnackBar
+- Inserts customer and shows success SnackBar
+
+### CustomerHeader (`lib/widgets/customer_header.dart`)
+- Gradient avatar circle, name, phone, join date
+
+### BalanceCard (`lib/widgets/balance_card.dart`)
+- Net balance display with owes/overpaid/settled status and color coding
+
+### TransactionTile (`lib/widgets/transaction_tile.dart`)
+- Single transaction row with type icon, amount, date, optional note
+- Shows "Remaining: X" for unpaid debts
+- Shows "Paid to #id" for linked payments
+- Shows "Fully Paid" badge for settled debts
+
+### DebtSelectorTile (`lib/widgets/debt_selector_tile.dart`)
+- Radio-selectable debt tile for payment linking
+- Shows remaining amount badge
+
+### AddDebtSheet (`lib/widgets/add_debt_sheet.dart`)
+- Simple debt entry: amount + note
+- Inserts debt transaction
+
+### RecordPaymentSheet (`lib/widgets/record_payment_sheet.dart`)
+- DraggableScrollableSheet (0.5→0.85) with debt selector + amount input
+- Validates amount > 0 and amount <= remaining
+- Shows error SnackBar when amount exceeds remaining
+
+### ActionBar (`lib/widgets/action_bar.dart`)
+- 3-button floating bar: Debt (red), Payment (primary), Edit Records (teal)
+- Opens respective sheets on tap
+
+### RecordsListSheet (`lib/widgets/records_list_sheet.dart`)
+- DraggableScrollableSheet listing all debts + payments
+- Each row tappable → opens edit debt or edit payment sheet
+- Shows type icon, amount, date, note preview, chevron
+
+### EditDebtSheet (`lib/widgets/edit_debt_sheet.dart`)
+- Edit/delete existing debt
+- Validates new amount >= total payments already linked
+- Shows error SnackBar on validation failure
+
+### EditPaymentSheet (`lib/widgets/edit_payment_sheet.dart`)
+- Edit/delete existing payment
+- Validates new amount <= debt remaining + old amount (can't overpay)
+- Shows error SnackBar on validation failure
+
+### AppSnackBar (`lib/widgets/app_snackbar.dart`)
+- `showSuccessSnackBar(context, message)` — floating, primary color, check icon
+- `showErrorSnackBar(context, message)` — floating, error color, error icon
+- Reusable across all widgets, theme-aware
+
+---
+
+## Number Formatting
+Smart decimal format used across all display files:
+- `50` → `"50"`, `50.5` → `"50.50"`, `1000.25` → `"1,000.25"`
+- Pattern: `n % 1 == 0 ? toStringAsFixed(0) : toStringAsFixed(2)`
+- Thousands separator: `replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (m) => '${m[1]},')`
 
 ---
 
@@ -315,6 +422,11 @@ Deleting a customer cascade-deletes all their transactions and reminders.
 8. **Screen files under 100 lines** — split into small, focused widgets
 9. **IndexedStack** in HomeScreen preserves scroll state across tabs
 10. **Large text sizes** (18px body) for readability across all age groups
+11. **Debt allocation** — payments linked to specific debts via `debt_id` column
+12. **getDebtsWithRemaining** uses subquery (not HAVING without GROUP BY)
+13. **DraggableScrollableSheet** for payment and records sheets (expands with content)
+14. **Action bar** with 3 gradient buttons replaces stacked FABs
+15. **Reusable SnackBar** via `app_snackbar.dart` instead of inline SnackBar code
 
 ---
 
@@ -339,21 +451,20 @@ Deleting a customer cascade-deletes all their transactions and reminders.
 ---
 
 ## Current Status
-- Database layer: COMPLETE (models, helper, repositories, providers)
-- Localization: COMPLETE (ARB files, generated AppLocalizations, locale provider)
-- Theme: COMPLETE (Light + Dark mode, theme provider)
-- Dashboard screen: COMPLETE
-- Customers screen: COMPLETE (list, search, add customer)
-- Customer Detail screen: NOT STARTED
-- Transaction entry: NOT STARTED
+- Database layer: ✅ COMPLETE (models, helper v2, repositories, providers, debt allocation)
+- Localization: ✅ COMPLETE (57 keys, ARB files, generated AppLocalizations, locale provider)
+- Theme: ✅ COMPLETE (Light + Dark mode, theme provider)
+- Dashboard screen: ✅ COMPLETE
+- Customers screen: ✅ COMPLETE (list, search, add customer)
+- Customer Detail screen: ✅ COMPLETE (header, balance card, transaction list)
+- Transaction entry: ✅ COMPLETE (add debt, record payment with debt linking)
+- Edit Records: ✅ COMPLETE (records list, edit/delete debt, edit/delete payment)
+- Reusable SnackBar: ✅ COMPLETE
 - Reminders screen: NOT STARTED
 - Cloud sync: NOT STARTED (firebase_id fields ready)
 
 ## Next Steps
-- Customer Detail screen (profile, balance, transaction history)
-- Transaction entry form (add debt / record payment)
 - Reminders screen + scheduling
 - Local notifications for debt reminders
-- Language/theme toggle button in AppBar
 - Export/backup functionality
 - Firebase integration for cloud sync

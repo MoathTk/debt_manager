@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../l10n/app_localizations.dart';
 import '../Providers/database_provider.dart';
+import 'app_snackbar.dart';
 
 /// Modern bottom sheet form for adding a new customer.
 ///
@@ -33,22 +34,7 @@ void showAddCustomerSheet(BuildContext context, WidgetRef ref) {
         );
         if (ctx.mounted) {
           Navigator.of(ctx).pop();
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Row(
-                children: [
-                  const Icon(Icons.check_circle, color: Colors.white, size: 20),
-                  const SizedBox(width: 10),
-                  Text('${l10n.addCustomer} ✓'),
-                ],
-              ),
-              behavior: SnackBarBehavior.floating,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(14),
-              ),
-              backgroundColor: Theme.of(context).colorScheme.primary,
-            ),
-          );
+          showSuccessSnackBar(context, '${l10n.addCustomer} ✓');
         }
       },
     ),

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../l10n/app_localizations.dart';
 import '../data/models/transaction.dart' as model;
 import '../Providers/database_provider.dart';
+import 'app_snackbar.dart';
 import 'debt_selector_tile.dart';
 
 void showRecordPaymentSheet(
@@ -44,7 +45,14 @@ class _S extends ConsumerState<_Body> {
   Future<void> _save() async {
     if (_debtId == null) return;
     final v = double.tryParse(_amt.text.trim());
-    if (v == null || v <= 0 || v > _max) return;
+    if (v == null || v <= 0) return;
+    if (v > _max) {
+      if (mounted) {
+        final l10n = AppLocalizations.of(context)!;
+        showErrorSnackBar(context, l10n.amountCannotExceedRemaining);
+      }
+      return;
+    }
     setState(() => _busy = true);
     await ref
         .read(transactionRepositoryProvider)
@@ -176,7 +184,7 @@ class _S extends ConsumerState<_Body> {
               ),
               if (_debtId != null) ...[
                 const SizedBox(height: 20),
-                _inp(_amt, '${l10n.amount} (max ${_fmt(_max)})', true),
+                _inp(_amt, '${l10n.amount} (max ${_fmt(_max)})', true, true),
                 const SizedBox(height: 14),
                 _inp(_note, l10n.noteOptional),
                 const SizedBox(height: 24),
@@ -209,9 +217,10 @@ class _S extends ConsumerState<_Body> {
     );
   }
 
-  Widget _inp(TextEditingController c, String label, [bool num = false]) =>
+  Widget _inp(TextEditingController c, String label, [bool num = false, bool autofocus = false]) =>
       TextField(
         controller: c,
+        autofocus: autofocus,
         keyboardType: num
             ? const TextInputType.numberWithOptions(decimal: true)
             : null,
