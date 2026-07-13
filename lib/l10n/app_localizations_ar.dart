@@ -106,4 +106,67 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get name => 'الاسم';
+
+  @override
+  String get customerDetail => 'تفاصيل العميل';
+
+  @override
+  String get addDebt => 'إضافة دين';
+
+  @override
+  String get recordPayment => 'تسجيل دفعة';
+
+  @override
+  String get noTransactionsForCustomer => 'لا توجد معاملات بعد';
+
+  @override
+  String get noTransactionsMessage => 'سجّل ديناً أو دفعة للبدء';
+
+  @override
+  String get totalOwed => 'إجمالي المستحق';
+
+  @override
+  String get totalPaid => 'إجمالي المدفوع';
+
+  @override
+  String get deleteCustomer => 'حذف العميل';
+
+  @override
+  String get confirmDelete => 'هل أنت متأكد من حذف هذا العميل؟';
+
+  @override
+  String get selectDebt => 'اختر الدين للسداد';
+
+  @override
+  String get remaining => 'المتبقي';
+
+  @override
+  String get paidTo => 'مدفوع لـ';
+
+  @override
+  String get fullyPaid => 'مدفوع بالكامل';
+
+  @override
+  String get noOutstandingDebts => 'لا توجد ديون مستحقة';
+
+  @override
+  String get noOutstandingDebtsMessage => 'جميع الديون مسددة';
+
+  @override
+  String get editPayment => 'تعديل الدفعة';
+
+  @override
+  String get deletePayment => 'حذف الدفعة';
+
+  @override
+  String get amountCannotExceedRemaining => 'المبلغ لا يمكن أن يتجاوز المتبقي';
+
+  @override
+  String get editRecords => 'تعديل ';
+
+  @override
+  String get editDebt => 'تعديل الدين';
+
+  @override
+  String get deleteDebt => 'حذف الدين';
 }

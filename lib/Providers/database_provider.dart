@@ -81,7 +81,7 @@ final transactionsByCustomerProvider =
     });
 
 /// Calculates the net balance for a specific customer.
-/// Uses Riverpod's family feature to cache per-customer balances.
+/// Balance = Total Debts - Total Payments
 /// Positive = customer owes money, Negative = customer has overpaid.
 final customerBalanceProvider = FutureProvider.family<double, int>((
   ref,
@@ -90,6 +90,18 @@ final customerBalanceProvider = FutureProvider.family<double, int>((
   final repo = ref.watch(transactionRepositoryProvider);
   return repo.getCustomerBalance(customerId);
 });
+
+/// Returns debts with their remaining balances for a specific customer.
+/// Each entry has: id, amount, note, date, remaining.
+/// Only includes debts with remaining > 0.
+final debtsWithRemainingProvider =
+    FutureProvider.family<List<Map<String, dynamic>>, int>((
+      ref,
+      customerId,
+    ) async {
+      final repo = ref.watch(transactionRepositoryProvider);
+      return repo.getDebtsWithRemaining(customerId);
+    });
 
 /// Fetches all pending (uncompleted) debt reminders.
 /// Results are ordered by reminder date (earliest first).
@@ -171,11 +183,13 @@ Future<void> addCustomer(
   String? phone,
 }) async {
   final repo = ref.read(customerRepositoryProvider);
-  await repo.insert(Customer(
-    name: name,
-    phone: phone,
-    createdAt: DateTime.now().toIso8601String(),
-  ));
+  await repo.insert(
+    Customer(
+      name: name,
+      phone: phone,
+      createdAt: DateTime.now().toIso8601String(),
+    ),
+  );
   ref.invalidate(customersProvider);
   ref.invalidate(dashboardStatsProvider);
 }

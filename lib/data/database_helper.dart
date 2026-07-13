@@ -29,7 +29,12 @@ class DatabaseHelper {
   Future<Database> _initDB(String filePath) async {
     final dbPath = await getDatabasesPath();
     final path = join(dbPath, filePath);
-    return await openDatabase(path, version: 1, onCreate: _createDB);
+    return await openDatabase(
+      path,
+      version: 2,
+      onCreate: _createDB,
+      onUpgrade: _onUpgrade,
+    );
   }
 
   /// Creates all database tables and indexes.
@@ -75,8 +80,10 @@ class DatabaseHelper {
         type INTEGER NOT NULL,
         note TEXT,
         date TEXT NOT NULL,
+        debt_id INTEGER,
         firebase_id TEXT,
-        FOREIGN KEY (customer_id) REFERENCES customers (id) ON DELETE CASCADE
+        FOREIGN KEY (customer_id) REFERENCES customers (id) ON DELETE CASCADE,
+        FOREIGN KEY (debt_id) REFERENCES transactions (id) ON DELETE SET NULL
       )
     ''');
 
@@ -118,6 +125,12 @@ class DatabaseHelper {
 
   /// Closes the database connection and resets the singleton.
   /// Should be called when the app is shutting down or when testing.
+  Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
+    if (oldVersion < 2) {
+      await db.execute('ALTER TABLE transactions ADD COLUMN debt_id INTEGER');
+    }
+  }
+
   Future<void> close() async {
     final db = await database;
     db.close();

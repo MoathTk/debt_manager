@@ -295,6 +295,132 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Name'**
   String get name;
+
+  /// No description provided for @customerDetail.
+  ///
+  /// In en, this message translates to:
+  /// **'Customer Detail'**
+  String get customerDetail;
+
+  /// No description provided for @addDebt.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Debt'**
+  String get addDebt;
+
+  /// No description provided for @recordPayment.
+  ///
+  /// In en, this message translates to:
+  /// **'Record Payment'**
+  String get recordPayment;
+
+  /// No description provided for @noTransactionsForCustomer.
+  ///
+  /// In en, this message translates to:
+  /// **'No transactions yet'**
+  String get noTransactionsForCustomer;
+
+  /// No description provided for @noTransactionsMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Record a debt or payment to get started'**
+  String get noTransactionsMessage;
+
+  /// No description provided for @totalOwed.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Owed'**
+  String get totalOwed;
+
+  /// No description provided for @totalPaid.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Paid'**
+  String get totalPaid;
+
+  /// No description provided for @deleteCustomer.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Customer'**
+  String get deleteCustomer;
+
+  /// No description provided for @confirmDelete.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete this customer?'**
+  String get confirmDelete;
+
+  /// No description provided for @selectDebt.
+  ///
+  /// In en, this message translates to:
+  /// **'Select a debt to pay'**
+  String get selectDebt;
+
+  /// No description provided for @remaining.
+  ///
+  /// In en, this message translates to:
+  /// **'Remaining'**
+  String get remaining;
+
+  /// No description provided for @paidTo.
+  ///
+  /// In en, this message translates to:
+  /// **'Paid to'**
+  String get paidTo;
+
+  /// No description provided for @fullyPaid.
+  ///
+  /// In en, this message translates to:
+  /// **'Fully Paid'**
+  String get fullyPaid;
+
+  /// No description provided for @noOutstandingDebts.
+  ///
+  /// In en, this message translates to:
+  /// **'No outstanding debts'**
+  String get noOutstandingDebts;
+
+  /// No description provided for @noOutstandingDebtsMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'All debts are settled'**
+  String get noOutstandingDebtsMessage;
+
+  /// No description provided for @editPayment.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Payment'**
+  String get editPayment;
+
+  /// No description provided for @deletePayment.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Payment'**
+  String get deletePayment;
+
+  /// No description provided for @amountCannotExceedRemaining.
+  ///
+  /// In en, this message translates to:
+  /// **'Amount cannot exceed remaining balance'**
+  String get amountCannotExceedRemaining;
+
+  /// No description provided for @editRecords.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Records'**
+  String get editRecords;
+
+  /// No description provided for @editDebt.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Debt'**
+  String get editDebt;
+
+  /// No description provided for @deleteDebt.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Debt'**
+  String get deleteDebt;
 }
 
 class _AppLocalizationsDelegate

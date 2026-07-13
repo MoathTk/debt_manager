@@ -125,7 +125,7 @@ class _TransactionTile extends StatelessWidget {
             ),
           ),
           title: Text(
-            '${transaction.amount.toStringAsFixed(0)} ${_isDebt ? l10n.debt : l10n.payment}',
+            '${transaction.amount % 1 == 0 ? transaction.amount.toStringAsFixed(0) : transaction.amount.toStringAsFixed(2)} ${_isDebt ? l10n.debt : l10n.payment}',
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w600,

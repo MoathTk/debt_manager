@@ -151,4 +151,35 @@ class TransactionRepository {
     final result = await db.rawQuery('SELECT COUNT(*) as count FROM transactions');
     return result.first['count'] as int;
   }
+
+  /// Returns each debt for a customer with its remaining balance.
+  /// Remaining = debt amount - sum of payments linked to that debt.
+  /// Only returns debts with remaining > 0 (unpaid/partially paid).
+  Future<List<Map<String, dynamic>>> getDebtsWithRemaining(int customerId) async {
+    final db = await _dbHelper.database;
+    return await db.rawQuery('''
+      SELECT * FROM (
+        SELECT
+          t.id, t.amount, t.note, t.date,
+          t.amount - COALESCE(
+            (SELECT SUM(p.amount) FROM transactions p WHERE p.debt_id = t.id), 0
+          ) as remaining
+        FROM transactions t
+        WHERE t.customer_id = ? AND t.type = 0
+      ) sub
+      WHERE sub.remaining > 0
+      ORDER BY sub.date DESC
+    ''', [customerId]);
+  }
+
+  /// Returns the total amount of payments linked to a specific debt.
+  Future<double> getPaymentsForDebt(int debtId) async {
+    final db = await _dbHelper.database;
+    final result = await db.rawQuery('''
+      SELECT COALESCE(SUM(amount), 0) as total
+      FROM transactions
+      WHERE debt_id = ? AND type = 1
+    ''', [debtId]);
+    return (result.first['total'] as num?)?.toDouble() ?? 0.0;
+  }
 }

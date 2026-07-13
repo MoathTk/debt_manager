@@ -266,12 +266,11 @@ class _BalanceBadge extends StatelessWidget {
 
   /// Clean regex-based number formatting (e.g., 1000000 -> 1,000,000)
   String _formatNumber(double n) {
-    return n
-        .toStringAsFixed(0)
-        .replaceAllMapped(
-          RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-          (Match m) => '${m[1]},',
-        );
+    final s = n % 1 == 0 ? n.toStringAsFixed(0) : n.toStringAsFixed(2);
+    return s.replaceAllMapped(
+      RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+      (Match m) => '${m[1]},',
+    );
   }
 }
 

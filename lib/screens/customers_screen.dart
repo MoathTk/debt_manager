@@ -5,20 +5,17 @@ import '../Providers/database_provider.dart';
 import '../widgets/customer_tile.dart';
 import '../widgets/empty_state.dart';
 import '../widgets/add_customer_sheet.dart';
+import 'customer_detail_screen.dart';
 
 /// Customers list screen with search and add functionality.
-///
-/// Features a search bar at the top, a scrollable customer list,
-/// and a FAB to add new customers via a bottom sheet.
 class CustomersScreen extends ConsumerStatefulWidget {
   const CustomersScreen({super.key});
-
   @override
   ConsumerState<CustomersScreen> createState() => _CustomersScreenState();
 }
 
 class _CustomersScreenState extends ConsumerState<CustomersScreen> {
-  String _searchQuery = '';
+  String _query = '';
 
   @override
   Widget build(BuildContext context) {
@@ -28,43 +25,29 @@ class _CustomersScreenState extends ConsumerState<CustomersScreen> {
     return Scaffold(
       body: Column(
         children: [
-          _SearchBar(
-            hint: l10n.searchCustomers,
-            onChanged: (q) => setState(() => _searchQuery = q),
-          ),
+          _SearchBar(hint: l10n.searchCustomers, onChanged: (q) => setState(() => _query = q)),
           Expanded(
             child: customersAsync.when(
-              data: (customers) {
-                final filtered = _searchQuery.isEmpty
-                    ? customers
-                    : customers
-                          .where(
-                            (c) =>
-                                c.name.toLowerCase().contains(
-                                  _searchQuery.toLowerCase(),
-                                ) ||
-                                (c.phone != null &&
-                                    c.phone!.contains(_searchQuery)),
-                          )
-                          .toList();
-
-                if (filtered.isEmpty) {
-                  return EmptyState(
-                    icon: Icons.people_outline,
-                    title: l10n.noCustomersYet,
-                    message: l10n.noCustomersMessage,
-                  );
+              data: (all) {
+                final list = _query.isEmpty
+                    ? all
+                    : all.where((c) =>
+                        c.name.toLowerCase().contains(_query.toLowerCase()) ||
+                        (c.phone != null && c.phone!.contains(_query))).toList();
+                if (list.isEmpty) {
+                  return EmptyState(icon: Icons.people_outline,
+                    title: l10n.noCustomersYet, message: l10n.noCustomersMessage);
                 }
-
                 return RefreshIndicator(
                   onRefresh: () async => ref.invalidate(customersProvider),
-                  child: ListView.builder(
+                  child: ListView.separated(
                     padding: const EdgeInsets.only(top: 8, bottom: 80),
-                    itemCount: filtered.length,
+                    itemCount: list.length,
+                    separatorBuilder: (_, __) => const SizedBox(height: 0),
                     itemBuilder: (ctx, i) => CustomerTile(
-                      name: filtered[i].name,
-                      phone: filtered[i].phone,
-                      customerId: filtered[i].id!,
+                      name: list[i].name, phone: list[i].phone, customerId: list[i].id!,
+                      onTap: () => Navigator.push(ctx, MaterialPageRoute(
+                        builder: (_) => CustomerDetailScreen(customerId: list[i].id!))),
                     ),
                   ),
                 );
@@ -83,11 +66,9 @@ class _CustomersScreenState extends ConsumerState<CustomersScreen> {
   }
 }
 
-/// Search bar widget with rounded border.
 class _SearchBar extends StatelessWidget {
   final String hint;
   final ValueChanged<String> onChanged;
-
   const _SearchBar({required this.hint, required this.onChanged});
 
   @override
@@ -95,17 +76,12 @@ class _SearchBar extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
       child: TextField(
-        onChanged: onChanged,
-        style: const TextStyle(fontSize: 18),
+        onChanged: onChanged, style: const TextStyle(fontSize: 18),
         decoration: InputDecoration(
-          hintText: hint,
-          hintStyle: const TextStyle(fontSize: 16),
+          hintText: hint, hintStyle: const TextStyle(fontSize: 16),
           prefixIcon: const Icon(Icons.search),
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 16,
-            vertical: 12,
-          ),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         ),
       ),
     );

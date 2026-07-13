@@ -12,6 +12,7 @@ class Transaction {
   final int type;
   final String? note;
   final String date;
+  final int? debtId;
   final String? firebaseId;
 
   const Transaction({
@@ -21,6 +22,7 @@ class Transaction {
     required this.type,
     this.note,
     required this.date,
+    this.debtId,
     this.firebaseId,
   });
 
@@ -44,6 +46,7 @@ class Transaction {
       'type': type,
       'note': note,
       'date': date,
+      'debt_id': debtId,
       'firebase_id': firebaseId,
     };
   }
@@ -58,6 +61,7 @@ class Transaction {
       type: map['type'] as int,
       note: map['note'] as String?,
       date: map['date'] as String,
+      debtId: map['debt_id'] as int?,
       firebaseId: map['firebase_id'] as String?,
     );
   }
@@ -71,6 +75,7 @@ class Transaction {
     int? type,
     String? note,
     String? date,
+    int? debtId,
     String? firebaseId,
   }) {
     return Transaction(
@@ -80,6 +85,7 @@ class Transaction {
       type: type ?? this.type,
       note: note ?? this.note,
       date: date ?? this.date,
+      debtId: debtId ?? this.debtId,
       firebaseId: firebaseId ?? this.firebaseId,
     );
   }

@@ -106,4 +106,68 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get name => 'Name';
+
+  @override
+  String get customerDetail => 'Customer Detail';
+
+  @override
+  String get addDebt => 'Add Debt';
+
+  @override
+  String get recordPayment => 'Record Payment';
+
+  @override
+  String get noTransactionsForCustomer => 'No transactions yet';
+
+  @override
+  String get noTransactionsMessage => 'Record a debt or payment to get started';
+
+  @override
+  String get totalOwed => 'Total Owed';
+
+  @override
+  String get totalPaid => 'Total Paid';
+
+  @override
+  String get deleteCustomer => 'Delete Customer';
+
+  @override
+  String get confirmDelete => 'Are you sure you want to delete this customer?';
+
+  @override
+  String get selectDebt => 'Select a debt to pay';
+
+  @override
+  String get remaining => 'Remaining';
+
+  @override
+  String get paidTo => 'Paid to';
+
+  @override
+  String get fullyPaid => 'Fully Paid';
+
+  @override
+  String get noOutstandingDebts => 'No outstanding debts';
+
+  @override
+  String get noOutstandingDebtsMessage => 'All debts are settled';
+
+  @override
+  String get editPayment => 'Edit Payment';
+
+  @override
+  String get deletePayment => 'Delete Payment';
+
+  @override
+  String get amountCannotExceedRemaining =>
+      'Amount cannot exceed remaining balance';
+
+  @override
+  String get editRecords => 'Edit Records';
+
+  @override
+  String get editDebt => 'Edit Debt';
+
+  @override
+  String get deleteDebt => 'Delete Debt';
 }
