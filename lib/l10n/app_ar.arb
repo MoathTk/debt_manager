@@ -52,5 +52,19 @@
   "amountCannotExceedRemaining": "المبلغ لا يمكن أن يتجاوز المتبقي",
   "editRecords": "تعديل ",
   "editDebt": "تعديل الدين",
-  "deleteDebt": "حذف الدين"
+  "deleteDebt": "حذف الدين",
+  "allTransactions": "جميع المعاملات",
+  "all": "الكل",
+  "debts": "الديون",
+  "payments": "المدفوعات",
+  "searchTransactions": "البحث في المعاملات...",
+  "sortBy": "ترتيب حسب",
+  "dateRange": "نطاق التاريخ",
+  "noResults": "لا توجد نتائج",
+  "netBalance": "الرصيد الصافي",
+  "dateNewest": "التاريخ (الأحدث أولاً)",
+  "dateOldest": "التاريخ (الأقدم أولاً)",
+  "amountHighest": "المبلغ (الأعلى أولاً)",
+  "amountLowest": "المبلغ (الأدنى أولاً)",
+  "clearFilters": "مسح الفلاتر"
 }

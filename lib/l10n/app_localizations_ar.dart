@@ -169,4 +169,46 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get deleteDebt => 'حذف الدين';
+
+  @override
+  String get allTransactions => 'جميع المعاملات';
+
+  @override
+  String get all => 'الكل';
+
+  @override
+  String get debts => 'الديون';
+
+  @override
+  String get payments => 'المدفوعات';
+
+  @override
+  String get searchTransactions => 'البحث في المعاملات...';
+
+  @override
+  String get sortBy => 'ترتيب حسب';
+
+  @override
+  String get dateRange => 'نطاق التاريخ';
+
+  @override
+  String get noResults => 'لا توجد نتائج';
+
+  @override
+  String get netBalance => 'الرصيد الصافي';
+
+  @override
+  String get dateNewest => 'التاريخ (الأحدث أولاً)';
+
+  @override
+  String get dateOldest => 'التاريخ (الأقدم أولاً)';
+
+  @override
+  String get amountHighest => 'المبلغ (الأعلى أولاً)';
+
+  @override
+  String get amountLowest => 'المبلغ (الأدنى أولاً)';
+
+  @override
+  String get clearFilters => 'مسح الفلاتر';
 }

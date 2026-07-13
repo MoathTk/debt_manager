@@ -421,6 +421,90 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Delete Debt'**
   String get deleteDebt;
+
+  /// No description provided for @allTransactions.
+  ///
+  /// In en, this message translates to:
+  /// **'All Transactions'**
+  String get allTransactions;
+
+  /// No description provided for @all.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get all;
+
+  /// No description provided for @debts.
+  ///
+  /// In en, this message translates to:
+  /// **'Debts'**
+  String get debts;
+
+  /// No description provided for @payments.
+  ///
+  /// In en, this message translates to:
+  /// **'Payments'**
+  String get payments;
+
+  /// No description provided for @searchTransactions.
+  ///
+  /// In en, this message translates to:
+  /// **'Search transactions...'**
+  String get searchTransactions;
+
+  /// No description provided for @sortBy.
+  ///
+  /// In en, this message translates to:
+  /// **'Sort by'**
+  String get sortBy;
+
+  /// No description provided for @dateRange.
+  ///
+  /// In en, this message translates to:
+  /// **'Date Range'**
+  String get dateRange;
+
+  /// No description provided for @noResults.
+  ///
+  /// In en, this message translates to:
+  /// **'No results found'**
+  String get noResults;
+
+  /// No description provided for @netBalance.
+  ///
+  /// In en, this message translates to:
+  /// **'Net Balance'**
+  String get netBalance;
+
+  /// No description provided for @dateNewest.
+  ///
+  /// In en, this message translates to:
+  /// **'Date (newest first)'**
+  String get dateNewest;
+
+  /// No description provided for @dateOldest.
+  ///
+  /// In en, this message translates to:
+  /// **'Date (oldest first)'**
+  String get dateOldest;
+
+  /// No description provided for @amountHighest.
+  ///
+  /// In en, this message translates to:
+  /// **'Amount (highest first)'**
+  String get amountHighest;
+
+  /// No description provided for @amountLowest.
+  ///
+  /// In en, this message translates to:
+  /// **'Amount (lowest first)'**
+  String get amountLowest;
+
+  /// No description provided for @clearFilters.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear filters'**
+  String get clearFilters;
 }
 
 class _AppLocalizationsDelegate

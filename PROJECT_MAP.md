@@ -20,8 +20,8 @@ A mobile Flutter application for local merchants in Al-Anbar, Iraq to digitize p
 lib/
   main.dart                              # App entry point, MaterialApp config
   l10n/
-    intl_en.arb                          # English translation keys (57 keys)
-    app_ar.arb                           # Arabic translation keys (57 keys)
+    intl_en.arb                          # English translation keys (72 keys)
+    app_ar.arb                           # Arabic translation keys (72 keys)
     app_localizations.dart               # GENERATED: AppLocalizations class
     app_localizations_en.dart            # GENERATED: English delegate
     app_localizations_ar.dart            # GENERATED: Arabic delegate
@@ -44,6 +44,11 @@ lib/
     dashboard_screen.dart                # Stats grid + recent transactions
     customers_screen.dart                # Customer list + search + FAB → Customer Detail
     customer_detail_screen.dart          # Header, balance, transactions, action bar
+    all_transactions_screen.dart         # All transactions with search/filter/sort (≤100 lines)
+    transaction_search_bar.dart          # Search bar for all transactions screen
+    transaction_filter_bar.dart          # Type chips + sort + date range filter
+    sort_bottom_sheet.dart               # Sort bottom sheet + date range picker helpers
+    all_transactions_tile.dart           # Transaction tile with customer name
   widgets/
     animated_counter.dart                # Smooth number counter animation
     stat_card.dart                       # Reusable stat card (icon, label, value)
@@ -240,7 +245,7 @@ Deleting a customer cascade-deletes all their transactions and reminders.
 - ARB files: `lib/l10n/intl_en.arb` (English), `lib/l10n/app_ar.arb` (Arabic)
 - Generated: `AppLocalizations` class in `lib/l10n/`
 
-### Translation Keys (57 keys)
+### Translation Keys (72 keys)
 | Key | English | Arabic |
 |---|---|---|
 | appTitle | Debt Management | إدارة الديون |
@@ -297,6 +302,20 @@ Deleting a customer cascade-deletes all their transactions and reminders.
 | editRecords | Edit Records | تعديل السجلات |
 | editDebt | Edit Debt | تعديل الدين |
 | deleteDebt | Delete Debt | حذف الدين |
+| allTransactions | All Transactions | جميع المعاملات |
+| all | All | الكل |
+| debts | Debts | الديون |
+| payments | Payments | المدفوعات |
+| searchTransactions | Search transactions... | البحث في المعاملات... |
+| sortBy | Sort by | ترتيب حسب |
+| dateRange | Date Range | نطاق التاريخ |
+| noResults | No results found | لا توجد نتائج |
+| netBalance | Net Balance | الرصيد الصافي |
+| dateNewest | Date (newest first) | التاريخ (الأحدث أولاً) |
+| dateOldest | Date (oldest first) | التاريخ (الأقدم أولاً) |
+| amountHighest | Amount (highest first) | المبلغ (الأعلى أولاً) |
+| amountLowest | Amount (lowest first) | المبلغ (الأدنى أولاً) |
+| clearFilters | Clear filters | مسح الفلاتر |
 
 ---
 
@@ -309,8 +328,17 @@ Deleting a customer cascade-deletes all their transactions and reminders.
 
 ### DashboardScreen (`lib/screens/dashboard_screen.dart`)
 - 2x2 GridView of StatCard widgets (Total Debts, Total Payments, Pending Reminders, Customers)
-- Recent transactions section below
+- Recent transactions section with "See All" arrow → navigates to AllTransactionsScreen
 - Pull-to-refresh support
+
+### AllTransactionsScreen (`lib/screens/all_transactions_screen.dart`)
+- ConsumerStatefulWidget with local filter/sort state
+- Search bar: filters by note text or amount
+- Type filter chips: All / Debts / Payments
+- Sort options bottom sheet: Date (newest/oldest), Amount (high/low)
+- Date range picker with clear button
+- Empty state for no transactions or no results
+- All filtering/sorting done client-side on full transaction list
 
 ### CustomersScreen (`lib/screens/customers_screen.dart`)
 - Search bar at top (filters by name/phone)

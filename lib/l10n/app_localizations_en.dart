@@ -170,4 +170,46 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get deleteDebt => 'Delete Debt';
+
+  @override
+  String get allTransactions => 'All Transactions';
+
+  @override
+  String get all => 'All';
+
+  @override
+  String get debts => 'Debts';
+
+  @override
+  String get payments => 'Payments';
+
+  @override
+  String get searchTransactions => 'Search transactions...';
+
+  @override
+  String get sortBy => 'Sort by';
+
+  @override
+  String get dateRange => 'Date Range';
+
+  @override
+  String get noResults => 'No results found';
+
+  @override
+  String get netBalance => 'Net Balance';
+
+  @override
+  String get dateNewest => 'Date (newest first)';
+
+  @override
+  String get dateOldest => 'Date (oldest first)';
+
+  @override
+  String get amountHighest => 'Amount (highest first)';
+
+  @override
+  String get amountLowest => 'Amount (lowest first)';
+
+  @override
+  String get clearFilters => 'Clear filters';
 }

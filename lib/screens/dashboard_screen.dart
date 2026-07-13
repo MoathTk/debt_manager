@@ -4,6 +4,7 @@ import '../l10n/app_localizations.dart';
 import '../Providers/database_provider.dart';
 import '../widgets/stat_card.dart';
 import '../widgets/recent_transactions_list.dart';
+import 'all_transactions_screen.dart';
 
 /// Dashboard screen showing business overview statistics.
 ///
@@ -81,11 +82,21 @@ class _DashboardContent extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 24),
-          Text(
-            l10n.recentTransactions,
-            style: Theme.of(
-              context,
-            ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  l10n.recentTransactions,
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
+                ),
+              ),
+              IconButton(
+                icon: const Icon(Icons.arrow_forward_rounded, size: 22),
+                tooltip: l10n.allTransactions,
+                onPressed: () => Navigator.push(context,
+                  MaterialPageRoute(builder: (_) => const AllTransactionsScreen())),
+              ),
+            ],
           ),
           const SizedBox(height: 12),
           const RecentTransactionsList(),

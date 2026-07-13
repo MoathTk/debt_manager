@@ -53,5 +53,19 @@
   "amountCannotExceedRemaining": "Amount cannot exceed remaining balance",
   "editRecords": "Edit Records",
   "editDebt": "Edit Debt",
-  "deleteDebt": "Delete Debt"
+  "deleteDebt": "Delete Debt",
+  "allTransactions": "All Transactions",
+  "all": "All",
+  "debts": "Debts",
+  "payments": "Payments",
+  "searchTransactions": "Search transactions...",
+  "sortBy": "Sort by",
+  "dateRange": "Date Range",
+  "noResults": "No results found",
+  "netBalance": "Net Balance",
+  "dateNewest": "Date (newest first)",
+  "dateOldest": "Date (oldest first)",
+  "amountHighest": "Amount (highest first)",
+  "amountLowest": "Amount (lowest first)",
+  "clearFilters": "Clear filters"
 }
