@@ -18,27 +18,37 @@ void showSortSheet(
   ];
   showModalBottomSheet(
     context: ctx,
-    builder: (_) => SafeArea(child: Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Padding(
-          padding: const EdgeInsets.all(16),
-          child: Text(l10n.sortBy,
-            style: Theme.of(ctx).textTheme.titleMedium
-                ?.copyWith(fontWeight: FontWeight.w700)),
-        ),
-        for (final (mode, label) in options)
-          ListTile(
-            leading: Icon(
-              current == mode ? Icons.radio_button_checked : Icons.radio_button_off,
-              color: current == mode ? cs.primary : null,
+    builder: (_) => SafeArea(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Text(
+              l10n.sortBy,
+              style: Theme.of(
+                ctx,
+              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
             ),
-            title: Text(label),
-            onTap: () { onSelected(mode); Navigator.pop(ctx); },
           ),
-        const SizedBox(height: 8),
-      ],
-    )),
+          for (final (mode, label) in options)
+            ListTile(
+              leading: Icon(
+                current == mode
+                    ? Icons.radio_button_checked
+                    : Icons.radio_button_off,
+                color: current == mode ? cs.primary : null,
+              ),
+              title: Text(label),
+              onTap: () {
+                onSelected(mode);
+                Navigator.pop(ctx);
+              },
+            ),
+          const SizedBox(height: 8),
+        ],
+      ),
+    ),
   );
 }
 
@@ -48,7 +58,9 @@ Future<void> pickDateRange(
   required ValueChanged<DateTimeRange> onPicked,
 }) async {
   final picked = await showDateRangePicker(
-    context: ctx, firstDate: DateTime(2020), lastDate: DateTime.now(),
+    context: ctx,
+    firstDate: DateTime(2020),
+    lastDate: DateTime.now(),
     initialDateRange: initial,
   );
   if (picked != null) onPicked(picked);
