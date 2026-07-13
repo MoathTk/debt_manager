@@ -52,36 +52,50 @@ final customersProvider = FutureProvider<List<Customer>>((ref) async {
 /// Fetches a single customer by ID.
 /// Uses Riverpod's family feature to cache per-customer results.
 /// Returns null if the customer doesn't exist.
-final customerByIdProvider = FutureProvider.family<Customer?, int>((ref, id) async {
+final customerByIdProvider = FutureProvider.family<Customer?, int>((
+  ref,
+  id,
+) async {
   final repo = ref.watch(customerRepositoryProvider);
   return repo.getById(id);
 });
 
 /// Fetches all transactions from the database.
 /// Returns a list ordered by date (newest first).
-final transactionsProvider = FutureProvider<List<model.Transaction>>((ref) async {
+final transactionsProvider = FutureProvider<List<model.Transaction>>((
+  ref,
+) async {
   final repo = ref.watch(transactionRepositoryProvider);
   return repo.getAll();
 });
 
 /// Fetches all transactions for a specific customer.
 /// Uses Riverpod's family feature to cache per-customer results.
-final transactionsByCustomerProvider = FutureProvider.family<List<model.Transaction>, int>((ref, customerId) async {
-  final repo = ref.watch(transactionRepositoryProvider);
-  return repo.getByCustomer(customerId);
-});
+final transactionsByCustomerProvider =
+    FutureProvider.family<List<model.Transaction>, int>((
+      ref,
+      customerId,
+    ) async {
+      final repo = ref.watch(transactionRepositoryProvider);
+      return repo.getByCustomer(customerId);
+    });
 
 /// Calculates the net balance for a specific customer.
 /// Uses Riverpod's family feature to cache per-customer balances.
 /// Positive = customer owes money, Negative = customer has overpaid.
-final customerBalanceProvider = FutureProvider.family<double, int>((ref, customerId) async {
+final customerBalanceProvider = FutureProvider.family<double, int>((
+  ref,
+  customerId,
+) async {
   final repo = ref.watch(transactionRepositoryProvider);
   return repo.getCustomerBalance(customerId);
 });
 
 /// Fetches all pending (uncompleted) debt reminders.
 /// Results are ordered by reminder date (earliest first).
-final pendingRemindersProvider = FutureProvider<List<DebtReminder>>((ref) async {
+final pendingRemindersProvider = FutureProvider<List<DebtReminder>>((
+  ref,
+) async {
   final repo = ref.watch(debtReminderRepositoryProvider);
   return repo.getPending();
 });
@@ -139,4 +153,29 @@ class DashboardStats {
     required this.totalPayments,
     required this.pendingReminders,
   });
+}
+
+// ============================================================================
+// MUTATION HELPERS
+// These functions perform database writes and invalidate affected providers.
+// ============================================================================
+
+/// Adds a new customer and refreshes all related providers.
+///
+/// Creates a new [Customer] with the given [name] and optional [phone],
+/// inserts it into the database, then invalidates the customer list
+/// and dashboard stats so the UI automatically refreshes.
+Future<void> addCustomer(
+  WidgetRef ref, {
+  required String name,
+  String? phone,
+}) async {
+  final repo = ref.read(customerRepositoryProvider);
+  await repo.insert(Customer(
+    name: name,
+    phone: phone,
+    createdAt: DateTime.now().toIso8601String(),
+  ));
+  ref.invalidate(customersProvider);
+  ref.invalidate(dashboardStatsProvider);
 }

@@ -1,0 +1,109 @@
+// ignore: unused_import
+import 'package:intl/intl.dart' as intl;
+import 'app_localizations.dart';
+
+// ignore_for_file: type=lint
+
+/// The translations for Arabic (`ar`).
+class AppLocalizationsAr extends AppLocalizations {
+  AppLocalizationsAr([String locale = 'ar']) : super(locale);
+
+  @override
+  String get appTitle => 'إدارة الديون';
+
+  @override
+  String get home => 'الرئيسية';
+
+  @override
+  String get customers => 'العملاء';
+
+  @override
+  String get reminders => 'التذكيرات';
+
+  @override
+  String get language => 'اللغة';
+
+  @override
+  String get dashboard => 'لوحة التحكم';
+
+  @override
+  String get totalDebts => 'إجمالي الديون';
+
+  @override
+  String get totalPayments => 'إجمالي المدفوعات';
+
+  @override
+  String get pendingReminders => 'المعلقة';
+
+  @override
+  String get recentTransactions => 'آخر المعاملات';
+
+  @override
+  String get noTransactionsYet => 'لا توجد معاملات بعد';
+
+  @override
+  String get searchCustomers => 'البحث عن عملاء...';
+
+  @override
+  String get addCustomer => 'إضافة عميل';
+
+  @override
+  String get editCustomer => 'تعديل العميل';
+
+  @override
+  String get customerName => 'اسم العميل';
+
+  @override
+  String get customerPhone => 'رقم الهاتف';
+
+  @override
+  String get nameRequired => 'الاسم مطلوب';
+
+  @override
+  String get phoneOptional => 'الهاتف (اختياري)';
+
+  @override
+  String get noCustomersYet => 'لا يوجد عملاء بعد';
+
+  @override
+  String get noCustomersMessage => 'أضف أول عميل للبدء';
+
+  @override
+  String get debt => 'دين';
+
+  @override
+  String get payment => 'دفعة';
+
+  @override
+  String get amount => 'المبلغ';
+
+  @override
+  String get note => 'ملاحظة';
+
+  @override
+  String get noteOptional => 'ملاحظة (اختياري)';
+
+  @override
+  String get balance => 'الرصيد';
+
+  @override
+  String get owes => 'عليه';
+
+  @override
+  String get overpaid => 'زائد';
+
+  @override
+  String get settled => 'مساوي';
+
+  @override
+  String get save => 'حفظ';
+
+  @override
+  String get cancel => 'إلغاء';
+
+  @override
+  String get phone => 'الهاتف';
+
+  @override
+  String get name => 'الاسم';
+}

@@ -1,60 +1,54 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'Providers/theme_provider.dart';
+import 'Providers/locale_provider.dart';
+import 'l10n/app_localizations.dart';
+import 'screens/home_screen.dart';
 
 /// Main entry point of the Debt Management application.
 ///
-/// Wraps the app with [ProviderScope] to enable Riverpod state management.
-/// All providers throughout the app are accessible through this scope.
+/// Wraps the app with [ProviderScope] for Riverpod state management,
+/// enabling access to theme, locale, and database providers.
 void main() {
-  runApp(const ProviderScope(child: MyApp()));
+  runApp(const ProviderScope(child: DebtManagementApp()));
 }
 
 /// Root widget of the application.
 ///
-/// Configures the app-wide settings:
-/// - App title
-/// - Material 3 theme with teal color scheme
-/// - Initial home screen
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+/// Consumes [themeProvider] and [localeProvider] to provide
+/// reactive theme and language switching across the entire app.
+class DebtManagementApp extends ConsumerWidget {
+  const DebtManagementApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final themeMode = ref.watch(themeProvider);
+    final locale = ref.watch(localeProvider);
+
     return MaterialApp(
       title: 'Debt Management',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.teal),
-        useMaterial3: true,
-      ),
-      home: const MyHomePage(title: 'Debt Management'),
-    );
-  }
-}
-
-/// Temporary home screen placeholder.
-///
-/// This will be replaced with the actual dashboard UI in future iterations.
-/// Currently serves as a confirmation that the app builds and runs correctly.
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  final String title;
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title),
-      ),
-      body: const Center(
-        child: Text('Database layer ready. UI coming soon.'),
-      ),
+      debugShowCheckedModeBanner: false,
+      themeMode: themeMode,
+      theme: lightTheme,
+      darkTheme: darkTheme,
+      locale: locale,
+      supportedLocales: const [Locale('en'), Locale('ar')],
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      localeResolutionCallback: (locale, supportedLocales) {
+        for (final supported in supportedLocales) {
+          if (locale?.languageCode == supported.languageCode) {
+            return supported;
+          }
+        }
+        return supportedLocales.first;
+      },
+      home: const HomeScreen(),
     );
   }
 }
