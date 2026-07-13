@@ -193,3 +193,23 @@ Future<void> addCustomer(
   ref.invalidate(customersProvider);
   ref.invalidate(dashboardStatsProvider);
 }
+
+/// Updates an existing customer and refreshes all related providers.
+Future<void> updateCustomer(
+  WidgetRef ref, {
+  required Customer customer,
+  required String name,
+  String? phone,
+}) async {
+  final repo = ref.read(customerRepositoryProvider);
+  await repo.update(Customer(
+    id: customer.id,
+    name: name,
+    phone: phone,
+    createdAt: customer.createdAt,
+    firebaseId: customer.firebaseId,
+  ));
+  ref.invalidate(customersProvider);
+  ref.invalidate(customerByIdProvider(customer.id!));
+  ref.invalidate(dashboardStatsProvider);
+}

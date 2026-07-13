@@ -61,6 +61,7 @@ lib/
     records_list_sheet.dart              # List of all debts + payments, tappable to edit
     edit_debt_sheet.dart                 # Edit/delete debt (validates amount >= total paid)
     edit_payment_sheet.dart              # Edit/delete payment (validates amount <= debt remaining)
+    edit_customer_sheet.dart            # Edit customer name/phone (pre-filled form)
     app_snackbar.dart                    # Reusable themed SnackBar helpers
   generated/                             # GENERATED: intl message files
 test/
@@ -213,6 +214,7 @@ Deleting a customer cascade-deletes all their transactions and reminders.
 
 ### Mutation Helpers
 - `addCustomer(ref, {name, phone})` — inserts customer and invalidates providers
+- `updateCustomer(ref, {customer, name, phone})` — updates customer and invalidates providers
 
 ### Theme Provider (`lib/Providers/theme_provider.dart`)
 | Provider | Type | Description |
@@ -320,6 +322,7 @@ Deleting a customer cascade-deletes all their transactions and reminders.
 ### CustomerDetailScreen (`lib/screens/customer_detail_screen.dart`)
 - CustomScrollView with CustomerHeader, BalanceCard, transaction list
 - Professional action bar at bottom (3 buttons: Debt, Payment, Edit Records)
+- AppBar with edit icon → opens Edit Customer sheet
 - Balance card shows net balance with owes/overpaid/settled status
 - Transaction list shows remaining for debts, "Paid to" for payments
 
@@ -351,6 +354,12 @@ Deleting a customer cascade-deletes all their transactions and reminders.
 - Bottom sheet form with name (required) + phone (optional)
 - Form validation on name field
 - Inserts customer and shows success SnackBar
+
+### EditCustomerSheet (`lib/widgets/edit_customer_sheet.dart`)
+- Bottom sheet form with pre-filled name + phone
+- Form validation on name field
+- Updates customer via `CustomerRepository.update()`
+- Shows success SnackBar after save
 
 ### CustomerHeader (`lib/widgets/customer_header.dart`)
 - Gradient avatar circle, name, phone, join date
@@ -427,6 +436,7 @@ Smart decimal format used across all display files:
 13. **DraggableScrollableSheet** for payment and records sheets (expands with content)
 14. **Action bar** with 3 gradient buttons replaces stacked FABs
 15. **Reusable SnackBar** via `app_snackbar.dart` instead of inline SnackBar code
+16. **Overlay-based alerts** render on top of bottom sheets (not behind like SnackBar)
 
 ---
 
@@ -455,7 +465,7 @@ Smart decimal format used across all display files:
 - Localization: ✅ COMPLETE (57 keys, ARB files, generated AppLocalizations, locale provider)
 - Theme: ✅ COMPLETE (Light + Dark mode, theme provider)
 - Dashboard screen: ✅ COMPLETE
-- Customers screen: ✅ COMPLETE (list, search, add customer)
+- Customers screen: ✅ COMPLETE (list, search, add customer, edit customer)
 - Customer Detail screen: ✅ COMPLETE (header, balance card, transaction list)
 - Transaction entry: ✅ COMPLETE (add debt, record payment with debt linking)
 - Edit Records: ✅ COMPLETE (records list, edit/delete debt, edit/delete payment)

@@ -7,6 +7,7 @@ import '../widgets/balance_card.dart';
 import '../widgets/transaction_tile.dart';
 import '../widgets/empty_state.dart';
 import '../widgets/action_bar.dart';
+import '../widgets/edit_customer_sheet.dart';
 
 /// Customer detail screen showing profile, balance, and transaction history.
 class CustomerDetailScreen extends ConsumerWidget {
@@ -18,7 +19,19 @@ class CustomerDetailScreen extends ConsumerWidget {
     final customerAsync = ref.watch(customerByIdProvider(customerId));
     final l10n = AppLocalizations.of(context)!;
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.customerDetail)),
+      appBar: AppBar(
+        title: Text(l10n.customerDetail),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.edit_rounded),
+            tooltip: l10n.editCustomer,
+            onPressed: () {
+              final c = ref.read(customerByIdProvider(customerId)).valueOrNull;
+              if (c != null) showEditCustomerSheet(context, ref, c);
+            },
+          ),
+        ],
+      ),
       bottomNavigationBar: ActionBar(customerId: customerId),
       body: customerAsync.when(
         data: (c) {
