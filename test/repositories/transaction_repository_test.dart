@@ -1,8 +1,11 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+import 'package:uuid/uuid.dart';
 import 'package:local_debt_management/data/database_helper.dart';
 import 'package:local_debt_management/data/models/transaction.dart' as model;
 import 'package:local_debt_management/data/repositories/transaction_repository.dart';
+
+const _uuid = Uuid();
 
 Future<void> _setupDb() async {
   sqfliteFfiInit();
@@ -13,25 +16,28 @@ Future<void> _setupDb() async {
       onCreate: (db, version) async {
         await db.execute('''
           CREATE TABLE customers (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id TEXT PRIMARY KEY,
             name TEXT NOT NULL, phone TEXT,
-            created_at TEXT NOT NULL, firebase_id TEXT
+            created_at TEXT NOT NULL,
+            is_synced INTEGER DEFAULT 0, updated_at TEXT
           )''');
         await db.execute('''
           CREATE TABLE transactions (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            customer_id INTEGER NOT NULL, amount REAL NOT NULL,
+            id TEXT PRIMARY KEY,
+            customer_id TEXT NOT NULL, amount REAL NOT NULL,
             type INTEGER NOT NULL, note TEXT, date TEXT NOT NULL,
-            debt_id INTEGER, firebase_id TEXT,
+            debt_id TEXT,
+            is_synced INTEGER DEFAULT 0, updated_at TEXT,
             FOREIGN KEY (customer_id) REFERENCES customers (id) ON DELETE CASCADE,
             FOREIGN KEY (debt_id) REFERENCES transactions (id) ON DELETE SET NULL
           )''');
         await db.execute('''
           CREATE TABLE debt_reminders (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            customer_id INTEGER NOT NULL, debt_id INTEGER,
+            id TEXT PRIMARY KEY,
+            customer_id TEXT NOT NULL, debt_id TEXT,
             reminder_date TEXT NOT NULL, is_completed INTEGER NOT NULL DEFAULT 0,
             message TEXT,
+            is_synced INTEGER DEFAULT 0, updated_at TEXT,
             FOREIGN KEY (customer_id) REFERENCES customers (id) ON DELETE CASCADE,
             FOREIGN KEY (debt_id) REFERENCES transactions (id) ON DELETE SET NULL
           )''');
@@ -44,14 +50,16 @@ Future<void> _setupDb() async {
 
 int _cid = 0;
 
-Future<int> _addCustomer(var repo) async {
+Future<String> _addCustomer(var repo) async {
   _cid++;
+  final id = _uuid.v4();
   final custRepo = (await DatabaseHelper.instance.database);
   await custRepo.insert('customers', {
+    'id': id,
     'name': 'Customer$_cid',
     'created_at': '2025-01-01',
   });
-  return _cid;
+  return id;
 }
 
 void main() {
@@ -68,21 +76,27 @@ void main() {
     await db.close();
   });
 
-  Future<int> insertDebt(int custId, double amount, {String date = '2025-06-01'}) =>
-      repo.insert(model.Transaction(
-        customerId: custId, amount: amount, type: model.Transaction.debt, date: date,
-      ));
+  Future<String> insertDebt(String custId, double amount, {String date = '2025-06-01'}) async {
+    final id = _uuid.v4();
+    await repo.insert(model.Transaction(
+      id: id, customerId: custId, amount: amount, type: model.Transaction.debt, date: date,
+    ));
+    return id;
+  }
 
-  Future<int> insertPayment(int custId, double amount, {int? debtId, String date = '2025-06-01'}) =>
-      repo.insert(model.Transaction(
-        customerId: custId, amount: amount, type: model.Transaction.payment, date: date, debtId: debtId,
-      ));
+  Future<String> insertPayment(String custId, double amount, {String? debtId, String date = '2025-06-01'}) async {
+    final id = _uuid.v4();
+    await repo.insert(model.Transaction(
+      id: id, customerId: custId, amount: amount, type: model.Transaction.payment, date: date, debtId: debtId,
+    ));
+    return id;
+  }
 
   group('insert & getById', () {
     test('insert returns valid id', () async {
       final cid = await _addCustomer(repo);
       final id = await insertDebt(cid, 500);
-      expect(id, greaterThan(0));
+      expect(id, isA<String>());
     });
 
     test('getById returns correct transaction', () async {
@@ -95,7 +109,7 @@ void main() {
     });
 
     test('getById returns null for nonexistent', () async {
-      expect(await repo.getById(9999), null);
+      expect(await repo.getById(_uuid.v4()), null);
     });
   });
 
@@ -202,7 +216,7 @@ void main() {
     });
 
     test('returns 0 for no payments', () async {
-      expect(await repo.getPaymentsForDebt(999), 0.0);
+      expect(await repo.getPaymentsForDebt(_uuid.v4()), 0.0);
     });
   });
 

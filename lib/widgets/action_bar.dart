@@ -7,7 +7,7 @@ import 'records_list_sheet.dart';
 
 /// Professional floating action bar with three action buttons.
 class ActionBar extends ConsumerWidget {
-  final int customerId;
+  final String customerId;
   const ActionBar({super.key, required this.customerId});
 
   @override

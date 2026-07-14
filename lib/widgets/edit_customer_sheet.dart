@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../l10n/app_localizations.dart';
 import '../data/models/customer.dart';
-import '../Providers/database_provider.dart';
+import '../Providers/mutations.dart';
 import 'app_snackbar.dart';
 
 void showEditCustomerSheet(
@@ -182,23 +182,34 @@ class _EditCustomerForm extends StatelessWidget {
               controller: phoneController,
               keyboardType: TextInputType.phone,
               textInputAction: TextInputAction.done,
-              inputFormatters: [FilteringTextInputFormatter.digitsOnly, LengthLimitingTextInputFormatter(11)],
+              inputFormatters: [
+                FilteringTextInputFormatter.digitsOnly,
+                LengthLimitingTextInputFormatter(11),
+              ],
               style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w500),
               decoration: InputDecoration(
                 labelText: l10n.customerPhone,
                 hintText: '07XX XXX XXXX',
                 prefixIcon: const Icon(Icons.phone_rounded),
                 filled: true,
-                fillColor: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
+                fillColor: theme.colorScheme.surfaceContainerHighest.withValues(
+                  alpha: 0.4,
+                ),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(16),
                   borderSide: BorderSide.none,
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(16),
-                  borderSide: BorderSide(color: theme.colorScheme.primary, width: 2),
+                  borderSide: BorderSide(
+                    color: theme.colorScheme.primary,
+                    width: 2,
+                  ),
                 ),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 18,
+                  vertical: 18,
+                ),
               ),
               validator: (v) {
                 if (v == null || v.trim().isEmpty) return null;

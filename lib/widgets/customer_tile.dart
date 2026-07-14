@@ -10,7 +10,7 @@ import '../Providers/database_provider.dart';
 class CustomerTile extends ConsumerWidget {
   final String name;
   final String? phone;
-  final int customerId;
+  final String customerId;
   final VoidCallback? onTap;
 
   const CustomerTile({

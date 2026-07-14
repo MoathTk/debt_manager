@@ -3,7 +3,7 @@ import '../l10n/app_localizations.dart';
 
 /// Selectable debt tile showing original amount and remaining balance.
 class DebtSelectorTile extends StatelessWidget {
-  final int id;
+  final String id;
   final double amount;
   final double remaining;
   final String? note;

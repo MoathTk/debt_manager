@@ -17,8 +17,8 @@ class _RemindersState extends ConsumerState<RemindersScreen> {
   String _query = '';
   String _statusFilter = 'all';
   String _sortBy = 'dateNewest';
-  Map<int, String> _names = {};
-  Map<int, double> _amounts = {};
+  Map<String, String> _names = {};
+  Map<String, double> _amounts = {};
 
   @override
   void initState() {
@@ -30,7 +30,7 @@ class _RemindersState extends ConsumerState<RemindersScreen> {
     final customers = await ref.read(customersProvider.future);
     final reminders = await ref.read(allRemindersProvider.future);
     final repo = ref.read(transactionRepositoryProvider);
-    final amounts = <int, double>{};
+    final amounts = <String, double>{};
     for (final r in reminders) {
       if (r.debtId != null && !amounts.containsKey(r.debtId)) {
         final txn = await repo.getById(r.debtId!);

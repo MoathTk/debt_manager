@@ -11,7 +11,7 @@ import '../widgets/edit_customer_sheet.dart';
 
 /// Customer detail screen showing profile, balance, and transaction history.
 class CustomerDetailScreen extends ConsumerWidget {
-  final int customerId;
+  final String customerId;
   const CustomerDetailScreen({super.key, required this.customerId});
 
   @override
@@ -46,7 +46,7 @@ class CustomerDetailScreen extends ConsumerWidget {
 }
 
 class _Body extends ConsumerWidget {
-  final int customerId;
+  final String customerId;
   final dynamic customer;
   const _Body({required this.customerId, required this.customer});
 
@@ -95,10 +95,10 @@ class _Body extends ConsumerWidget {
               );
             }
 
-            final rMap = <int, double>{};
+            final rMap = <String, double>{};
             debtsAsync.whenData((ds) {
               for (final d in ds){
-                rMap[d['id'] as int] = (d['remaining'] as num).toDouble();
+                rMap[d['id'] as String] = (d['remaining'] as num).toDouble();
               }
                 
             });

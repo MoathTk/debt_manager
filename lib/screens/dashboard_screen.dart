@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../l10n/app_localizations.dart';
 import '../Providers/database_provider.dart';
+import '../Providers/mutations.dart';
 import '../widgets/stat_card.dart';
 import '../widgets/recent_transactions_list.dart';
 import 'all_transactions_screen.dart';

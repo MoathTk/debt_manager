@@ -52,7 +52,6 @@ void confirmToggle(BuildContext ctx, DebtReminder r, AppLocalizations l10n) {
 void confirmDelete(BuildContext ctx, DebtReminder r, AppLocalizations l10n) {
   final container = ProviderScope.containerOf(ctx);
   final reminderRepo = container.read(debtReminderRepositoryProvider);
-  final txnRepo = container.read(transactionRepositoryProvider);
   final parentCtx = Navigator.of(ctx).context;
   Navigator.pop(ctx);
   showDialog(
@@ -66,23 +65,6 @@ void confirmDelete(BuildContext ctx, DebtReminder r, AppLocalizations l10n) {
         TextButton(
           onPressed: () async {
             Navigator.pop(parentCtx);
-            if (r.debtId != null) {
-              final debt = await txnRepo.getById(r.debtId!);
-              if (debt != null) {
-                final paid = await txnRepo.getPaymentsForDebt(r.debtId!);
-                final remaining = debt.amount - paid;
-                if (remaining > 0) {
-                  await txnRepo.insert(model.Transaction(
-                    customerId: debt.customerId,
-                    amount: remaining,
-                    type: model.Transaction.payment,
-                    debtId: r.debtId,
-                    date: DateTime.now().toIso8601String(),
-                    note: l10n.autoSettledViaReminderDelete,
-                  ));
-                }
-              }
-            }
             await reminderRepo.delete(r.id!);
             if (parentCtx.mounted) _invalidate(parentCtx);
           },

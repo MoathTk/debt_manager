@@ -1,29 +1,14 @@
 import '../database_helper.dart';
 import '../models/transaction.dart' as model;
 
-/// Repository class for Transaction CRUD operations and financial queries.
-///
-/// Handles all database interactions related to financial transactions.
-/// Uses [DatabaseHelper] singleton to access the SQLite database.
-///
-/// **Important**: The Transaction model is imported as 'model' to avoid
-/// name collision with sqflite's internal Transaction class.
-///
-/// Transaction types:
-/// - 0 (debt): Money owed by customer
-/// - 1 (payment): Money paid by customer
 class TransactionRepository {
   final DatabaseHelper _dbHelper = DatabaseHelper.instance;
 
-  /// Inserts a new transaction into the database.
-  /// Returns the auto-generated ID of the newly created transaction.
   Future<int> insert(model.Transaction transaction) async {
     final db = await _dbHelper.database;
     return await db.insert('transactions', transaction.toMap());
   }
 
-  /// Updates an existing transaction in the database.
-  /// Matches by transaction.id and returns the number of affected rows.
   Future<int> update(model.Transaction transaction) async {
     final db = await _dbHelper.database;
     return await db.update(
@@ -34,8 +19,7 @@ class TransactionRepository {
     );
   }
 
-  /// Deletes a transaction from the database by ID.
-  Future<int> delete(int id) async {
+  Future<int> delete(String id) async {
     final db = await _dbHelper.database;
     return await db.delete(
       'transactions',
@@ -44,17 +28,13 @@ class TransactionRepository {
     );
   }
 
-  /// Retrieves all transactions from the database.
-  /// Results are ordered by date (newest first).
   Future<List<model.Transaction>> getAll() async {
     final db = await _dbHelper.database;
     final result = await db.query('transactions', orderBy: 'date DESC');
     return result.map((map) => model.Transaction.fromMap(map)).toList();
   }
 
-  /// Retrieves a single transaction by its ID.
-  /// Returns null if no transaction is found.
-  Future<model.Transaction?> getById(int id) async {
+  Future<model.Transaction?> getById(String id) async {
     final db = await _dbHelper.database;
     final result = await db.query(
       'transactions',
@@ -65,9 +45,7 @@ class TransactionRepository {
     return model.Transaction.fromMap(result.first);
   }
 
-  /// Retrieves all transactions for a specific customer.
-  /// Results are ordered by date (newest first).
-  Future<List<model.Transaction>> getByCustomer(int customerId) async {
+  Future<List<model.Transaction>> getByCustomer(String customerId) async {
     final db = await _dbHelper.database;
     final result = await db.query(
       'transactions',
@@ -78,8 +56,6 @@ class TransactionRepository {
     return result.map((map) => model.Transaction.fromMap(map)).toList();
   }
 
-  /// Retrieves transactions filtered by type.
-  /// Use [model.Transaction.debt] (0) or [model.Transaction.payment] (1).
   Future<List<model.Transaction>> getByType(int type) async {
     final db = await _dbHelper.database;
     final result = await db.query(
@@ -91,9 +67,10 @@ class TransactionRepository {
     return result.map((map) => model.Transaction.fromMap(map)).toList();
   }
 
-  /// Retrieves transactions within a date range (inclusive).
-  /// Both dates should be in ISO 8601 format (YYYY-MM-DD).
-  Future<List<model.Transaction>> getByDateRange(String startDate, String endDate) async {
+  Future<List<model.Transaction>> getByDateRange(
+    String startDate,
+    String endDate,
+  ) async {
     final db = await _dbHelper.database;
     final result = await db.query(
       'transactions',
@@ -104,60 +81,50 @@ class TransactionRepository {
     return result.map((map) => model.Transaction.fromMap(map)).toList();
   }
 
-  /// Calculates the net balance for a specific customer.
-  /// Balance = Total Debts - Total Payments
-  /// Positive balance means customer owes money.
-  /// Negative balance means customer has overpaid.
-  Future<double> getCustomerBalance(int customerId) async {
+  Future<double> getCustomerBalance(String customerId) async {
     final db = await _dbHelper.database;
-    final result = await db.rawQuery('''
-      SELECT 
-        COALESCE(SUM(CASE WHEN type = 0 THEN amount ELSE 0 END), 0) - 
+    final result = await db.rawQuery(
+      '''
+      SELECT
+        COALESCE(SUM(CASE WHEN type = 0 THEN amount ELSE 0 END), 0) -
         COALESCE(SUM(CASE WHEN type = 1 THEN amount ELSE 0 END), 0) as balance
-      FROM transactions 
+      FROM transactions
       WHERE customer_id = ?
-    ''', [customerId]);
+    ''',
+      [customerId],
+    );
     return (result.first['balance'] as num?)?.toDouble() ?? 0.0;
   }
 
-  /// Calculates the sum of all debt transactions across all customers.
-  /// Used for dashboard statistics.
   Future<double> getTotalDebts() async {
     final db = await _dbHelper.database;
-    final result = await db.rawQuery('''
-      SELECT COALESCE(SUM(amount), 0) as total 
-      FROM transactions 
-      WHERE type = 0
-    ''');
+    final result = await db.rawQuery(
+      "SELECT COALESCE(SUM(amount), 0) as total FROM transactions WHERE type = 0",
+    );
     return (result.first['total'] as num?)?.toDouble() ?? 0.0;
   }
 
-  /// Calculates the sum of all payment transactions across all customers.
-  /// Used for dashboard statistics.
   Future<double> getTotalPayments() async {
     final db = await _dbHelper.database;
-    final result = await db.rawQuery('''
-      SELECT COALESCE(SUM(amount), 0) as total 
-      FROM transactions 
-      WHERE type = 1
-    ''');
+    final result = await db.rawQuery(
+      "SELECT COALESCE(SUM(amount), 0) as total FROM transactions WHERE type = 1",
+    );
     return (result.first['total'] as num?)?.toDouble() ?? 0.0;
   }
 
-  /// Returns the total number of transactions in the database.
-  /// Useful for dashboard statistics.
   Future<int> getTransactionCount() async {
     final db = await _dbHelper.database;
-    final result = await db.rawQuery('SELECT COUNT(*) as count FROM transactions');
+    final result =
+        await db.rawQuery('SELECT COUNT(*) as count FROM transactions');
     return result.first['count'] as int;
   }
 
-  /// Returns each debt for a customer with its remaining balance.
-  /// Remaining = debt amount - sum of payments linked to that debt.
-  /// Only returns debts with remaining > 0 (unpaid/partially paid).
-  Future<List<Map<String, dynamic>>> getDebtsWithRemaining(int customerId) async {
+  Future<List<Map<String, dynamic>>> getDebtsWithRemaining(
+    String customerId,
+  ) async {
     final db = await _dbHelper.database;
-    return await db.rawQuery('''
+    return await db.rawQuery(
+      '''
       SELECT * FROM (
         SELECT
           t.id, t.amount, t.note, t.date,
@@ -169,52 +136,55 @@ class TransactionRepository {
       ) sub
       WHERE sub.remaining > 0
       ORDER BY sub.date DESC
-    ''', [customerId]);
+    ''',
+      [customerId],
+    );
   }
 
-  /// Returns the total amount of payments linked to a specific debt.
-  Future<double> getPaymentsForDebt(int debtId) async {
+  Future<double> getPaymentsForDebt(String debtId) async {
     final db = await _dbHelper.database;
-    final result = await db.rawQuery('''
+    final result = await db.rawQuery(
+      '''
       SELECT COALESCE(SUM(amount), 0) as total
       FROM transactions
       WHERE debt_id = ? AND type = 1
-    ''', [debtId]);
+    ''',
+      [debtId],
+    );
     return (result.first['total'] as num?)?.toDouble() ?? 0.0;
   }
 
-  /// Returns total debts and payments within a date range.
-  /// Both dates should be in ISO 8601 format.
   Future<Map<String, double>> getTotalsByDateRange(
-      String startDate, String endDate) async {
+    String startDate,
+    String endDate,
+  ) async {
     final db = await _dbHelper.database;
-    final result = await db.rawQuery('''
+    final result = await db.rawQuery(
+      '''
       SELECT
         COALESCE(SUM(CASE WHEN type = 0 THEN amount ELSE 0 END), 0) as debts,
         COALESCE(SUM(CASE WHEN type = 1 THEN amount ELSE 0 END), 0) as payments
       FROM transactions
       WHERE date BETWEEN ? AND ?
-    ''', [startDate, endDate]);
+    ''',
+      [startDate, endDate],
+    );
     return {
       'debts': (result.first['debts'] as num?)?.toDouble() ?? 0.0,
       'payments': (result.first['payments'] as num?)?.toDouble() ?? 0.0,
     };
   }
 
-  /// Returns aggregated debt/payment data grouped by period.
-  /// If [isWeekly] is true, groups by ISO week; otherwise by month.
-  /// Returns last 6 periods, each with: label, debts, payments.
   Future<List<Map<String, dynamic>>> getPeriodicData({
     bool isWeekly = false,
   }) async {
     final db = await _dbHelper.database;
-    final groupExpr = isWeekly
-        ? "strftime('%Y-W%W', date)"
-        : "strftime('%Y-%m', date)";
-    final labelExpr = isWeekly
-        ? "strftime('%W', date)"
-        : "strftime('%m', date)";
-    final result = await db.rawQuery('''
+    final groupExpr =
+        isWeekly ? "strftime('%Y-W%W', date)" : "strftime('%Y-%m', date)";
+    final labelExpr =
+        isWeekly ? "strftime('%W', date)" : "strftime('%m', date)";
+    final result = await db.rawQuery(
+      '''
       SELECT
         $groupExpr as period,
         $labelExpr as label,
@@ -224,15 +194,15 @@ class TransactionRepository {
       GROUP BY period
       ORDER BY period DESC
       LIMIT 6
-    ''');
+    ''',
+    );
     return result.reversed.toList();
   }
 
-  /// Returns top [limit] customers by outstanding balance.
-  /// Each entry: {customer_id, name, outstanding}.
   Future<List<Map<String, dynamic>>> getTopDebtors(int limit) async {
     final db = await _dbHelper.database;
-    return await db.rawQuery('''
+    return await db.rawQuery(
+      '''
       SELECT
         t.customer_id,
         c.name,
@@ -245,6 +215,8 @@ class TransactionRepository {
       HAVING outstanding > 0
       ORDER BY outstanding DESC
       LIMIT ?
-    ''', [limit]);
+    ''',
+      [limit],
+    );
   }
 }

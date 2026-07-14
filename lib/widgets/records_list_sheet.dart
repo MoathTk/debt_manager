@@ -6,7 +6,7 @@ import '../Providers/database_provider.dart';
 import 'edit_debt_sheet.dart';
 import 'edit_payment_sheet.dart';
 
-void showRecordsListSheet(BuildContext context, WidgetRef ref, int customerId) {
+void showRecordsListSheet(BuildContext context, WidgetRef ref, String customerId) {
   showModalBottomSheet(
     context: context,
     isScrollControlled: true,
@@ -18,7 +18,7 @@ void showRecordsListSheet(BuildContext context, WidgetRef ref, int customerId) {
 }
 
 class _RecordsListBody extends ConsumerWidget {
-  final int customerId;
+  final String customerId;
   const _RecordsListBody({required this.customerId});
 
   @override
@@ -71,10 +71,10 @@ class _RecordsListBody extends ConsumerWidget {
                       ),
                     );
                   }
-                  final rMap = <int, double>{};
+                  final rMap = <String, double>{};
                   debtsAsync.whenData((ds) {
                     for (final d in ds) {
-                      rMap[d['id'] as int] = (d['remaining'] as num).toDouble();
+                      rMap[d['id'] as String] = (d['remaining'] as num).toDouble();
                     }
                   });
                   return ListView.separated(

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../l10n/app_localizations.dart';
-import '../Providers/database_provider.dart';
+import '../Providers/mutations.dart';
 import 'app_snackbar.dart';
 
 /// Modern bottom sheet form for adding a new customer.

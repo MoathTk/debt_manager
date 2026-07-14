@@ -1,19 +1,19 @@
-/// Represents a financial transaction (debt or payment) for a customer.
-///
-/// Transaction types:
-/// - [debt] (0): Money owed by the customer (increases their balance)
-/// - [payment] (1): Money paid by the customer (decreases their balance)
-///
-/// The [firebaseId] field is reserved for future cloud sync with Firebase.
 class Transaction {
-  final int? id;
-  final int customerId;
+  final String? id;
+  final String customerId;
   final double amount;
   final int type;
   final String? note;
   final String date;
-  final int? debtId;
-  final String? firebaseId;
+  final String? debtId;
+  final bool isSynced;
+  final String updatedAt;
+
+  static const int debt = 0;
+  static const int payment = 1;
+
+  bool get isDebt => type == debt;
+  bool get isPayment => type == payment;
 
   const Transaction({
     this.id,
@@ -23,21 +23,10 @@ class Transaction {
     this.note,
     required this.date,
     this.debtId,
-    this.firebaseId,
+    this.isSynced = false,
+    this.updatedAt = '',
   });
 
-  /// Type constants for the 'type' field
-  static const int debt = 0;
-  static const int payment = 1;
-
-  /// Check if this transaction is a debt
-  bool get isDebt => type == debt;
-
-  /// Check if this transaction is a payment
-  bool get isPayment => type == payment;
-
-  /// Converts the Transaction instance to a Map for SQLite insertion.
-  /// The Map keys match the column names in the 'transactions' table.
   Map<String, dynamic> toMap() {
     return {
       'id': id,
@@ -47,36 +36,35 @@ class Transaction {
       'note': note,
       'date': date,
       'debt_id': debtId,
-      'firebase_id': firebaseId,
+      'is_synced': isSynced ? 1 : 0,
+      'updated_at': updatedAt,
     };
   }
 
-  /// Creates a Transaction instance from a SQLite query result Map.
-  /// Used when reading data from the database.
   factory Transaction.fromMap(Map<String, dynamic> map) {
     return Transaction(
-      id: map['id'] as int?,
-      customerId: map['customer_id'] as int,
+      id: map['id'] as String?,
+      customerId: map['customer_id'] as String,
       amount: (map['amount'] as num).toDouble(),
       type: map['type'] as int,
       note: map['note'] as String?,
       date: map['date'] as String,
-      debtId: map['debt_id'] as int?,
-      firebaseId: map['firebase_id'] as String?,
+      debtId: map['debt_id'] as String?,
+      isSynced: (map['is_synced'] as int? ?? 0) == 1,
+      updatedAt: map['updated_at'] as String? ?? '',
     );
   }
 
-  /// Creates a new Transaction with selectively replaced fields.
-  /// Useful for updates where only some fields change.
   Transaction copyWith({
-    int? id,
-    int? customerId,
+    String? id,
+    String? customerId,
     double? amount,
     int? type,
     String? note,
     String? date,
-    int? debtId,
-    String? firebaseId,
+    String? debtId,
+    bool? isSynced,
+    String? updatedAt,
   }) {
     return Transaction(
       id: id ?? this.id,
@@ -86,7 +74,8 @@ class Transaction {
       note: note ?? this.note,
       date: date ?? this.date,
       debtId: debtId ?? this.debtId,
-      firebaseId: firebaseId ?? this.firebaseId,
+      isSynced: isSynced ?? this.isSynced,
+      updatedAt: updatedAt ?? this.updatedAt,
     );
   }
 

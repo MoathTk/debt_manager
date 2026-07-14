@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../l10n/app_localizations.dart';
 import '../Providers/database_provider.dart';
+import '../Providers/mutations.dart';
 import '../data/models/debt_reminder.dart';
 import '../data/models/transaction.dart' as model;
 import 'reminder_action_btn.dart';
@@ -219,7 +220,7 @@ class ReminderCard extends ConsumerWidget {
 }
 
 class _AmountChip extends ConsumerWidget {
-  final int debtId;
+  final String debtId;
   const _AmountChip({required this.debtId});
 
   @override

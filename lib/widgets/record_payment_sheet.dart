@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../l10n/app_localizations.dart';
 import '../data/models/transaction.dart' as model;
 import '../Providers/database_provider.dart';
+import '../utils/sync_id.dart';
 import 'amount_input_formatter.dart';
 import 'app_snackbar.dart';
 import 'debt_selector_tile.dart';
@@ -10,7 +11,7 @@ import 'debt_selector_tile.dart';
 void showRecordPaymentSheet(
   BuildContext context,
   WidgetRef ref,
-  int customerId,
+  String customerId,
 ) {
   showModalBottomSheet(
     context: context,
@@ -23,14 +24,14 @@ void showRecordPaymentSheet(
 }
 
 class _Body extends ConsumerStatefulWidget {
-  final int customerId;
+  final String customerId;
   const _Body({required this.customerId});
   @override
   ConsumerState<_Body> createState() => _S();
 }
 
 class _S extends ConsumerState<_Body> {
-  int? _debtId;
+  String? _debtId;
   double _max = 0;
   final _amt = TextEditingController();
   final _note = TextEditingController();
@@ -59,6 +60,7 @@ class _S extends ConsumerState<_Body> {
         .read(transactionRepositoryProvider)
         .insert(
           model.Transaction(
+            id: generateId(),
             customerId: widget.customerId,
             amount: v,
             type: model.Transaction.payment,
@@ -163,13 +165,13 @@ class _S extends ConsumerState<_Body> {
                       ...List.generate(ds.length, (i) {
                         final d = ds[i];
                         return DebtSelectorTile(
-                          id: d['id'] as int,
+                          id: d['id'] as String,
                           amount: (d['amount'] as num).toDouble(),
                           remaining: (d['remaining'] as num).toDouble(),
                           note: d['note'] as String?,
                           isSelected: _debtId == d['id'],
                           onTap: () => setState(() {
-                            _debtId = d['id'] as int;
+                            _debtId = d['id'] as String;
                             _max = (d['remaining'] as num).toDouble();
                           }),
                         );

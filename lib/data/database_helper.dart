@@ -1,135 +1,157 @@
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
+import '../utils/sync_id.dart';
 
-/// Singleton helper class for managing the SQLite database.
-///
-/// This class handles:
-/// - Database initialization and creation
-/// - Table creation with proper schema
-/// - Index creation for query performance
-/// - Database lifecycle management (open/close)
-///
-/// Uses singleton pattern to ensure only one database connection exists.
 class DatabaseHelper {
   static final DatabaseHelper instance = DatabaseHelper._init();
   static Database? _database;
 
   DatabaseHelper._init();
 
-  /// Inject a database instance (used for in-memory testing).
   static set testDatabase(Database db) => _database = db;
 
-  /// Returns the database instance, creating it if necessary.
-  /// This is the main entry point for all database operations.
   Future<Database> get database async {
     if (_database != null) return _database!;
     final dbPath = await getDatabasesPath();
     final path = join(dbPath, 'debt_management.db');
     _database = await openDatabase(
       path,
-      version: 3,
+      version: 4,
       onCreate: _createDB,
       onUpgrade: _onUpgrade,
     );
     return _database!;
   }
 
-  /// Creates all database tables and indexes.
-  /// This is called automatically when the database file is first created.
-  ///
-  /// Tables created:
-  /// - customers: Stores customer information
-  /// - transactions: Logs all financial movements (debts and payments)
-  /// - debt_reminders: Schedules debt collection follow-ups
-  ///
-  /// Foreign keys use CASCADE DELETE to maintain referential integrity.
-  /// Deleting a customer automatically removes all their transactions and reminders.
   Future<void> _createDB(Database db, int version) async {
-    // Create customers table
-    // - id: Auto-incrementing primary key
-    // - name: Customer's full name (required)
-    // - phone: Customer's phone number (optional, can be null)
-    // - created_at: Timestamp when customer was added (ISO 8601 format)
-    // - firebase_id: Reserved for future cloud sync with Firebase
     await db.execute('''
       CREATE TABLE customers (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        id TEXT PRIMARY KEY,
         name TEXT NOT NULL,
         phone TEXT,
         created_at TEXT NOT NULL,
-        firebase_id TEXT
+        is_synced INTEGER DEFAULT 0,
+        updated_at TEXT
       )
     ''');
 
-    // Create transactions table
-    // - id: Auto-incrementing primary key
-    // - customer_id: Foreign key to customers table (cascade delete)
-    // - amount: Transaction amount (always positive)
-    // - type: 0 = Debt (money owed), 1 = Payment (money received)
-    // - note: Optional description of the transaction
-    // - date: Transaction date (ISO 8601 format)
-    // - firebase_id: Reserved for future cloud sync with Firebase
     await db.execute('''
       CREATE TABLE transactions (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        customer_id INTEGER NOT NULL,
+        id TEXT PRIMARY KEY,
+        customer_id TEXT NOT NULL,
         amount REAL NOT NULL,
         type INTEGER NOT NULL,
         note TEXT,
         date TEXT NOT NULL,
-        debt_id INTEGER,
-        firebase_id TEXT,
+        debt_id TEXT,
+        is_synced INTEGER DEFAULT 0,
+        updated_at TEXT,
         FOREIGN KEY (customer_id) REFERENCES customers (id) ON DELETE CASCADE,
         FOREIGN KEY (debt_id) REFERENCES transactions (id) ON DELETE SET NULL
       )
     ''');
 
-    // Create debt_reminders table
-    // - id: Auto-incrementing primary key
-    // - customer_id: Foreign key to customers table (cascade delete)
-    // - reminder_date: When the reminder is due (ISO 8601 format)
-    // - is_completed: 0 = pending, 1 = completed
-    // - message: Optional reminder message/description
     await db.execute('''
       CREATE TABLE debt_reminders (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        customer_id INTEGER NOT NULL,
-        debt_id INTEGER,
+        id TEXT PRIMARY KEY,
+        customer_id TEXT NOT NULL,
+        debt_id TEXT,
         reminder_date TEXT NOT NULL,
         is_completed INTEGER NOT NULL DEFAULT 0,
         message TEXT,
+        is_synced INTEGER DEFAULT 0,
+        updated_at TEXT,
         FOREIGN KEY (customer_id) REFERENCES customers (id) ON DELETE CASCADE,
         FOREIGN KEY (debt_id) REFERENCES transactions (id) ON DELETE SET NULL
       )
     ''');
 
-    // Create indexes for performance optimization
-    // These speed up queries that filter by customer_id or type/date
-    await db.execute('''
-      CREATE INDEX idx_transactions_customer_id ON transactions (customer_id)
-    ''');
-
-    await db.execute('''
-      CREATE INDEX idx_transactions_type ON transactions (type)
-    ''');
-
-    await db.execute('''
-      CREATE INDEX idx_debt_reminders_customer_id ON debt_reminders (customer_id)
-    ''');
-
-    await db.execute('''
-      CREATE INDEX idx_debt_reminders_date ON debt_reminders (reminder_date)
-    ''');
+    await db.execute(
+      'CREATE INDEX idx_transactions_customer_id ON transactions (customer_id)',
+    );
+    await db.execute(
+      'CREATE INDEX idx_transactions_type ON transactions (type)',
+    );
+    await db.execute(
+      'CREATE INDEX idx_debt_reminders_customer_id ON debt_reminders (customer_id)',
+    );
+    await db.execute(
+      'CREATE INDEX idx_debt_reminders_date ON debt_reminders (reminder_date)',
+    );
   }
 
-  /// Closes the database connection and resets the singleton.
-  /// Should be called when the app is shutting down or when testing.
-  Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
-    if (oldVersion < 2) {
-      await db.execute('ALTER TABLE transactions ADD COLUMN debt_id INTEGER');
-    }
-    if (oldVersion < 3) {
-      await db.execute('ALTER TABLE debt_reminders ADD COLUMN debt_id INTEGER');
+  Future<void> _onUpgrade(
+    Database db,
+    int oldVersion,
+    int newVersion,
+  ) async {
+    if (oldVersion < 4) {
+      final customers = await db.query('customers');
+      final transactions = await db.query('transactions');
+      final reminders = await db.query('debt_reminders');
+
+      final customerMap = <int, String>{};
+      final debtMap = <int, String>{};
+
+      await db.execute('DROP TABLE IF EXISTS debt_reminders');
+      await db.execute('DROP TABLE IF EXISTS transactions');
+      await db.execute('DROP TABLE IF EXISTS customers');
+
+      await _createDB(db, 4);
+
+      for (final c in customers) {
+        final newId = generateId();
+        customerMap[c['id'] as int] = newId;
+        await db.insert('customers', {
+          'id': newId,
+          'name': c['name'],
+          'phone': c['phone'],
+          'created_at': c['created_at'],
+          'is_synced': 0,
+          'updated_at': DateTime.now().toIso8601String(),
+        });
+      }
+
+      for (final t in transactions) {
+        final newId = generateId();
+        final oldId = t['id'] as int;
+        final newCustId = customerMap[t['customer_id'] as int] ?? '';
+        final oldDebtId = t['debt_id'] as int?;
+        final newDebtId =
+            oldDebtId != null ? debtMap[oldDebtId] : null;
+        debtMap[oldId] = newId;
+
+        await db.insert('transactions', {
+          'id': newId,
+          'customer_id': newCustId,
+          'amount': t['amount'],
+          'type': t['type'],
+          'note': t['note'],
+          'date': t['date'],
+          'debt_id': newDebtId,
+          'is_synced': 0,
+          'updated_at': DateTime.now().toIso8601String(),
+        });
+      }
+
+      for (final r in reminders) {
+        final newId = generateId();
+        final newCustId = customerMap[r['customer_id'] as int] ?? '';
+        final oldDebtId = r['debt_id'] as int?;
+        final newDebtId =
+            oldDebtId != null ? debtMap[oldDebtId] : null;
+
+        await db.insert('debt_reminders', {
+          'id': newId,
+          'customer_id': newCustId,
+          'debt_id': newDebtId,
+          'reminder_date': r['reminder_date'],
+          'is_completed': r['is_completed'],
+          'message': r['message'],
+          'is_synced': 0,
+          'updated_at': DateTime.now().toIso8601String(),
+        });
+      }
     }
   }
 

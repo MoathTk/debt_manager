@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../l10n/app_localizations.dart';
 import '../Providers/database_provider.dart';
+import '../Providers/mutations.dart';
 import '../widgets/collection_progress_ring.dart';
 import '../widgets/time_range_selector.dart';
 import '../widgets/debt_payment_ratio_chart.dart';
