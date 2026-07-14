@@ -65,12 +65,14 @@ class CustomerRepository {
   /// Searches customers by name or phone number.
   /// Uses LIKE for partial matching (case-insensitive on most systems).
   /// Handles null phone values safely with NULL check.
+  /// Escapes LIKE wildcards in user input to prevent unintended matches.
   Future<List<Customer>> search(String query) async {
     final db = await _dbHelper.database;
+    final escaped = query.replaceAll('%', '\\%').replaceAll('_', '\\_');
     final result = await db.query(
       'customers',
-      where: 'name LIKE ? OR (phone IS NOT NULL AND phone LIKE ?)',
-      whereArgs: ['%$query%', '%$query%'],
+      where: 'name LIKE ? ESCAPE \'\\\' OR (phone IS NOT NULL AND phone LIKE ? ESCAPE \'\\\')',
+      whereArgs: ['%$escaped%', '%$escaped%'],
       orderBy: 'created_at DESC',
     );
     return result.map((map) => Customer.fromMap(map)).toList();

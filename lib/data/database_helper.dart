@@ -16,25 +16,22 @@ class DatabaseHelper {
 
   DatabaseHelper._init();
 
+  /// Inject a database instance (used for in-memory testing).
+  static set testDatabase(Database db) => _database = db;
+
   /// Returns the database instance, creating it if necessary.
   /// This is the main entry point for all database operations.
   Future<Database> get database async {
     if (_database != null) return _database!;
-    _database = await _initDB('debt_management.db');
-    return _database!;
-  }
-
-  /// Initializes the database file and sets up the schema.
-  /// The [onCreate] callback is called only when the database is first created.
-  Future<Database> _initDB(String filePath) async {
     final dbPath = await getDatabasesPath();
-    final path = join(dbPath, filePath);
-    return await openDatabase(
+    final path = join(dbPath, 'debt_management.db');
+    _database = await openDatabase(
       path,
       version: 3,
       onCreate: _createDB,
       onUpgrade: _onUpgrade,
     );
+    return _database!;
   }
 
   /// Creates all database tables and indexes.
@@ -97,10 +94,12 @@ class DatabaseHelper {
       CREATE TABLE debt_reminders (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         customer_id INTEGER NOT NULL,
+        debt_id INTEGER,
         reminder_date TEXT NOT NULL,
         is_completed INTEGER NOT NULL DEFAULT 0,
         message TEXT,
-        FOREIGN KEY (customer_id) REFERENCES customers (id) ON DELETE CASCADE
+        FOREIGN KEY (customer_id) REFERENCES customers (id) ON DELETE CASCADE,
+        FOREIGN KEY (debt_id) REFERENCES transactions (id) ON DELETE SET NULL
       )
     ''');
 

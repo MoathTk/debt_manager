@@ -133,12 +133,12 @@ class DebtReminderRepository {
     );
   }
 
-  /// Retrieves all pending reminders that are due today or earlier.
-  /// Uses today's date (YYYY-MM-DD) for comparison.
+  /// Retrieves all pending reminders that are due on or before [date].
+  /// Defaults to today's date if [date] is not provided.
   /// Results are ordered by reminder date (earliest first).
-  Future<List<DebtReminder>> getDueToday() async {
+  Future<List<DebtReminder>> getDueToday({String? date}) async {
     final db = await _dbHelper.database;
-    final now = DateTime.now().toIso8601String().substring(0, 10);
+    final now = (date ?? DateTime.now().toIso8601String().substring(0, 10));
     final result = await db.query(
       'debt_reminders',
       where: 'is_completed = 0 AND reminder_date <= ?',

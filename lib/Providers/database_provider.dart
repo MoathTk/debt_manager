@@ -169,6 +169,9 @@ final totalsByDateRangeProvider =
     FutureProvider.family<Map<String, double>, String>((ref, key) async {
       ref.watch(dashboardStatsProvider);
       final parts = key.split('|');
+      if (parts.length != 2 || parts[0].isEmpty || parts[1].isEmpty) {
+        throw ArgumentError('Invalid date range key: "$key" (expected "startIso|endIso")');
+      }
       final repo = ref.read(transactionRepositoryProvider);
       return repo.getTotalsByDateRange(parts[0], parts[1]);
     });

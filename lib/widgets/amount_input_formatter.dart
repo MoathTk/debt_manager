@@ -62,6 +62,7 @@ class ThousandsSeparatorInputFormatter extends TextInputFormatter {
 /// Formats a number with thousand separators for display.
 /// 50 → "50", 1000 → "1,000", 10000.5 → "10,000.50"
 String formatAmount(double n) {
+  if (n.isNaN || n.isInfinite) return '0';
   final s = n % 1 == 0 ? n.toStringAsFixed(0) : n.toStringAsFixed(2);
   final parts = s.split('.');
   final intPart = parts[0];
