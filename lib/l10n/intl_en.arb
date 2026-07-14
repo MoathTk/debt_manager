@@ -122,5 +122,9 @@
   "sortByDateOldest": "Date (oldest)",
   "sortByAmountHighest": "Amount (highest)",
   "sortByAmountLowest": "Amount (lowest)",
-  "sortByNameAZ": "Name (A-Z)"
+  "sortByNameAZ": "Name (A-Z)",
+  "preferences": "PREFERENCES",
+  "theme": "Theme",
+  "dataManagement": "DATA MANAGEMENT",
+  "administrator" : "administrator"
 }

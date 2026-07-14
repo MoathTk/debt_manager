@@ -378,4 +378,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get sortByNameAZ => 'Name (A-Z)';
+
+  @override
+  String get preferences => 'PREFERENCES';
+
+  @override
+  String get theme => 'Theme';
+
+  @override
+  String get dataManagement => 'DATA MANAGEMENT';
+
+  @override
+  String get administrator => 'administrator';
 }

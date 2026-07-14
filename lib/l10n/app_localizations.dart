@@ -835,6 +835,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Name (A-Z)'**
   String get sortByNameAZ;
+
+  /// No description provided for @preferences.
+  ///
+  /// In en, this message translates to:
+  /// **'PREFERENCES'**
+  String get preferences;
+
+  /// No description provided for @theme.
+  ///
+  /// In en, this message translates to:
+  /// **'Theme'**
+  String get theme;
+
+  /// No description provided for @dataManagement.
+  ///
+  /// In en, this message translates to:
+  /// **'DATA MANAGEMENT'**
+  String get dataManagement;
+
+  /// No description provided for @administrator.
+  ///
+  /// In en, this message translates to:
+  /// **'administrator'**
+  String get administrator;
 }
 
 class _AppLocalizationsDelegate

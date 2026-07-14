@@ -121,5 +121,9 @@
   "sortByDateOldest": "التاريخ (الأقدم)",
   "sortByAmountHighest": "المبلغ (الأعلى)",
   "sortByAmountLowest": "المبلغ (الأدنى)",
-  "sortByNameAZ": "الاسم (أ-ي)"
+  "sortByNameAZ": "الاسم (أ-ي)",
+  "preferences": "التفضيلات",
+  "theme": "المظهر",
+  "dataManagement": "إدارة البيانات",
+  "administrator" : "مشرف"
 }

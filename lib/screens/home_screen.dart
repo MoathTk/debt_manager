@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:local_debt_management/widgets/side_drawer.dart';
 import '../l10n/app_localizations.dart';
 import '../Providers/theme_provider.dart';
 import '../Providers/locale_provider.dart';
@@ -24,7 +25,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   int _currentIndex = 0;
   final _scaffoldKey = GlobalKey<ScaffoldState>();
 
-  final _screens = const [DashboardScreen(), CustomersScreen(), RemindersScreen()];
+  final _screens = const [
+    DashboardScreen(),
+    CustomersScreen(),
+    RemindersScreen(),
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -43,7 +48,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ),
         ],
       ),
-      endDrawer: _SettingsDrawer(
+      endDrawer: SettingsDrawer(
         l10n: l10n,
         ref: ref,
         onClose: () => _scaffoldKey.currentState?.closeEndDrawer(),
@@ -53,9 +58,22 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         currentIndex: _currentIndex,
         onTap: (i) => setState(() => _currentIndex = i),
         items: [
-          _NavItem(icon: Icons.home_rounded, activeIcon: Icons.home_rounded, label: l10n.home),
-          _NavItem(icon: Icons.people_rounded, activeIcon: Icons.people_rounded, label: l10n.customers),
-          _NavItem(icon: Icons.notifications_none_rounded, activeIcon: Icons.notifications_active_rounded, label: l10n.reminders, badge: pendingCount),
+          _NavItem(
+            icon: Icons.home_rounded,
+            activeIcon: Icons.home_rounded,
+            label: l10n.home,
+          ),
+          _NavItem(
+            icon: Icons.people_rounded,
+            activeIcon: Icons.people_rounded,
+            label: l10n.customers,
+          ),
+          _NavItem(
+            icon: Icons.notifications_none_rounded,
+            activeIcon: Icons.notifications_active_rounded,
+            label: l10n.reminders,
+            badge: pendingCount,
+          ),
         ],
       ),
     );
@@ -69,7 +87,12 @@ class _NavItem {
   final String label;
   final int? badge;
 
-  _NavItem({required this.icon, required this.activeIcon, required this.label, this.badge});
+  _NavItem({
+    required this.icon,
+    required this.activeIcon,
+    required this.label,
+    this.badge,
+  });
 }
 
 /// Modern floating bottom navigation bar with a pill-shaped indicator.
@@ -172,28 +195,37 @@ class _NavTab extends StatelessWidget {
                       borderRadius: BorderRadius.circular(16),
                     )
                   : null,
-              child: Stack(clipBehavior: Clip.none, children: [
-                Icon(
-                  isSelected ? item.activeIcon : item.icon,
-                  color: color,
-                  size: 26,
-                ),
-                if (item.badge != null && item.badge! > 0)
-                  Positioned(
-                    top: -4, right: -10,
-                    child: Container(
-                      padding: const EdgeInsets.all(4),
-                      decoration: BoxDecoration(
-                        color: theme.colorScheme.error,
-                        shape: BoxShape.circle,
-                      ),
-                      child: Text('${item.badge}',
-                        style: const TextStyle(
-                          fontSize: 9, fontWeight: FontWeight.w800,
-                          color: Colors.white, height: 1)),
-                    ),
+              child: Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  Icon(
+                    isSelected ? item.activeIcon : item.icon,
+                    color: color,
+                    size: 26,
                   ),
-              ]),
+                  if (item.badge != null && item.badge! > 0)
+                    Positioned(
+                      top: -4,
+                      right: -10,
+                      child: Container(
+                        padding: const EdgeInsets.all(4),
+                        decoration: BoxDecoration(
+                          color: theme.colorScheme.error,
+                          shape: BoxShape.circle,
+                        ),
+                        child: Text(
+                          '${item.badge}',
+                          style: const TextStyle(
+                            fontSize: 9,
+                            fontWeight: FontWeight.w800,
+                            color: Colors.white,
+                            height: 1,
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
+              ),
             ),
             const SizedBox(height: 4),
             Text(
@@ -206,135 +238,6 @@ class _NavTab extends StatelessWidget {
               ),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-/// Side drawer with language and theme settings.
-class _SettingsDrawer extends StatelessWidget {
-  final AppLocalizations l10n;
-  final WidgetRef ref;
-  final VoidCallback onClose;
-
-  const _SettingsDrawer({
-    required this.l10n,
-    required this.ref,
-    required this.onClose,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final currentLocale = ref.watch(localeProvider);
-    final currentTheme = ref.watch(themeProvider);
-
-    final screenWidth = MediaQuery.of(context).size.width;
-
-    return Drawer(
-      width: screenWidth * 0.8,
-      child: SafeArea(
-        child: ListView(
-          padding: const EdgeInsets.all(16),
-          children: [
-            Text(l10n.language, style: Theme.of(context).textTheme.titleMedium),
-            const SizedBox(height: 8),
-            SegmentedButton<String>(
-              segments: [
-                ButtonSegment(value: 'ar', label: Text('العربية')),
-                ButtonSegment(value: 'en', label: Text('English')),
-              ],
-              selected: {currentLocale.languageCode},
-              onSelectionChanged: (selected) {
-                final code = selected.first;
-                if (code == 'ar') {
-                  ref.read(localeProvider.notifier).setArabic();
-                } else {
-                  ref.read(localeProvider.notifier).setEnglish();
-                }
-                onClose();
-              },
-            ),
-            const SizedBox(height: 24),
-            Text('Theme', style: Theme.of(context).textTheme.titleMedium),
-            const SizedBox(height: 8),
-            SegmentedButton<ThemeMode>(
-              segments: [
-                ButtonSegment(
-                  value: ThemeMode.light,
-                  label: const Icon(Icons.light_mode),
-                ),
-                ButtonSegment(
-                  value: ThemeMode.dark,
-                  label: const Icon(Icons.dark_mode),
-                ),
-              ],
-              selected: {currentTheme},
-              onSelectionChanged: (selected) {
-                ref.read(themeProvider.notifier).setTheme(selected.first);
-                onClose();
-              },
-            ),
-            const SizedBox(height: 24),
-            const Divider(),
-            const SizedBox(height: 8),
-            OutlinedButton.icon(
-              onPressed: () async {
-                await SeedDatabase.seedDemoData();
-                ref.invalidate(dashboardStatsProvider);
-                ref.invalidate(customersProvider);
-                ref.invalidate(transactionsProvider);
-                if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text(l10n.demoDataSeeded)),
-                  );
-                }
-              },
-              icon: const Icon(Icons.dataset_outlined),
-              label: Text(l10n.seedDemoData),
-              style: OutlinedButton.styleFrom(
-                foregroundColor: Theme.of(context).colorScheme.primary,
-              ),
-            ),
-            const SizedBox(height: 8),
-            OutlinedButton.icon(
-              onPressed: () async {
-                final confirm = await showDialog<bool>(
-                  context: context,
-                  builder: (_) => AlertDialog(
-                    title: Text(l10n.clearDemoData),
-                    content: Text(l10n.confirmDelete),
-                    actions: [
-                      TextButton(
-                        onPressed: () => Navigator.pop(context, false),
-                        child: Text(l10n.cancel),
-                      ),
-                      TextButton(
-                        onPressed: () => Navigator.pop(context, true),
-                        child: Text(l10n.save),
-                      ),
-                    ],
-                  ),
-                );
-                if (confirm == true) {
-                  await SeedDatabase.clearDemoData();
-                  ref.invalidate(dashboardStatsProvider);
-                  ref.invalidate(customersProvider);
-                  ref.invalidate(transactionsProvider);
-                  if (context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text(l10n.demoDataCleared)),
-                    );
-                  }
-                }
-              },
-              icon: const Icon(Icons.delete_outline),
-              label: Text(l10n.clearDemoData),
-              style: OutlinedButton.styleFrom(
-                foregroundColor: Theme.of(context).colorScheme.error,
-              ),
             ),
           ],
         ),

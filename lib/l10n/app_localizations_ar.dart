@@ -377,4 +377,16 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get sortByNameAZ => 'الاسم (أ-ي)';
+
+  @override
+  String get preferences => 'التفضيلات';
+
+  @override
+  String get theme => 'المظهر';
+
+  @override
+  String get dataManagement => 'إدارة البيانات';
+
+  @override
+  String get administrator => 'مشرف';
 }
