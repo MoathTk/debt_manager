@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'animated_counter.dart';
 import '../utils/number_formatter.dart';
+import '../l10n/app_localizations.dart';
 
 /// Premium stat card for the dashboard grid.
 ///
@@ -24,6 +25,11 @@ class StatCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final compactFn = compact
+      ? (double v) => NumberFormatter.compact(v,
+          billion: l10n!.billion, million: l10n.million, thousand: l10n.thousand)
+      : null;
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
@@ -51,7 +57,7 @@ class StatCard extends StatelessWidget {
             FittedBox(
               child: AnimatedCounter(
                 targetValue: numValue,
-                formatter: compact ? NumberFormatter.compact : null,
+                formatter: compactFn,
                 style: TextStyle(
                   fontSize: compact ? 22 : 32,
                   fontWeight: FontWeight.w800,

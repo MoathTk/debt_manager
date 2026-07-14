@@ -865,6 +865,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'administrator'**
   String get administrator;
+
+  /// No description provided for @autoSettledViaReminder.
+  ///
+  /// In en, this message translates to:
+  /// **'Auto-settled via reminder'**
+  String get autoSettledViaReminder;
+
+  /// No description provided for @autoSettledViaReminderDelete.
+  ///
+  /// In en, this message translates to:
+  /// **'Auto-settled via reminder delete'**
+  String get autoSettledViaReminderDelete;
+
+  /// No description provided for @phoneInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Phone must be 11 digits'**
+  String get phoneInvalid;
+
+  /// No description provided for @joined.
+  ///
+  /// In en, this message translates to:
+  /// **'Joined {date}'**
+  String joined(Object date);
+
+  /// No description provided for @billion.
+  ///
+  /// In en, this message translates to:
+  /// **'Billion'**
+  String get billion;
+
+  /// No description provided for @million.
+  ///
+  /// In en, this message translates to:
+  /// **'Million'**
+  String get million;
+
+  /// No description provided for @thousand.
+  ///
+  /// In en, this message translates to:
+  /// **'Thousand'**
+  String get thousand;
 }
 
 class _AppLocalizationsDelegate

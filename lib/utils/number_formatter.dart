@@ -1,22 +1,19 @@
-/// Formats large numbers into compact Arabic text.
+/// Formats large numbers into compact text based on locale.
 ///
-/// Examples:
-/// - 500       → "500"
-/// - 1500      → "1.5 ألف"
-/// - 1250000   → "1.25 مليون"
-/// - 3000000000 → "3 مليار"
+/// Examples (ar): "1.5 ألف", "1.25 مليون", "3 مليار"
+/// Examples (en): "1.5 Thousand", "1.25 Million", "3 Billion"
 class NumberFormatter {
-  static String compact(double value) {
+  static String compact(double value, {String billion = 'مليار', String million = 'مليون', String thousand = 'ألف'}) {
     final abs = value.abs();
     if (abs >= 1000000000) {
       final v = value / 1000000000;
-      return _fmt(v, 'مليار');
+      return _fmt(v, billion);
     } else if (abs >= 1000000) {
       final v = value / 1000000;
-      return _fmt(v, 'مليون');
+      return _fmt(v, million);
     } else if (abs >= 1000) {
       final v = value / 1000;
-      return _fmt(v, 'ألف');
+      return _fmt(v, thousand);
     }
     return value.toStringAsFixed(0);
   }

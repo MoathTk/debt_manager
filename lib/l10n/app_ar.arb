@@ -126,5 +126,12 @@
   "preferences": "التفضيلات",
   "theme": "المظهر",
   "dataManagement": "إدارة البيانات",
-  "administrator" : "مشرف"
+  "administrator" : "مشرف",
+  "autoSettledViaReminder": "تسوية تلقائية عبر التذكير",
+  "autoSettledViaReminderDelete": "تسوية تلقائية عبر حذف التذكير",
+  "phoneInvalid": "يجب أن يكون الرقم 11 خانة",
+  "joined": "انضم {date}",
+  "billion": "مليار",
+  "million": "مليون",
+  "thousand": "ألف"
 }

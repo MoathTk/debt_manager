@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../utils/number_formatter.dart';
+import '../l10n/app_localizations.dart';
 
 class PeriodMiniCard extends StatelessWidget {
   final String label;
@@ -14,6 +15,7 @@ class PeriodMiniCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       decoration: BoxDecoration(
@@ -34,7 +36,8 @@ class PeriodMiniCard extends StatelessWidget {
           ),
           const SizedBox(height: 4),
           Text(
-            NumberFormatter.compact(value),
+            NumberFormatter.compact(value,
+              billion: l10n!.billion, million: l10n.million, thousand: l10n.thousand),
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w800,

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../data/models/customer.dart';
+import '../l10n/app_localizations.dart';
 
 /// Large customer profile header with gradient avatar, name, phone, and join date.
 class CustomerHeader extends StatelessWidget {
@@ -87,7 +88,7 @@ class CustomerHeader extends StatelessWidget {
           ],
           const SizedBox(height: 6),
           Text(
-            'Joined ${customer.createdAt.substring(0, 10)}',
+            AppLocalizations.of(context)!.joined(customer.createdAt.substring(0, 10)),
             style: theme.textTheme.bodySmall?.copyWith(
               color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
             ),

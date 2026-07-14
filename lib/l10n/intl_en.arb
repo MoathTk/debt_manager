@@ -127,5 +127,12 @@
   "preferences": "PREFERENCES",
   "theme": "Theme",
   "dataManagement": "DATA MANAGEMENT",
-  "administrator" : "administrator"
+  "administrator" : "administrator",
+  "autoSettledViaReminder": "Auto-settled via reminder",
+  "autoSettledViaReminderDelete": "Auto-settled via reminder delete",
+  "phoneInvalid": "Phone must be 11 digits",
+  "joined": "Joined {date}",
+  "billion": "Billion",
+  "million": "Million",
+  "thousand": "Thousand"
 }

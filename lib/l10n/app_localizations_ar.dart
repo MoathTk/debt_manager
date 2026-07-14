@@ -392,4 +392,27 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get administrator => 'مشرف';
+
+  @override
+  String get autoSettledViaReminder => 'تسوية تلقائية عبر التذكير';
+
+  @override
+  String get autoSettledViaReminderDelete => 'تسوية تلقائية عبر حذف التذكير';
+
+  @override
+  String get phoneInvalid => 'يجب أن يكون الرقم 11 خانة';
+
+  @override
+  String joined(Object date) {
+    return 'انضم $date';
+  }
+
+  @override
+  String get billion => 'مليار';
+
+  @override
+  String get million => 'مليون';
+
+  @override
+  String get thousand => 'ألف';
 }

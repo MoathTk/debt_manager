@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../l10n/app_localizations.dart';
 import '../Providers/database_provider.dart';
@@ -235,6 +236,7 @@ class _PhoneField extends StatelessWidget {
       controller: controller,
       keyboardType: TextInputType.phone,
       textInputAction: TextInputAction.done,
+      inputFormatters: [FilteringTextInputFormatter.digitsOnly, LengthLimitingTextInputFormatter(11)],
       style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w500),
       decoration: InputDecoration(
         labelText: l10n.customerPhone,
@@ -255,6 +257,11 @@ class _PhoneField extends StatelessWidget {
         ),
         contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
       ),
+      validator: (v) {
+        if (v == null || v.trim().isEmpty) return null;
+        if (v.trim().length != 11) return l10n.phoneInvalid;
+        return null;
+      },
     );
   }
 }

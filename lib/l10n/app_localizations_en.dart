@@ -393,4 +393,27 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get administrator => 'administrator';
+
+  @override
+  String get autoSettledViaReminder => 'Auto-settled via reminder';
+
+  @override
+  String get autoSettledViaReminderDelete => 'Auto-settled via reminder delete';
+
+  @override
+  String get phoneInvalid => 'Phone must be 11 digits';
+
+  @override
+  String joined(Object date) {
+    return 'Joined $date';
+  }
+
+  @override
+  String get billion => 'Billion';
+
+  @override
+  String get million => 'Million';
+
+  @override
+  String get thousand => 'Thousand';
 }
