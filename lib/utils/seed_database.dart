@@ -107,15 +107,28 @@ class SeedDatabase {
       }
 
       // 4. Insert 30 reminders (some pending, some completed)
+      final customerDebts = <int, List<int>>{};
+      for (final entry in debtAmounts.entries) {
+        customerDebts[entry.key] = entry.value.map((e) => e.key).toList();
+      }
+
       for (var i = 0; i < 30; i++) {
         final cid = customerIds[_rand.nextInt(customerIds.length)];
         final daysOffset = _rand.nextInt(90) - 30; // -30 to +60 days
         final date = now.add(Duration(days: daysOffset));
-        final completed = _rand.nextInt(3) == 0 ? 1 : 0; // 33% completed
+        final dateStr = '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
+        final completed = _rand.nextInt(3) == 0 ? 1 : 0;
+
+        // Link reminder to a random debt of the same customer
+        final debts = customerDebts[cid];
+        final debtId = (debts != null && debts.isNotEmpty)
+            ? debts[_rand.nextInt(debts.length)]
+            : null;
 
         await txn.insert('debt_reminders', {
           'customer_id': cid,
-          'reminder_date': date.toIso8601String(),
+          'debt_id': debtId,
+          'reminder_date': dateStr,
           'is_completed': completed,
           'message': _reminderMessages[_rand.nextInt(_reminderMessages.length)],
         });

@@ -58,21 +58,21 @@ class _AnalyticsState extends ConsumerState<AnalyticsScreen> {
             ],
           ),
           const SizedBox(height: 12),
-          periodic.when(
-            data: (d) => DebtPaymentTrendChart(data: d),
-            loading: () => const SizedBox(
-              height: 200,
-              child: Center(child: CircularProgressIndicator()),
-            ),
-            error: (e, _) => Text('Error: $e'),
-          ),
-          const SizedBox(height: 16),
-          periodic.when(
-            data: (d) => MonthlyBreakdownChart(data: d),
-            loading: () => const SizedBox(height: 180),
-            error: (_, __) => const SizedBox(),
-          ),
-          const SizedBox(height: 16),
+          // periodic.when(
+          //   data: (d) => DebtPaymentTrendChart(data: d),
+          //   loading: () => const SizedBox(
+          //     height: 200,
+          //     child: Center(child: CircularProgressIndicator()),
+          //   ),
+          //   error: (e, _) => Text('Error: $e'),
+          // ),
+          // const SizedBox(height: 16),
+          // periodic.when(
+          //   data: (d) => MonthlyBreakdownChart(data: d),
+          //   loading: () => const SizedBox(height: 180),
+          //   error: (_, __) => const SizedBox(),
+          // ),
+          // const SizedBox(height: 16),
           DebtPaymentRatioChart(
             totalDebts: s.totalDebts,
             totalPayments: s.totalPayments,

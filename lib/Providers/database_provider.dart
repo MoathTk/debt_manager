@@ -171,6 +171,48 @@ final totalsByDateRangeProvider =
       return repo.getTotalsByDateRange(parts[0], parts[1]);
     });
 
+/// Provider for all reminders (for grouping in reminders screen).
+final allRemindersProvider = FutureProvider<List<DebtReminder>>((ref) async {
+  final repo = ref.watch(debtReminderRepositoryProvider);
+  return repo.getAll();
+});
+
+/// Helper to invalidate all reminder-related providers.
+void _invalidateReminders(WidgetRef ref) {
+  ref.invalidate(allRemindersProvider);
+  ref.invalidate(pendingRemindersProvider);
+  ref.invalidate(dueTodayProvider);
+  ref.invalidate(dashboardStatsProvider);
+}
+
+/// Marks a reminder as completed.
+Future<void> markReminderCompleted(WidgetRef ref, int id) async {
+  final repo = ref.read(debtReminderRepositoryProvider);
+  await repo.markCompleted(id);
+  _invalidateReminders(ref);
+}
+
+/// Reopens a completed reminder back to pending.
+Future<void> markReminderPending(WidgetRef ref, int id) async {
+  final repo = ref.read(debtReminderRepositoryProvider);
+  await repo.markPending(id);
+  _invalidateReminders(ref);
+}
+
+/// Deletes a reminder and refreshes all related providers.
+Future<void> deleteReminder(WidgetRef ref, int id) async {
+  final repo = ref.read(debtReminderRepositoryProvider);
+  await repo.delete(id);
+  _invalidateReminders(ref);
+}
+
+/// Deletes multiple reminders by IDs and refreshes all related providers.
+Future<void> deleteRemindersBatch(WidgetRef ref, List<int> ids) async {
+  final repo = ref.read(debtReminderRepositoryProvider);
+  await repo.deleteBatch(ids);
+  _invalidateReminders(ref);
+}
+
 // ============================================================================
 // DATA CLASSES
 // ============================================================================

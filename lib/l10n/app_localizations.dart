@@ -458,6 +458,12 @@ abstract class AppLocalizations {
   /// **'Sort by'**
   String get sortBy;
 
+  /// No description provided for @filter.
+  ///
+  /// In en, this message translates to:
+  /// **'Filter'**
+  String get filter;
+
   /// No description provided for @dateRange.
   ///
   /// In en, this message translates to:
@@ -637,6 +643,198 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Current'**
   String get currentPeriod;
+
+  /// No description provided for @overdue.
+  ///
+  /// In en, this message translates to:
+  /// **'Overdue'**
+  String get overdue;
+
+  /// No description provided for @dueToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Due Today'**
+  String get dueToday;
+
+  /// No description provided for @upcoming.
+  ///
+  /// In en, this message translates to:
+  /// **'Upcoming'**
+  String get upcoming;
+
+  /// No description provided for @completedReminders.
+  ///
+  /// In en, this message translates to:
+  /// **'Completed'**
+  String get completedReminders;
+
+  /// No description provided for @noReminders.
+  ///
+  /// In en, this message translates to:
+  /// **'No reminders'**
+  String get noReminders;
+
+  /// No description provided for @noRemindersMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'All debts are settled!'**
+  String get noRemindersMessage;
+
+  /// No description provided for @daysOverdue.
+  ///
+  /// In en, this message translates to:
+  /// **'days overdue'**
+  String get daysOverdue;
+
+  /// No description provided for @daysUntilDue.
+  ///
+  /// In en, this message translates to:
+  /// **'days until due'**
+  String get daysUntilDue;
+
+  /// No description provided for @reminderDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Reminder Details'**
+  String get reminderDetails;
+
+  /// No description provided for @outstandingAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Outstanding Amount'**
+  String get outstandingAmount;
+
+  /// No description provided for @status.
+  ///
+  /// In en, this message translates to:
+  /// **'Status'**
+  String get status;
+
+  /// No description provided for @markCompleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark Completed'**
+  String get markCompleted;
+
+  /// No description provided for @deleteReminder.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Reminder'**
+  String get deleteReminder;
+
+  /// No description provided for @confirmDeleteReminder.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete this reminder?'**
+  String get confirmDeleteReminder;
+
+  /// No description provided for @reminderDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Reminder Date'**
+  String get reminderDate;
+
+  /// No description provided for @confirmMarkCompleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark this reminder as completed?'**
+  String get confirmMarkCompleted;
+
+  /// No description provided for @confirmMarkPending.
+  ///
+  /// In en, this message translates to:
+  /// **'Reopen this reminder?'**
+  String get confirmMarkPending;
+
+  /// No description provided for @deleteAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete All'**
+  String get deleteAll;
+
+  /// No description provided for @confirmDeleteAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete all reminders in this section?'**
+  String get confirmDeleteAll;
+
+  /// No description provided for @yes.
+  ///
+  /// In en, this message translates to:
+  /// **'Yes'**
+  String get yes;
+
+  /// No description provided for @no.
+  ///
+  /// In en, this message translates to:
+  /// **'No'**
+  String get no;
+
+  /// No description provided for @reminderDateOptional.
+  ///
+  /// In en, this message translates to:
+  /// **'Reminder Date (optional)'**
+  String get reminderDateOptional;
+
+  /// No description provided for @pickDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick Date'**
+  String get pickDate;
+
+  /// No description provided for @today.
+  ///
+  /// In en, this message translates to:
+  /// **'Today'**
+  String get today;
+
+  /// No description provided for @afterOneWeek.
+  ///
+  /// In en, this message translates to:
+  /// **'After 1 week'**
+  String get afterOneWeek;
+
+  /// No description provided for @afterOneMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'After 1 month'**
+  String get afterOneMonth;
+
+  /// No description provided for @searchReminders.
+  ///
+  /// In en, this message translates to:
+  /// **'Search reminders...'**
+  String get searchReminders;
+
+  /// No description provided for @sortByDateNewest.
+  ///
+  /// In en, this message translates to:
+  /// **'Date (newest)'**
+  String get sortByDateNewest;
+
+  /// No description provided for @sortByDateOldest.
+  ///
+  /// In en, this message translates to:
+  /// **'Date (oldest)'**
+  String get sortByDateOldest;
+
+  /// No description provided for @sortByAmountHighest.
+  ///
+  /// In en, this message translates to:
+  /// **'Amount (highest)'**
+  String get sortByAmountHighest;
+
+  /// No description provided for @sortByAmountLowest.
+  ///
+  /// In en, this message translates to:
+  /// **'Amount (lowest)'**
+  String get sortByAmountLowest;
+
+  /// No description provided for @sortByNameAZ.
+  ///
+  /// In en, this message translates to:
+  /// **'Name (A-Z)'**
+  String get sortByNameAZ;
 }
 
 class _AppLocalizationsDelegate

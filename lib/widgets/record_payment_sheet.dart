@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../l10n/app_localizations.dart';
 import '../data/models/transaction.dart' as model;
 import '../Providers/database_provider.dart';
+import 'amount_input_formatter.dart';
 import 'app_snackbar.dart';
 import 'debt_selector_tile.dart';
 
@@ -44,7 +45,7 @@ class _S extends ConsumerState<_Body> {
 
   Future<void> _save() async {
     if (_debtId == null) return;
-    final v = double.tryParse(_amt.text.trim());
+    final v = parseAmount(_amt.text.trim());
     if (v == null || v <= 0) return;
     if (v > _max) {
       if (mounted) {
@@ -184,7 +185,7 @@ class _S extends ConsumerState<_Body> {
               ),
               if (_debtId != null) ...[
                 const SizedBox(height: 20),
-                _inp(_amt, '${l10n.amount} (max ${_fmt(_max)})', true, true),
+                _inp(_amt, '${l10n.amount} (max ${formatAmount(_max)})', true, true),
                 const SizedBox(height: 14),
                 _inp(_note, l10n.noteOptional),
                 const SizedBox(height: 24),
@@ -224,18 +225,11 @@ class _S extends ConsumerState<_Body> {
         keyboardType: num
             ? const TextInputType.numberWithOptions(decimal: true)
             : null,
+        inputFormatters: num ? [ThousandsSeparatorInputFormatter()] : null,
         style: const TextStyle(fontSize: 18),
         decoration: InputDecoration(
           labelText: label,
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
         ),
       );
-
-  String _fmt(double n) {
-    final s = n % 1 == 0 ? n.toStringAsFixed(0) : n.toStringAsFixed(2);
-    return s.replaceAllMapped(
-      RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-      (m) => '${m[1]},',
-    );
-  }
 }

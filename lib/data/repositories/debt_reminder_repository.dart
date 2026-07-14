@@ -33,11 +33,22 @@ class DebtReminderRepository {
   /// Deletes a debt reminder from the database by ID.
   Future<int> delete(int id) async {
     final db = await _dbHelper.database;
-    return await db.delete(
-      'debt_reminders',
-      where: 'id = ?',
-      whereArgs: [id],
-    );
+    return await db.delete('debt_reminders', where: 'id = ?', whereArgs: [id]);
+  }
+
+  /// Deletes multiple reminders by their IDs in one query.
+  Future<void> deleteBatch(List<int> ids) async {
+    if (ids.isEmpty) return;
+    final db = await _dbHelper.database;
+    final placeholders = ids.map((_) => '?').join(',');
+    await db.delete('debt_reminders',
+      where: 'id IN ($placeholders)', whereArgs: ids);
+  }
+
+  /// Deletes all reminders linked to a specific debt.
+  Future<void> deleteByDebtId(int debtId) async {
+    final db = await _dbHelper.database;
+    await db.delete('debt_reminders', where: 'debt_id = ?', whereArgs: [debtId]);
   }
 
   /// Retrieves all debt reminders from the database.

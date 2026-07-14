@@ -31,7 +31,7 @@ class DatabaseHelper {
     final path = join(dbPath, filePath);
     return await openDatabase(
       path,
-      version: 2,
+      version: 3,
       onCreate: _createDB,
       onUpgrade: _onUpgrade,
     );
@@ -128,6 +128,9 @@ class DatabaseHelper {
   Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
     if (oldVersion < 2) {
       await db.execute('ALTER TABLE transactions ADD COLUMN debt_id INTEGER');
+    }
+    if (oldVersion < 3) {
+      await db.execute('ALTER TABLE debt_reminders ADD COLUMN debt_id INTEGER');
     }
   }
 

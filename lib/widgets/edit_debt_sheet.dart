@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../l10n/app_localizations.dart';
 import '../data/models/transaction.dart' as model;
 import '../Providers/database_provider.dart';
+import 'amount_input_formatter.dart';
 import 'app_snackbar.dart';
 
 /// Bottom sheet for editing or deleting an existing debt.
@@ -37,9 +39,7 @@ class _BodyState extends ConsumerState<_EditDebtBody> {
   void initState() {
     super.initState();
     _amount = TextEditingController(
-      text: widget.debt.amount % 1 == 0
-          ? widget.debt.amount.toStringAsFixed(0)
-          : widget.debt.amount.toStringAsFixed(2),
+      text: formatAmount(widget.debt.amount),
     );
     _note = TextEditingController(text: widget.debt.note ?? '');
   }
@@ -52,7 +52,7 @@ class _BodyState extends ConsumerState<_EditDebtBody> {
   }
 
   Future<void> _save() async {
-    final val = double.tryParse(_amount.text.trim());
+    final val = parseAmount(_amount.text.trim());
     if (val == null || val <= 0) return;
 
     final totalPaid = await ref
@@ -85,9 +85,14 @@ class _BodyState extends ConsumerState<_EditDebtBody> {
 
   Future<void> _delete() async {
     setState(() => _saving = true);
+    final reminderRepo = ref.read(debtReminderRepositoryProvider);
+    await reminderRepo.deleteByDebtId(widget.debt.id!);
     final repo = ref.read(transactionRepositoryProvider);
     await repo.delete(widget.debt.id!);
     _invalidate(ref);
+    ref.invalidate(allRemindersProvider);
+    ref.invalidate(pendingRemindersProvider);
+    ref.invalidate(dueTodayProvider);
     if (mounted) Navigator.pop(context);
   }
 
@@ -122,7 +127,8 @@ class _BodyState extends ConsumerState<_EditDebtBody> {
             ),
           ),
           const SizedBox(height: 24),
-          _Field(ctrl: _amount, label: l10n.amount, decimal: true, autofocus: true),
+          _Field(ctrl: _amount, label: l10n.amount, decimal: true, autofocus: true,
+            formatters: [ThousandsSeparatorInputFormatter()]),
           const SizedBox(height: 16),
           _Field(ctrl: _note, label: l10n.noteOptional),
           const SizedBox(height: 24),
@@ -185,7 +191,8 @@ class _Field extends StatelessWidget {
   final String label;
   final bool decimal;
   final bool autofocus;
-  const _Field({required this.ctrl, required this.label, this.decimal = false, this.autofocus = false});
+  final List<TextInputFormatter>? formatters;
+  const _Field({required this.ctrl, required this.label, this.decimal = false, this.autofocus = false, this.formatters});
 
   @override
   Widget build(BuildContext context) {
@@ -195,6 +202,7 @@ class _Field extends StatelessWidget {
       keyboardType: decimal
           ? const TextInputType.numberWithOptions(decimal: true)
           : null,
+      inputFormatters: formatters,
       style: const TextStyle(fontSize: 18),
       decoration: InputDecoration(
         labelText: label,

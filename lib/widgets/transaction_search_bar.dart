@@ -36,7 +36,7 @@ class TransactionSearchBar extends StatelessWidget {
               : null,
           filled: true,
           fillColor: theme.colorScheme.surfaceContainerHighest.withValues(
-            alpha: 0.3,
+            alpha: 0.45,
           ),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(14),

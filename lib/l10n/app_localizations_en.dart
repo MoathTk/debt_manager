@@ -190,6 +190,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get sortBy => 'Sort by';
 
   @override
+  String get filter => 'Filter';
+
+  @override
   String get dateRange => 'Date Range';
 
   @override
@@ -278,4 +281,101 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get currentPeriod => 'Current';
+
+  @override
+  String get overdue => 'Overdue';
+
+  @override
+  String get dueToday => 'Due Today';
+
+  @override
+  String get upcoming => 'Upcoming';
+
+  @override
+  String get completedReminders => 'Completed';
+
+  @override
+  String get noReminders => 'No reminders';
+
+  @override
+  String get noRemindersMessage => 'All debts are settled!';
+
+  @override
+  String get daysOverdue => 'days overdue';
+
+  @override
+  String get daysUntilDue => 'days until due';
+
+  @override
+  String get reminderDetails => 'Reminder Details';
+
+  @override
+  String get outstandingAmount => 'Outstanding Amount';
+
+  @override
+  String get status => 'Status';
+
+  @override
+  String get markCompleted => 'Mark Completed';
+
+  @override
+  String get deleteReminder => 'Delete Reminder';
+
+  @override
+  String get confirmDeleteReminder =>
+      'Are you sure you want to delete this reminder?';
+
+  @override
+  String get reminderDate => 'Reminder Date';
+
+  @override
+  String get confirmMarkCompleted => 'Mark this reminder as completed?';
+
+  @override
+  String get confirmMarkPending => 'Reopen this reminder?';
+
+  @override
+  String get deleteAll => 'Delete All';
+
+  @override
+  String get confirmDeleteAll => 'Delete all reminders in this section?';
+
+  @override
+  String get yes => 'Yes';
+
+  @override
+  String get no => 'No';
+
+  @override
+  String get reminderDateOptional => 'Reminder Date (optional)';
+
+  @override
+  String get pickDate => 'Pick Date';
+
+  @override
+  String get today => 'Today';
+
+  @override
+  String get afterOneWeek => 'After 1 week';
+
+  @override
+  String get afterOneMonth => 'After 1 month';
+
+  @override
+  String get searchReminders => 'Search reminders...';
+
+  @override
+  String get sortByDateNewest => 'Date (newest)';
+
+  @override
+  String get sortByDateOldest => 'Date (oldest)';
+
+  @override
+  String get sortByAmountHighest => 'Amount (highest)';
+
+  @override
+  String get sortByAmountLowest => 'Amount (lowest)';
+
+  @override
+  String get sortByNameAZ => 'Name (A-Z)';
 }

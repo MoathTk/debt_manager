@@ -7,6 +7,7 @@ import '../Providers/database_provider.dart';
 import '../utils/seed_database.dart';
 import 'dashboard_screen.dart';
 import 'customers_screen.dart';
+import 'reminders_screen.dart';
 
 /// Main shell screen with bottom navigation bar and settings drawer.
 ///
@@ -23,11 +24,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   int _currentIndex = 0;
   final _scaffoldKey = GlobalKey<ScaffoldState>();
 
-  final _screens = const [DashboardScreen(), CustomersScreen()];
+  final _screens = const [DashboardScreen(), CustomersScreen(), RemindersScreen()];
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final pendingAsync = ref.watch(pendingRemindersProvider);
+    final pendingCount = pendingAsync.whenOrNull(data: (list) => list.length);
 
     return Scaffold(
       key: _scaffoldKey,
@@ -52,6 +55,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         items: [
           _NavItem(icon: Icons.home_rounded, activeIcon: Icons.home_rounded, label: l10n.home),
           _NavItem(icon: Icons.people_rounded, activeIcon: Icons.people_rounded, label: l10n.customers),
+          _NavItem(icon: Icons.notifications_none_rounded, activeIcon: Icons.notifications_active_rounded, label: l10n.reminders, badge: pendingCount),
         ],
       ),
     );
@@ -63,8 +67,9 @@ class _NavItem {
   final IconData icon;
   final IconData activeIcon;
   final String label;
+  final int? badge;
 
-  _NavItem({required this.icon, required this.activeIcon, required this.label});
+  _NavItem({required this.icon, required this.activeIcon, required this.label, this.badge});
 }
 
 /// Modern floating bottom navigation bar with a pill-shaped indicator.
@@ -167,11 +172,28 @@ class _NavTab extends StatelessWidget {
                       borderRadius: BorderRadius.circular(16),
                     )
                   : null,
-              child: Icon(
-                isSelected ? item.activeIcon : item.icon,
-                color: color,
-                size: 26,
-              ),
+              child: Stack(clipBehavior: Clip.none, children: [
+                Icon(
+                  isSelected ? item.activeIcon : item.icon,
+                  color: color,
+                  size: 26,
+                ),
+                if (item.badge != null && item.badge! > 0)
+                  Positioned(
+                    top: -4, right: -10,
+                    child: Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.error,
+                        shape: BoxShape.circle,
+                      ),
+                      child: Text('${item.badge}',
+                        style: const TextStyle(
+                          fontSize: 9, fontWeight: FontWeight.w800,
+                          color: Colors.white, height: 1)),
+                    ),
+                  ),
+              ]),
             ),
             const SizedBox(height: 4),
             Text(
@@ -212,7 +234,7 @@ class _SettingsDrawer extends StatelessWidget {
     final screenWidth = MediaQuery.of(context).size.width;
 
     return Drawer(
-      width: screenWidth * 0.5,
+      width: screenWidth * 0.8,
       child: SafeArea(
         child: ListView(
           padding: const EdgeInsets.all(16),

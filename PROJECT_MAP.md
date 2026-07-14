@@ -20,8 +20,8 @@ A mobile Flutter application for local merchants in Al-Anbar, Iraq to digitize p
 lib/
   main.dart                              # App entry point, MaterialApp config
   l10n/
-    intl_en.arb                          # English translation keys (88 keys)
-    app_ar.arb                           # Arabic translation keys (88 keys)
+    intl_en.arb                          # English translation keys (123 keys)
+    app_ar.arb                           # Arabic translation keys (123 keys)
     app_localizations.dart               # GENERATED: AppLocalizations class
     app_localizations_en.dart            # GENERATED: English delegate
     app_localizations_ar.dart            # GENERATED: Arabic delegate
@@ -46,6 +46,8 @@ lib/
     customers_screen.dart                # Customer list + search + FAB → Customer Detail
     customer_detail_screen.dart          # Header, balance, transactions, action bar
     all_transactions_screen.dart         # All transactions with search/filter/sort (≤100 lines)
+    reminders_screen.dart                # Flat list with search, status filter, sort dropdowns
+    reminder_filters.dart                # Search bar + status/sort dropdowns (theme-consistent)
     transaction_search_bar.dart          # Search bar for all transactions screen
     transaction_filter_bar.dart          # Type chips + sort + date range filter
     sort_bottom_sheet.dart               # Sort bottom sheet + date range picker helpers
@@ -61,7 +63,8 @@ lib/
     balance_card.dart                    # Net balance with owes/overpaid/settled status
     transaction_tile.dart                # Transaction row with type icon, amount, remaining
     debt_selector_tile.dart              # Radio-selectable debt tile for payment linking
-    add_debt_sheet.dart                  # Simple debt entry (amount + note)
+    add_debt_sheet.dart                  # Debt entry with optional reminder date picker
+    reminder_date_picker.dart            # Optional date picker with quick-select chips (Today/Week/Month)
     record_payment_sheet.dart            # DraggableScrollableSheet with debt selector
     action_bar.dart                      # 3-button floating bar (Debt, Payment, Edit Records)
     records_list_sheet.dart              # List of all debts + payments, tappable to edit
@@ -75,6 +78,11 @@ lib/
     debt_payment_ratio_chart.dart        # Donut/pie chart (debt vs payment ratio)
     top_debtors_chart.dart               # Horizontal bar chart (top 5 debtors)
     time_range_selector.dart             # Week/Month toggle for chart data
+    reminder_section_header.dart         # Collapsible section header (unused, kept for reference)
+    reminder_card.dart                   # Reminder card with customer name, date, amount chip, actions
+    reminder_action_btn.dart             # Small circular icon button for reminder cards
+    reminder_detail_sheet.dart           # Bottom sheet with reminder details + actions
+    info_row.dart                        # Reusable label-value row for bottom sheets
   utils/
     seed_database.dart                   # Demo data seeder (50 customers, 200 debts, 150 payments, 30 reminders)
   generated/                             # GENERATED: intl message files
@@ -223,6 +231,7 @@ Deleting a customer cascade-deletes all their transactions and reminders.
 | `debtsWithRemainingProvider` | `FutureProvider.family<List<Map>, int>` | Debts with remaining balance per customer |
 | `pendingRemindersProvider` | `FutureProvider<List<DebtReminder>>` | All pending reminders |
 | `dueTodayProvider` | `FutureProvider<List<DebtReminder>>` | Reminders due today |
+| `allRemindersProvider` | `FutureProvider<List<DebtReminder>>` | All reminders (for grouping in reminders screen) |
 | `dashboardStatsProvider` | `FutureProvider<DashboardStats>` | Aggregated dashboard stats (includes periodic + top debtors) |
 | `periodicDataProvider` | `FutureProvider.family<List<Map>, bool>` | Periodic data (weekly/monthly toggle) |
 | `topDebtorsProvider` | `FutureProvider<List<Map>>` | Top 5 debtors by outstanding balance |
@@ -236,6 +245,9 @@ Deleting a customer cascade-deletes all their transactions and reminders.
 ### Mutation Helpers
 - `addCustomer(ref, {name, phone})` — inserts customer and invalidates providers
 - `updateCustomer(ref, {customer, name, phone})` — updates customer and invalidates providers
+- `markReminderCompleted(ref, id)` — marks reminder as completed
+- `markReminderPending(ref, id)` — reopens completed reminder
+- `deleteReminder(ref, id)` — deletes reminder
 
 ### Theme Provider (`lib/Providers/theme_provider.dart`)
 | Provider | Type | Description |
@@ -261,7 +273,7 @@ Deleting a customer cascade-deletes all their transactions and reminders.
 - ARB files: `lib/l10n/intl_en.arb` (English), `lib/l10n/app_ar.arb` (Arabic)
 - Generated: `AppLocalizations` class in `lib/l10n/`
 
-### Translation Keys (88 keys)
+### Translation Keys (123 keys)
 | Key | English | Arabic |
 |---|---|---|
 | appTitle | Debt Management | إدارة الديون |
@@ -346,13 +358,39 @@ Deleting a customer cascade-deletes all their transactions and reminders.
 | clearDemoData | Clear Demo Data | مسح البيانات التجريبية |
 | demoDataSeeded | Demo data loaded! | تم تحميل البيانات التجريبية! |
 | demoDataCleared | Demo data cleared! | تم مسح البيانات التجريبية! |
+| overdue | Overdue | متأخرة |
+| dueToday | Due Today | مستحقة اليوم |
+| upcoming | Upcoming | قادمة |
+| completedReminders | Completed | مكتملة |
+| noReminders | No reminders | لا توجد تذكيرات |
+| noRemindersMessage | All debts are settled! | جميع الديون مسددة! |
+| daysOverdue | days overdue | أيام تأخر |
+| daysUntilDue | days until due | أيام حتى الاستحقاق |
+| reminderDetails | Reminder Details | تفاصيل التذكير |
+| outstandingAmount | Outstanding Amount | المبلغ المستحق |
+| status | Status | الحالة |
+| markCompleted | Mark Completed | تم التحصيل |
+| deleteReminder | Delete Reminder | حذف التذكير |
+| confirmDeleteReminder | Delete this reminder? | حذف هذا التذكير؟ |
+| reminderDate | Reminder Date | تاريخ التذكير |
+| confirmMarkCompleted | Mark this reminder as completed? | تحديد هذا التذكير كمكتمل؟ |
+| confirmMarkPending | Reopen this reminder? | إعادة فتح هذا التذكير؟ |
+| deleteAll | Delete All | حذف الكل |
+| confirmDeleteAll | Delete all reminders in this section? | حذف جميع تذكيرات هذه القائمة؟ |
+| yes | Yes | نعم |
+| no | No | لا |
+| reminderDateOptional | Reminder Date (optional) | تذكير (اختياري) |
+| pickDate | Pick Date | اختر تاريخ |
+| today | Today | اليوم |
+| afterOneWeek | After 1 week | بعد أسبوع |
+| afterOneMonth | After 1 month | بعد شهر |
 
 ---
 
 ## Screens
 
 ### HomeScreen (`lib/screens/home_screen.dart`)
-- Custom floating bottom nav bar (`_ModernNavBar`) with animated pill indicator
+- Custom floating bottom nav bar (`_ModernNavBar`) with animated pill indicator + badge
 - Settings drawer (half-width) with language + theme segmented buttons + seed/clear demo data buttons
 - IndexedStack preserves scroll state across tabs
 
@@ -387,6 +425,16 @@ Deleting a customer cascade-deletes all their transactions and reminders.
 - EmptyState when no customers
 - FAB opens AddCustomerSheet
 - Tap tile → navigates to Customer Detail
+
+### RemindersScreen (`lib/screens/reminders_screen.dart`)
+- Flat list of ReminderCards (no sections, no collapsible)
+- Fixed search bar at top (searches by customer name + message text)
+- Status filter dropdown: All / Late / Pending / Completed
+- Sort dropdown: Date (newest/oldest) / Amount (highest/lowest) / Name (A-Z)
+- Pre-loads customer names + debt amounts for sync filtering/sorting
+- Color-coded accent per card: red (overdue), orange (due today), blue (upcoming), grey (completed)
+- Empty state adapts to active filters
+- Tap card → opens ReminderDetailSheet
 
 ### CustomerDetailScreen (`lib/screens/customer_detail_screen.dart`)
 - CustomScrollView with CustomerHeader, BalanceCard, transaction list
@@ -447,8 +495,17 @@ Deleting a customer cascade-deletes all their transactions and reminders.
 - Shows remaining amount badge
 
 ### AddDebtSheet (`lib/widgets/add_debt_sheet.dart`)
-- Simple debt entry: amount + note
-- Inserts debt transaction
+- Debt entry: amount + optional note + optional reminder date
+- Quick-select chips: Today, After 1 week, After 1 month
+- Full date picker via calendar icon
+- Inserts debt transaction + optional DebtReminder on save
+
+### ReminderDatePicker (`lib/widgets/reminder_date_picker.dart`)
+- Standalone reusable widget for selecting a reminder date
+- Quick-select chips row (Today, After 1 week, After 1 month)
+- Tappable date field opens native date picker
+- Clear (X) button when date is selected
+- Uses `l10n` for all labels
 
 ### RecordPaymentSheet (`lib/widgets/record_payment_sheet.dart`)
 - DraggableScrollableSheet (0.5→0.85) with debt selector + amount input
@@ -575,14 +632,13 @@ Smart decimal format used across all display files:
 - Dashboard charts: ✅ COMPLETE (progress ring, trend line, bar breakdown, donut ratio, top debtors, week/month toggle)
 - Customers screen: ✅ COMPLETE (list, search, add customer, edit customer)
 - Customer Detail screen: ✅ COMPLETE (header, balance card, transaction list)
-- Transaction entry: ✅ COMPLETE (add debt, record payment with debt linking)
+- Transaction entry: ✅ COMPLETE (add debt with optional reminder, record payment with debt linking)
 - Edit Records: ✅ COMPLETE (records list, edit/delete debt, edit/delete payment)
 - Reusable SnackBar: ✅ COMPLETE
-- Reminders screen: NOT STARTED
+- Reminders screen: ✅ COMPLETE (grouped sections, badge, delete-all, confirmation dialogs)
 - Cloud sync: NOT STARTED (firebase_id fields ready)
 
 ## Next Steps
-- Reminders screen + scheduling
 - Local notifications for debt reminders
 - Export/backup functionality
 - Firebase integration for cloud sync

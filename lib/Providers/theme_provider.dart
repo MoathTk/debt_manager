@@ -33,7 +33,7 @@ class ThemeNotifier extends StateNotifier<ThemeMode> {
 /// for accessibility across all age groups.
 ThemeData get lightTheme {
   final colorScheme = ColorScheme.fromSeed(
-    seedColor: Colors.teal,
+    seedColor: Colors.indigo,
     brightness: Brightness.light,
   );
 
@@ -75,7 +75,7 @@ ThemeData get lightTheme {
 /// Maintains the same text scaling for consistency.
 ThemeData get darkTheme {
   final colorScheme = ColorScheme.fromSeed(
-    seedColor: Colors.teal,
+    seedColor: const Color.fromARGB(255, 46, 59, 134),
     brightness: Brightness.dark,
   );
 

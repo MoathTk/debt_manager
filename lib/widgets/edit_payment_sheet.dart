@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../l10n/app_localizations.dart';
 import '../data/models/transaction.dart' as model;
 import '../Providers/database_provider.dart';
+import 'amount_input_formatter.dart';
 import 'app_snackbar.dart';
 
 /// Bottom sheet for editing or deleting an existing payment.
@@ -30,9 +32,7 @@ class _BodyState extends ConsumerState<_EditPaymentBody> {
   @override
   void initState() {
     super.initState();
-    _amount = TextEditingController(text: widget.payment.amount % 1 == 0
-        ? widget.payment.amount.toStringAsFixed(0)
-        : widget.payment.amount.toStringAsFixed(2));
+    _amount = TextEditingController(text: formatAmount(widget.payment.amount));
     _note = TextEditingController(text: widget.payment.note ?? '');
   }
 
@@ -40,7 +40,7 @@ class _BodyState extends ConsumerState<_EditPaymentBody> {
   void dispose() { _amount.dispose(); _note.dispose(); super.dispose(); }
 
   Future<void> _save() async {
-    final val = double.tryParse(_amount.text.trim());
+    final val = parseAmount(_amount.text.trim());
     if (val == null || val <= 0) return;
 
     if (widget.payment.debtId != null) {
@@ -98,7 +98,8 @@ class _BodyState extends ConsumerState<_EditPaymentBody> {
         const SizedBox(height: 20),
         Text(l10n.editPayment, style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800)),
         const SizedBox(height: 24),
-        _Field(ctrl: _amount, label: l10n.amount, decimal: true, autofocus: true),
+        _Field(ctrl: _amount, label: l10n.amount, decimal: true, autofocus: true,
+          formatters: [ThousandsSeparatorInputFormatter()]),
         const SizedBox(height: 16),
         _Field(ctrl: _note, label: l10n.noteOptional),
         const SizedBox(height: 24),
@@ -127,13 +128,15 @@ class _Field extends StatelessWidget {
   final String label;
   final bool decimal;
   final bool autofocus;
-  const _Field({required this.ctrl, required this.label, this.decimal = false, this.autofocus = false});
+  final List<TextInputFormatter>? formatters;
+  const _Field({required this.ctrl, required this.label, this.decimal = false, this.autofocus = false, this.formatters});
 
   @override
   Widget build(BuildContext context) {
     return TextField(controller: ctrl,
       autofocus: autofocus,
       keyboardType: decimal ? const TextInputType.numberWithOptions(decimal: true) : null,
+      inputFormatters: formatters,
       style: const TextStyle(fontSize: 18),
       decoration: InputDecoration(labelText: label,
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12))));

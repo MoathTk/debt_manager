@@ -189,6 +189,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get sortBy => 'ترتيب حسب';
 
   @override
+  String get filter => 'تصفية';
+
+  @override
   String get dateRange => 'نطاق التاريخ';
 
   @override
@@ -277,4 +280,101 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get currentPeriod => 'الحالي';
+
+  @override
+  String get overdue => 'متأخرة';
+
+  @override
+  String get dueToday => 'مستحقة اليوم';
+
+  @override
+  String get upcoming => 'قادمة';
+
+  @override
+  String get completedReminders => 'مكتملة';
+
+  @override
+  String get noReminders => 'لا توجد تذكيرات';
+
+  @override
+  String get noRemindersMessage => 'جميع الديون مسددة!';
+
+  @override
+  String get daysOverdue => 'أيام تأخر';
+
+  @override
+  String get daysUntilDue => 'أيام حتى الاستحقاق';
+
+  @override
+  String get reminderDetails => 'تفاصيل التذكير';
+
+  @override
+  String get outstandingAmount => 'المبلغ المستحق';
+
+  @override
+  String get status => 'الحالة';
+
+  @override
+  String get markCompleted => 'تم التحصيل';
+
+  @override
+  String get deleteReminder => 'حذف التذكير';
+
+  @override
+  String get confirmDeleteReminder => 'هل أنت متأكد من حذف هذا التذكير؟';
+
+  @override
+  String get reminderDate => 'تاريخ التذكير';
+
+  @override
+  String get confirmMarkCompleted => 'هل تريد تحديد هذا التذكير كمكتمل؟';
+
+  @override
+  String get confirmMarkPending => 'هل تريد إعادة فتح هذا التذكير؟';
+
+  @override
+  String get deleteAll => 'حذف الكل';
+
+  @override
+  String get confirmDeleteAll =>
+      'هل أنت متأكد من حذف جميع تذكيرات هذه القائمة؟';
+
+  @override
+  String get yes => 'نعم';
+
+  @override
+  String get no => 'لا';
+
+  @override
+  String get reminderDateOptional => 'تذكير (اختياري)';
+
+  @override
+  String get pickDate => 'اختر تاريخ';
+
+  @override
+  String get today => 'اليوم';
+
+  @override
+  String get afterOneWeek => 'بعد أسبوع';
+
+  @override
+  String get afterOneMonth => 'بعد شهر';
+
+  @override
+  String get searchReminders => 'بحث في التذكيرات...';
+
+  @override
+  String get sortByDateNewest => 'التاريخ (الأحدث)';
+
+  @override
+  String get sortByDateOldest => 'التاريخ (الأقدم)';
+
+  @override
+  String get sortByAmountHighest => 'المبلغ (الأعلى)';
+
+  @override
+  String get sortByAmountLowest => 'المبلغ (الأدنى)';
+
+  @override
+  String get sortByNameAZ => 'الاسم (أ-ي)';
 }

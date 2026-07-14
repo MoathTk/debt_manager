@@ -66,21 +66,44 @@ class _CustomersScreenState extends ConsumerState<CustomersScreen> {
   }
 }
 
-class _SearchBar extends StatelessWidget {
+class _SearchBar extends StatefulWidget {
   final String hint;
   final ValueChanged<String> onChanged;
   const _SearchBar({required this.hint, required this.onChanged});
+  @override
+  State<_SearchBar> createState() => _SearchBarState();
+}
+
+class _SearchBarState extends State<_SearchBar> {
+  final _ctrl = TextEditingController();
+  @override
+  void dispose() { _ctrl.dispose(); super.dispose(); }
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final hasQuery = _ctrl.text.isNotEmpty;
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
       child: TextField(
-        onChanged: onChanged, style: const TextStyle(fontSize: 18),
+        controller: _ctrl, onChanged: (q) {
+          widget.onChanged(q);
+          setState(() {});
+        },
+        style: const TextStyle(fontSize: 18),
         decoration: InputDecoration(
-          hintText: hint, hintStyle: const TextStyle(fontSize: 16),
-          prefixIcon: const Icon(Icons.search),
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+          hintText: widget.hint, hintStyle: const TextStyle(fontSize: 16),
+          prefixIcon: const Icon(Icons.search, size: 20),
+          suffixIcon: hasQuery
+            ? IconButton(
+                icon: const Icon(Icons.clear, size: 18),
+                onPressed: () { _ctrl.clear(); widget.onChanged(''); setState(() {}); })
+            : null,
+          filled: true,
+          fillColor: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.45),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(14),
+            borderSide: BorderSide.none),
           contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         ),
       ),
