@@ -22,18 +22,21 @@ class ThousandsSeparatorInputFormatter extends TextInputFormatter {
 
     final formatted = _formatWithCommas(clean);
 
-    // Calculate cursor position based on digit count before cursor
+    // Calculate cursor position based on meaningful chars (digits + dot) before cursor
     final cursorOffset = newValue.selection.baseOffset;
-    final digitsBefore = newValue.text
-        .substring(0, cursorOffset.clamp(0, newValue.text.length))
-        .replaceAll(RegExp(r'[^\d]'), '')
+    final beforeCursor = newValue.text.substring(
+      0,
+      cursorOffset.clamp(0, newValue.text.length),
+    );
+    final meaningfulBefore = beforeCursor
+        .replaceAll(RegExp(r'[^0-9.]'), '')
         .length;
 
     int newPos = 0;
-    int digitCount = 0;
+    int meaningfulCount = 0;
     for (int i = 0; i < formatted.length; i++) {
-      if (digitCount >= digitsBefore) break;
-      if (RegExp(r'\d').hasMatch(formatted[i])) digitCount++;
+      if (meaningfulCount >= meaningfulBefore) break;
+      if (formatted[i] != ',') meaningfulCount++;
       newPos = i + 1;
     }
 
