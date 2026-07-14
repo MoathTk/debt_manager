@@ -158,7 +158,8 @@ final periodicDataProvider =
 final topDebtorsProvider = FutureProvider<List<Map<String, dynamic>>>((
   ref,
 ) async {
-  final repo = ref.watch(transactionRepositoryProvider);
+  ref.watch(dashboardStatsProvider);
+  final repo = ref.read(transactionRepositoryProvider);
   return repo.getTopDebtors(5);
 });
 
@@ -166,8 +167,9 @@ final topDebtorsProvider = FutureProvider<List<Map<String, dynamic>>>((
 /// Family key is "startIso|endIso".
 final totalsByDateRangeProvider =
     FutureProvider.family<Map<String, double>, String>((ref, key) async {
+      ref.watch(dashboardStatsProvider);
       final parts = key.split('|');
-      final repo = ref.watch(transactionRepositoryProvider);
+      final repo = ref.read(transactionRepositoryProvider);
       return repo.getTotalsByDateRange(parts[0], parts[1]);
     });
 

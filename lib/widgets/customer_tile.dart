@@ -237,10 +237,12 @@ class _BalanceBadge extends StatelessWidget {
   }
 
   Color _getTextColor(bool isDark, ThemeData theme) {
-    if (balance > 0)
+    if (balance > 0) {
       return isDark ? const Color(0xFFFFB4AB) : theme.colorScheme.error;
-    if (balance < 0)
+    }
+    if (balance < 0) {
       return isDark ? const Color(0xFF81C784) : const Color(0xFF2E7D32);
+    }
     return theme.colorScheme.onSurfaceVariant;
   }
 

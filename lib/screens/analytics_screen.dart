@@ -4,8 +4,6 @@ import '../l10n/app_localizations.dart';
 import '../Providers/database_provider.dart';
 import '../widgets/collection_progress_ring.dart';
 import '../widgets/time_range_selector.dart';
-import '../widgets/debt_payment_trend_chart.dart';
-import '../widgets/monthly_breakdown_chart.dart';
 import '../widgets/debt_payment_ratio_chart.dart';
 import '../widgets/top_debtors_chart.dart';
 import '../widgets/period_totals_section.dart';
@@ -33,7 +31,7 @@ class _AnalyticsState extends ConsumerState<AnalyticsScreen> {
   }
 
   Widget _body(AppLocalizations l10n, DashboardStats s) {
-    final periodic = ref.watch(periodicDataProvider(_isWeekly));
+    //final periodic = ref.watch(periodicDataProvider(_isWeekly));
     return SingleChildScrollView(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
       child: Column(

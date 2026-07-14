@@ -227,7 +227,7 @@ abstract class AppLocalizations {
   /// No description provided for @payment.
   ///
   /// In en, this message translates to:
-  /// **'Payment'**
+  /// **'Pay'**
   String get payment;
 
   /// No description provided for @amount.
@@ -362,6 +362,12 @@ abstract class AppLocalizations {
   /// **'Remaining'**
   String get remaining;
 
+  /// No description provided for @paid.
+  ///
+  /// In en, this message translates to:
+  /// **'Paid'**
+  String get paid;
+
   /// No description provided for @paidTo.
   ///
   /// In en, this message translates to:
@@ -407,7 +413,7 @@ abstract class AppLocalizations {
   /// No description provided for @editRecords.
   ///
   /// In en, this message translates to:
-  /// **'Edit Records'**
+  /// **'Edit '**
   String get editRecords;
 
   /// No description provided for @editDebt.

@@ -43,6 +43,7 @@
   "confirmDelete": "هل أنت متأكد من حذف هذا العميل؟",
   "selectDebt": "اختر الدين للسداد",
   "remaining": "المتبقي",
+  "paid": "المدفوع",
   "paidTo": "مدفوع لـ",
   "fullyPaid": "مدفوع بالكامل",
   "noOutstandingDebts": "لا توجد ديون مستحقة",

@@ -17,10 +17,12 @@ class ActionBar extends ConsumerWidget {
 
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+
       child: Container(
         height: 64,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(20),
+          color: Colors.transparent,
           boxShadow: [
             BoxShadow(
               color: theme.colorScheme.shadow.withValues(alpha: 0.1),
@@ -107,11 +109,11 @@ class _ActionBtn extends StatelessWidget {
             ),
             borderRadius: BorderRadius.circular(20),
             boxShadow: [
-              BoxShadow(
-                color: shadowColor,
-                blurRadius: 12,
-                offset: const Offset(0, 4),
-              ),
+              // BoxShadow(
+              //   color: shadowColor,
+              //   blurRadius: 12,
+              //   offset: const Offset(0, 4),
+              // ),
             ],
           ),
           child: Center(

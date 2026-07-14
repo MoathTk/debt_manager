@@ -79,6 +79,10 @@ class _BodyState extends ConsumerState<_ReminderDetailBody> {
           InfoRow(label: l10n.amount, child: Text(_fmt(_debtTxn!.amount),
             style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600,
               color: cs.onSurface))),
+          if (_debtPaid > 0)
+            InfoRow(label: l10n.paid, child: Text(_fmt(_debtPaid),
+              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600,
+                color: Colors.green))),
           if (remaining > 0)
             InfoRow(label: l10n.remaining, child: Text(_fmt(remaining),
               style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600,

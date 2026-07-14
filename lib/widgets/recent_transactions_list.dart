@@ -4,6 +4,11 @@ import '../l10n/app_localizations.dart';
 import '../Providers/database_provider.dart';
 import '../data/models/transaction.dart' as model;
 
+String _fmt(double n) {
+  final s = n % 1 == 0 ? n.toStringAsFixed(0) : n.toStringAsFixed(2);
+  return s.replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (m) => '${m[1]},');
+}
+
 /// Displays the 5 most recent transactions on the dashboard.
 ///
 /// Each tile shows a color-coded icon, amount, type, and date.
@@ -125,7 +130,7 @@ class _TransactionTile extends StatelessWidget {
             ),
           ),
           title: Text(
-            '${transaction.amount % 1 == 0 ? transaction.amount.toStringAsFixed(0) : transaction.amount.toStringAsFixed(2)} ${_isDebt ? l10n.debt : l10n.payment}',
+            '${_fmt(transaction.amount)} ${_isDebt ? l10n.debt : l10n.payment}',
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w600,

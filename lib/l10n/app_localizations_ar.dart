@@ -141,6 +141,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get remaining => 'المتبقي';
 
   @override
+  String get paid => 'المدفوع';
+
+  @override
   String get paidTo => 'مدفوع لـ';
 
   @override

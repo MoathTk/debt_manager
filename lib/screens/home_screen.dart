@@ -2,10 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:local_debt_management/widgets/side_drawer.dart';
 import '../l10n/app_localizations.dart';
-import '../Providers/theme_provider.dart';
-import '../Providers/locale_provider.dart';
 import '../Providers/database_provider.dart';
-import '../utils/seed_database.dart';
+
 import 'dashboard_screen.dart';
 import 'customers_screen.dart';
 import 'reminders_screen.dart';
@@ -35,7 +33,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final pendingAsync = ref.watch(pendingRemindersProvider);
-    final pendingCount = pendingAsync.whenOrNull(data: (list) => list.length);
+    final pendingCount = pendingAsync.whenOrNull(
+      data: (list) {
+        final today = DateTime.now();
+        final todayStr = '${today.year}-${today.month.toString().padLeft(2, '0')}-${today.day.toString().padLeft(2, '0')}';
+        return list.where((r) => r.isCompleted == 0 && r.reminderDate.compareTo(todayStr) < 0).length;
+      },
+    );
 
     return Scaffold(
       key: _scaffoldKey,

@@ -20,6 +20,8 @@ class AllTransactionsTile extends ConsumerWidget {
     final amt = t.amount % 1 == 0
         ? t.amount.toStringAsFixed(0)
         : t.amount.toStringAsFixed(2);
+    final display = amt.replaceAllMapped(
+      RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (m) => '${m[1]},');
     final name =
         ref.watch(customerByIdProvider(t.customerId)).value?.name ?? '\u2014';
 
@@ -82,7 +84,7 @@ class AllTransactionsTile extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Text(
-                amt,
+                display,
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w800,

@@ -78,6 +78,8 @@ class _Row extends StatelessWidget {
     final formatted = amount % 1 == 0
         ? amount.toStringAsFixed(0)
         : amount.toStringAsFixed(2);
+    final display = formatted.replaceAllMapped(
+      RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (m) => '${m[1]},');
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
       child: Column(
@@ -96,7 +98,7 @@ class _Row extends StatelessWidget {
                 ),
               ),
               Text(
-                formatted,
+                display,
                 style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w700,

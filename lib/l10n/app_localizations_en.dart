@@ -72,7 +72,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get debt => 'Debt';
 
   @override
-  String get payment => 'Payment';
+  String get payment => 'Pay';
 
   @override
   String get amount => 'Amount';
@@ -141,6 +141,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get remaining => 'Remaining';
 
   @override
+  String get paid => 'Paid';
+
+  @override
   String get paidTo => 'Paid to';
 
   @override
@@ -163,7 +166,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'Amount cannot exceed remaining balance';
 
   @override
-  String get editRecords => 'Edit Records';
+  String get editRecords => 'Edit ';
 
   @override
   String get editDebt => 'Edit Debt';

@@ -97,8 +97,10 @@ class _Body extends ConsumerWidget {
 
             final rMap = <int, double>{};
             debtsAsync.whenData((ds) {
-              for (final d in ds)
+              for (final d in ds){
                 rMap[d['id'] as int] = (d['remaining'] as num).toDouble();
+              }
+                
             });
             return SliverList.separated(
               itemCount: txns.length,
