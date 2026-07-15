@@ -45,9 +45,9 @@ class _CustomersScreenState extends ConsumerState<CustomersScreen> {
                     itemCount: list.length,
                     separatorBuilder: (_, __) => const SizedBox(height: 0),
                     itemBuilder: (ctx, i) => CustomerTile(
-                      name: list[i].name, phone: list[i].phone, customerId: list[i].id!,
+                      name: list[i].name, phone: list[i].phone, customerId: list[i].id,
                       onTap: () => Navigator.push(ctx, MaterialPageRoute(
-                        builder: (_) => CustomerDetailScreen(customerId: list[i].id!))),
+                        builder: (_) => CustomerDetailScreen(customerId: list[i].id))),
                     ),
                   ),
                 );

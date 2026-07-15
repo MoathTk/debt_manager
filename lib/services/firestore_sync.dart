@@ -22,6 +22,7 @@ class FirestoreSync {
       await _pushCustomers(uid);
       customersPushed = true;
     } catch (_) {
+      print("fail customer");
       // customers push failed → skip transactions & reminders
     }
 
@@ -29,15 +30,19 @@ class FirestoreSync {
       try {
         await _pushTransactions(uid);
         transactionsPushed = true;
-      } catch (_) {
-        // transactions push failed → skip reminders
+      } catch (e) {
+        print("fail transaction error: " + e.toString());
+        // transactions push failed → s
+        //kip reminders
       }
     }
 
     if (transactionsPushed) {
       try {
         await _pushReminders(uid);
-      } catch (_) {}
+      } catch (_) {
+        print("fail reminder");
+      }
     }
 
     // PULL PHASE (always runs to get latest data from other devices)
@@ -72,7 +77,7 @@ class FirestoreSync {
       final batch = _firestore.batch();
       for (final c in chunk) {
         batch.set(col.doc(c.id), c.toMap());
-        ids.add(c.id!);
+        ids.add(c.id);
       }
       await batch.commit();
     }
@@ -93,7 +98,7 @@ class FirestoreSync {
       final batch = _firestore.batch();
       for (final t in chunk) {
         batch.set(col.doc(t.id), t.toMap());
-        ids.add(t.id!);
+        ids.add(t.id);
       }
       await batch.commit();
     }
@@ -114,7 +119,7 @@ class FirestoreSync {
       final batch = _firestore.batch();
       for (final r in chunk) {
         batch.set(col.doc(r.id), r.toMap());
-        ids.add(r.id!);
+        ids.add(r.id);
       }
       await batch.commit();
     }
@@ -203,7 +208,10 @@ class _CustomerSyncRepo {
 
   Future<List<Customer>> getUnsynced() async {
     final db = await _db.database;
-    final result = await db.query('customers', where: 'is_synced = 0');
+    final result = await db.query(
+      'customers',
+      where: 'is_synced = 0',
+    );
     return result.map((m) => Customer.fromMap(m)).toList();
   }
 
@@ -222,7 +230,7 @@ class _CustomerSyncRepo {
   Future<void> upsertFromCloud(List<Customer> records) async {
     final db = await _db.database;
     for (final c in records) {
-      final existing = await _getById(c.id!);
+      final existing = await _getById(c.id);
       if (existing == null) {
         final map = c.toMap();
         map['is_synced'] = 1;
@@ -256,7 +264,10 @@ class _TransactionSyncRepo {
 
   Future<List<model.Transaction>> getUnsynced() async {
     final db = await _db.database;
-    final result = await db.query('transactions', where: 'is_synced = 0');
+    final result = await db.query(
+      'transactions',
+      where: 'is_synced = 0',
+    );
     return result.map((m) => model.Transaction.fromMap(m)).toList();
   }
 
@@ -275,7 +286,7 @@ class _TransactionSyncRepo {
   Future<void> upsertFromCloud(List<model.Transaction> records) async {
     final db = await _db.database;
     for (final t in records) {
-      final existing = await _getById(t.id!);
+      final existing = await _getById(t.id);
       if (existing == null) {
         final map = t.toMap();
         map['is_synced'] = 1;
@@ -309,7 +320,10 @@ class _ReminderSyncRepo {
 
   Future<List<DebtReminder>> getUnsynced() async {
     final db = await _db.database;
-    final result = await db.query('debt_reminders', where: 'is_synced = 0');
+    final result = await db.query(
+      'debt_reminders',
+      where: 'is_synced = 0',
+    );
     return result.map((m) => DebtReminder.fromMap(m)).toList();
   }
 
@@ -328,7 +342,7 @@ class _ReminderSyncRepo {
   Future<void> upsertFromCloud(List<DebtReminder> records) async {
     final db = await _db.database;
     for (final r in records) {
-      final existing = await _getById(r.id!);
+      final existing = await _getById(r.id);
       if (existing == null) {
         final map = r.toMap();
         map['is_synced'] = 1;

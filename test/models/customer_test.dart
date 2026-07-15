@@ -18,9 +18,9 @@ void main() {
     });
 
     test('toMap with null optional fields', () {
-      final c = Customer(name: 'Ali', createdAt: '2025-01-01');
+      final c = Customer(id: 'uuid-12', name: 'Ali', createdAt: '2025-01-01');
       final map = c.toMap();
-      expect(map['id'], null);
+      expect(map['id'], 'uuid-12');
       expect(map['phone'], null);
       expect(map['owner_id'], '');
     });

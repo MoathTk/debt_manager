@@ -1,5 +1,5 @@
 class Transaction {
-  final String? id;
+  final String id;
   final String customerId;
   final double amount;
   final int type;
@@ -18,7 +18,7 @@ class Transaction {
   bool get isPayment => type == payment;
 
   const Transaction({
-    this.id,
+    required this.id,
     required this.customerId,
     required this.amount,
     required this.type,
@@ -49,7 +49,7 @@ class Transaction {
 
   factory Transaction.fromMap(Map<String, dynamic> map) {
     return Transaction(
-      id: map['id'] as String?,
+      id: map['id'] as String,
       customerId: map['customer_id'] as String,
       amount: (map['amount'] as num).toDouble(),
       type: map['type'] as int,

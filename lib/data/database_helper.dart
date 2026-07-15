@@ -20,6 +20,7 @@ class DatabaseHelper {
       onCreate: _createDB,
       onUpgrade: _onUpgrade,
     );
+    await _cleanupOrphanRecords(_database!);
     return _database!;
   }
 
@@ -186,5 +187,10 @@ class DatabaseHelper {
     db.close();
     _database = null;
   }
-   
+
+  Future<void> _cleanupOrphanRecords(Database db) async {
+    await db.delete('customers', where: 'id IS NULL');
+    await db.delete('transactions', where: 'id IS NULL');
+    await db.delete('debt_reminders', where: 'id IS NULL');
+  }
 }

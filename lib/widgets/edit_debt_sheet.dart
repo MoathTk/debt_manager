@@ -59,7 +59,7 @@ class _BodyState extends ConsumerState<_EditDebtBody> {
 
     final totalPaid = await ref
         .read(transactionRepositoryProvider)
-        .getPaymentsForDebt(widget.debt.id!);
+        .getPaymentsForDebt(widget.debt.id);
     if (val < totalPaid) {
       if (mounted) {
         final l10n = AppLocalizations.of(context)!;
@@ -81,9 +81,9 @@ class _BodyState extends ConsumerState<_EditDebtBody> {
   Future<void> _delete() async {
     setState(() => _saving = true);
     final reminderRepo = ref.read(debtReminderRepositoryProvider);
-    await reminderRepo.deleteByDebtId(widget.debt.id!);
+    await reminderRepo.deleteByDebtId(widget.debt.id);
     final repo = ref.read(transactionRepositoryProvider);
-    await repo.delete(widget.debt.id!);
+    await repo.delete(widget.debt.id);
     ref.read(syncProvider.notifier).schedulePush();
     _invalidate(ref);
     ref.invalidate(allRemindersProvider);

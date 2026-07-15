@@ -9,8 +9,8 @@ void main() {
     });
 
     test('isDebt / isPayment getters', () {
-      final debt = Transaction(customerId: 'c1', amount: 500, type: 0, date: '2025-01-01');
-      final payment = Transaction(customerId: 'c1', amount: 100, type: 1, date: '2025-01-02');
+      final debt = Transaction(id: 'uuid-t1', customerId: 'c1', amount: 500, type: 0, date: '2025-01-01');
+      final payment = Transaction(id: 'uuid-t2', customerId: 'c1', amount: 100, type: 1, date: '2025-01-02');
       expect(debt.isDebt, true);
       expect(debt.isPayment, false);
       expect(payment.isDebt, false);
@@ -35,9 +35,9 @@ void main() {
     });
 
     test('toMap with null optional fields', () {
-      final t = Transaction(customerId: 'c1', amount: 50, type: 1, date: '2025-01-01');
+      final t = Transaction(id: 'uuid-t3', customerId: 'c1', amount: 50, type: 1, date: '2025-01-01');
       final map = t.toMap();
-      expect(map['id'], null);
+      expect(map['id'], 'uuid-t3');
       expect(map['note'], null);
       expect(map['debt_id'], null);
     });

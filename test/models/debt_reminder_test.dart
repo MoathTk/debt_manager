@@ -4,14 +4,14 @@ import 'package:local_debt_management/data/models/debt_reminder.dart';
 void main() {
   group('DebtReminder', () {
     test('default isCompleted = 0', () {
-      final r = DebtReminder(customerId: 'c1', reminderDate: '2025-01-01');
+      final r = DebtReminder(id: 'uuid-d1', customerId: 'c1', reminderDate: '2025-01-01');
       expect(r.isCompleted, 0);
       expect(r.completed, false);
     });
 
     test('completed getter returns true when isCompleted=1', () {
       final r = DebtReminder(
-        customerId: 'c1', reminderDate: '2025-01-01', isCompleted: 1,
+        id: 'uuid-d2', customerId: 'c1', reminderDate: '2025-01-01', isCompleted: 1,
       );
       expect(r.completed, true);
     });
@@ -33,9 +33,9 @@ void main() {
     });
 
     test('toMap null optional fields', () {
-      final r = DebtReminder(customerId: 'c1', reminderDate: '2025-01-01');
+      final r = DebtReminder(id: 'uuid-d3', customerId: 'c1', reminderDate: '2025-01-01');
       final map = r.toMap();
-      expect(map['id'], null);
+      expect(map['id'], 'uuid-d3');
       expect(map['debt_id'], null);
       expect(map['message'], null);
     });

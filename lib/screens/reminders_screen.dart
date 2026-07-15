@@ -39,7 +39,7 @@ class _RemindersState extends ConsumerState<RemindersScreen> {
     }
     if (mounted) {
       setState(() {
-        _names = {for (var c in customers) c.id!: c.name};
+        _names = {for (var c in customers) c.id: c.name};
         _amounts = amounts;
       });
     }

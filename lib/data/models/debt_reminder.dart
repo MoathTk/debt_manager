@@ -1,5 +1,5 @@
 class DebtReminder {
-  final String? id;
+  final String id;
   final String customerId;
   final String? debtId;
   final String reminderDate;
@@ -11,7 +11,7 @@ class DebtReminder {
   final String updatedAt;
 
   const DebtReminder({
-    this.id,
+    required this.id,
     required this.customerId,
     this.debtId,
     required this.reminderDate,
@@ -42,7 +42,7 @@ class DebtReminder {
 
   factory DebtReminder.fromMap(Map<String, dynamic> map) {
     return DebtReminder(
-      id: map['id'] as String?,
+      id: map['id'] as String,
       customerId: map['customer_id'] as String,
       debtId: map['debt_id'] as String?,
       reminderDate: map['reminder_date'] as String,

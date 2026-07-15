@@ -3,14 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../l10n/app_localizations.dart';
 import '../Providers/database_provider.dart';
 import '../Providers/sync_provider.dart';
-import '../data/models/transaction.dart' as model;
 import '../data/models/debt_reminder.dart';
 
 void confirmToggle(BuildContext ctx, DebtReminder r, AppLocalizations l10n) {
   final msg = r.completed ? l10n.confirmMarkPending : l10n.confirmMarkCompleted;
-  final container = ProviderScope.containerOf(ctx);
-  final reminderRepo = container.read(debtReminderRepositoryProvider);
-  final txnRepo = container.read(transactionRepositoryProvider);
   final parentCtx = Navigator.of(ctx).context;
   Navigator.pop(ctx);
   showDialog(
@@ -25,28 +21,29 @@ void confirmToggle(BuildContext ctx, DebtReminder r, AppLocalizations l10n) {
         ),
         TextButton(
           onPressed: () async {
-            Navigator.pop(parentCtx);
-            await reminderRepo.markCompleted(r.id!);
-            if (r.debtId != null) {
-              final debt = await txnRepo.getById(r.debtId!);
-              if (debt != null) {
-                final paid = await txnRepo.getPaymentsForDebt(r.debtId!);
-                final remaining = debt.amount - paid;
-                if (remaining > 0) {
-                  await txnRepo.insert(
-                    model.Transaction(
-                      customerId: debt.customerId,
-                      amount: remaining,
-                      type: model.Transaction.payment,
-                      debtId: r.debtId,
-                      date: DateTime.now().toIso8601String(),
-                      note: l10n.autoSettledViaReminder,
-                    ),
-                  );
-                }
-              }
-            }
-            if (parentCtx.mounted) _invalidate(parentCtx);
+            // Navigator.pop(parentCtx);
+            // await reminderRepo.markCompleted(r.id!);
+            // if (r.debtId != null) {
+            //   final debt = await txnRepo.getById(r.debtId!);
+            //   if (debt != null) {
+            //     final paid = await txnRepo.getPaymentsForDebt(r.debtId!);
+            //     final remaining = debt.amount - paid;
+            //     if (remaining > 0) {
+            //       await txnRepo.insert(
+            //         model.Transaction(
+                  
+            //           customerId: debt.customerId,
+            //           amount: remaining,
+            //           type: model.Transaction.payment,
+            //           debtId: r.debtId,
+            //           date: DateTime.now().toIso8601String(),
+            //           note: l10n.autoSettledViaReminder,
+            //         ),
+            //       );
+            //     }
+            //   }
+            // }
+            // if (parentCtx.mounted) _invalidate(parentCtx);
           },
           child: Text(l10n.yes),
         ),
@@ -73,7 +70,7 @@ void confirmDelete(BuildContext ctx, DebtReminder r, AppLocalizations l10n) {
         TextButton(
           onPressed: () async {
             Navigator.pop(parentCtx);
-            await reminderRepo.delete(r.id!);
+            await reminderRepo.delete(r.id);
             if (parentCtx.mounted) {
               ProviderScope.containerOf(
                 parentCtx,

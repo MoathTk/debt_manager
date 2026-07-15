@@ -83,6 +83,7 @@ class SyncNotifier extends StateNotifier<SyncState> {
         lastSynced: DateTime.now().toIso8601String(),
       );
     } catch (e) {
+      print("transaction failed");
       _scheduleRetry(e.toString());
     }
   }

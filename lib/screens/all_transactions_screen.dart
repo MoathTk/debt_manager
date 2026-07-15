@@ -32,7 +32,7 @@ class _State extends ConsumerState<AllTransactionsScreen> {
     List<model.Transaction> txns,
     List<Customer> customers,
   ) {
-    final names = {for (final c in customers) c.id!: c.name};
+    final names = {for (final c in customers) c.id: c.name};
     var list = txns;
     if (_type >= 0) list = list.where((t) => t.type == _type).toList();
     if (_range != null) {

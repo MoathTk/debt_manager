@@ -135,7 +135,7 @@ Future<void> updateCustomer(
     ),
   );
   ref.invalidate(customersProvider);
-  ref.invalidate(customerByIdProvider(customer.id!));
+  ref.invalidate(customerByIdProvider(customer.id));
   ref.invalidate(dashboardStatsProvider);
   ref.read(syncProvider.notifier).schedulePush();
 }
@@ -286,7 +286,7 @@ Future<void> settleDebt(
   final reminders = await reminderRepo.getAll();
   for (final r in reminders) {
     if (r.debtId == debtId && !r.completed) {
-      await reminderRepo.markCompleted(r.id!);
+      await reminderRepo.markCompleted(r.id);
     }
   }
   _invalidateTransactions(ref, customerId);

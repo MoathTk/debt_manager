@@ -74,7 +74,7 @@ class _BodyState extends ConsumerState<_EditPaymentBody> {
   Future<void> _delete() async {
     setState(() => _saving = true);
     final repo = ref.read(transactionRepositoryProvider);
-    await repo.delete(widget.payment.id!);
+    await repo.delete(widget.payment.id);
     ref.read(syncProvider.notifier).schedulePush();
     _invalidate(ref);
     if (mounted) Navigator.pop(context);

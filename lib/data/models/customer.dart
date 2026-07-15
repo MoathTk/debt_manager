@@ -1,5 +1,5 @@
 class Customer {
-  final String? id;
+  final String id;
   final String name;
   final String? phone;
   final String createdAt;
@@ -9,7 +9,7 @@ class Customer {
   final String updatedAt;
 
   const Customer({
-    this.id,
+    required this.id,
     required this.name,
     this.phone,
     required this.createdAt,
@@ -34,7 +34,7 @@ class Customer {
 
   factory Customer.fromMap(Map<String, dynamic> map) {
     return Customer(
-      id: map['id'] as String?,
+      id: map['id'] as String,
       name: map['name'] as String,
       phone: map['phone'] as String?,
       createdAt: map['created_at'] as String,

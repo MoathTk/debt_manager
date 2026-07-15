@@ -182,8 +182,8 @@ class ReminderCard extends ConsumerWidget {
             onPressed: () {
               Navigator.pop(ctx);
               reminder.completed
-                  ? markReminderPending(ref, reminder.id!)
-                  : markReminderCompleted(ref, reminder.id!);
+                  ? markReminderPending(ref, reminder.id)
+                  : markReminderCompleted(ref, reminder.id);
             },
             child: Text(l10n.yes),
           ),
@@ -206,7 +206,7 @@ class ReminderCard extends ConsumerWidget {
           TextButton(
             onPressed: () {
               Navigator.pop(ctx);
-              deleteReminder(ref, reminder.id!);
+              deleteReminder(ref, reminder.id);
             },
             child: Text(
               l10n.yes,
