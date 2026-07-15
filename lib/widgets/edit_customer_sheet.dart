@@ -28,7 +28,7 @@ void showEditCustomerSheet(
       onSave: () async {
         if (!formKey.currentState!.validate()) return;
         await updateCustomer(
-          ref,
+          ProviderScope.containerOf(ctx),
           customer: customer,
           name: nameController.text.trim(),
           phone: phoneController.text.trim().isEmpty

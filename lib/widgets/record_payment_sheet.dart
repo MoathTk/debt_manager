@@ -56,7 +56,7 @@ class _S extends ConsumerState<_Body> {
     }
     setState(() => _busy = true);
     await recordPayment(
-      ref,
+      ProviderScope.containerOf(context),
       customerId: widget.customerId,
       amount: v,
       debtId: _debtId,

@@ -128,20 +128,18 @@ class ReminderCard extends ConsumerWidget {
                         ],
                       ),
                     ),
-                    ReminderActionBtn(
-                      icon: reminder.completed
-                          ? Icons.replay_rounded
-                          : Icons.check_circle_outline_rounded,
-                      color: reminder.completed
-                          ? cs.onSurfaceVariant
-                          : const Color(0xFF43A047),
-                      onTap: () => _confirmToggle(context, ref, l10n),
-                    ),
-                    const SizedBox(width: 8),
+                    if (!reminder.completed)
+                      ReminderActionBtn(
+                        icon: Icons.check_circle_outline_rounded,
+                        color: const Color(0xFF43A047),
+                        onTap: () => _confirmToggle(context, l10n),
+                      ),
+                    if (!reminder.completed)
+                      const SizedBox(width: 8),
                     ReminderActionBtn(
                       icon: Icons.delete_outline_rounded,
                       color: cs.error,
-                      onTap: () => _confirmDelete(context, ref, l10n),
+                      onTap: () => _confirmDelete(context, l10n),
                     ),
                   ],
                 ),
@@ -164,7 +162,7 @@ class ReminderCard extends ConsumerWidget {
     return '$d  ·  ${-diff} ${l10n.daysUntilDue}';
   }
 
-  void _confirmToggle(BuildContext ctx, WidgetRef ref, AppLocalizations l10n) {
+  void _confirmToggle(BuildContext ctx, AppLocalizations l10n) {
     final msg = reminder.completed
         ? l10n.confirmMarkPending
         : l10n.confirmMarkCompleted;
@@ -181,9 +179,10 @@ class ReminderCard extends ConsumerWidget {
           TextButton(
             onPressed: () {
               Navigator.pop(ctx);
+              final container = ProviderScope.containerOf(ctx);
               reminder.completed
-                  ? markReminderPending(ref, reminder.id)
-                  : markReminderCompleted(ref, reminder.id);
+                  ? markReminderPending(container, reminder.id)
+                  : markReminderCompleted(container, reminder.id,l10n.autoSettledViaReminder);
             },
             child: Text(l10n.yes),
           ),
@@ -192,7 +191,7 @@ class ReminderCard extends ConsumerWidget {
     );
   }
 
-  void _confirmDelete(BuildContext ctx, WidgetRef ref, AppLocalizations l10n) {
+  void _confirmDelete(BuildContext ctx, AppLocalizations l10n) {
     showDialog(
       context: ctx,
       builder: (_) => AlertDialog(
@@ -206,7 +205,7 @@ class ReminderCard extends ConsumerWidget {
           TextButton(
             onPressed: () {
               Navigator.pop(ctx);
-              deleteReminder(ref, reminder.id);
+              deleteReminder(ProviderScope.containerOf(ctx), reminder.id);
             },
             child: Text(
               l10n.yes,

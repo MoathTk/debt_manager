@@ -70,7 +70,7 @@ class _BodyState extends ConsumerState<_EditDebtBody> {
 
     setState(() => _saving = true);
     await updateTransaction(
-      ref,
+      ProviderScope.containerOf(context),
       transaction: widget.debt,
       amount: val,
       note: _note.text.trim().isEmpty ? null : _note.text.trim(),

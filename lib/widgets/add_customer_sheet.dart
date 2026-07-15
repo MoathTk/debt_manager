@@ -27,7 +27,7 @@ void showAddCustomerSheet(BuildContext context, WidgetRef ref) {
       onSave: () async {
         if (!formKey.currentState!.validate()) return;
         await addCustomer(
-          ref,
+          ProviderScope.containerOf(ctx),
           name: nameController.text.trim(),
           phone: phoneController.text.trim().isEmpty
               ? null

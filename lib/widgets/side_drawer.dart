@@ -42,52 +42,53 @@ class SettingsDrawer extends StatelessWidget {
           children: [
             Padding(
               padding: const EdgeInsets.fromLTRB(24, 32, 24, 16),
-              child: Row(
+              child: Column(
                 children: [
                   CircleAvatar(
-                    radius: 28,
+                    radius: 32,
                     backgroundColor: colorScheme.primary,
                     foregroundColor: colorScheme.onPrimary,
                     child: user?.photoURL != null
                         ? ClipOval(
                             child: Image.network(
                               user!.photoURL!,
-                              width: 56,
-                              height: 56,
+                              width: 64,
+                              height: 64,
                               fit: BoxFit.cover,
+                              errorBuilder: (_, __, ___) => Text(
+                                (user.displayName ?? 'U')[0].toUpperCase(),
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 22,
+                                ),
+                              ),
                             ),
                           )
                         : Text(
                             (user?.displayName ?? 'U')[0].toUpperCase(),
                             style: const TextStyle(
                               fontWeight: FontWeight.bold,
-                              fontSize: 20,
+                              fontSize: 22,
                             ),
                           ),
                   ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          user?.displayName ?? 'User',
-                          style: textTheme.titleLarge?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        Text(
-                          user?.email ?? '',
-                          style: textTheme.bodyMedium?.copyWith(
-                            color: colorScheme.onSurfaceVariant,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ],
+                  const SizedBox(height: 12),
+                  Text(
+                    user?.displayName ?? 'User',
+                    style: textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
                     ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    user?.email ?? '',
+                    style: textTheme.bodyMedium?.copyWith(
+                      color: colorScheme.onSurfaceVariant,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ],
               ),

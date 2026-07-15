@@ -43,7 +43,7 @@ class _BodyState extends ConsumerState<_AddDebtBody> {
     if (val == null || val <= 0) return;
     setState(() => _saving = true);
     await addDebt(
-      ref,
+      ProviderScope.containerOf(context),
       customerId: widget.customerId,
       amount: val,
       note: _note.text.trim().isEmpty ? null : _note.text.trim(),
