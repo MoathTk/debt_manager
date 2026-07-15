@@ -2,13 +2,13 @@ import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:local_debt_management/data/database_helper.dart';
 
 /// Initializes sqflite_ffi for desktop testing and creates an in-memory
-/// database with the full v5 schema. Assigns it to [DatabaseHelper.testDatabase].
+/// database with the full v6 schema. Assigns it to [DatabaseHelper.testDatabase].
 Future<Database> setupTestDb() async {
   sqfliteFfiInit();
   final db = await databaseFactoryFfi.openDatabase(
     inMemoryDatabasePath,
     options: OpenDatabaseOptions(
-      version: 5,
+      version: 6,
       onCreate: (db, version) async {
         await db.execute('''
           CREATE TABLE customers (
@@ -18,6 +18,7 @@ Future<Database> setupTestDb() async {
             created_at TEXT NOT NULL,
             owner_id TEXT NOT NULL DEFAULT '',
             is_synced INTEGER DEFAULT 0,
+            is_deleted INTEGER NOT NULL DEFAULT 0,
             updated_at TEXT
           )
         ''');
@@ -32,6 +33,7 @@ Future<Database> setupTestDb() async {
             debt_id TEXT,
             owner_id TEXT NOT NULL DEFAULT '',
             is_synced INTEGER DEFAULT 0,
+            is_deleted INTEGER NOT NULL DEFAULT 0,
             updated_at TEXT,
             FOREIGN KEY (customer_id) REFERENCES customers (id) ON DELETE CASCADE,
             FOREIGN KEY (debt_id) REFERENCES transactions (id) ON DELETE SET NULL
@@ -47,6 +49,7 @@ Future<Database> setupTestDb() async {
             message TEXT,
             owner_id TEXT NOT NULL DEFAULT '',
             is_synced INTEGER DEFAULT 0,
+            is_deleted INTEGER NOT NULL DEFAULT 0,
             updated_at TEXT,
             FOREIGN KEY (customer_id) REFERENCES customers (id) ON DELETE CASCADE,
             FOREIGN KEY (debt_id) REFERENCES transactions (id) ON DELETE SET NULL

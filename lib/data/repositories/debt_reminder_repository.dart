@@ -19,30 +19,58 @@ class DebtReminderRepository {
 
   Future<int> delete(String id) async {
     final db = await _dbHelper.database;
-    return await db.delete('debt_reminders', where: 'id = ?', whereArgs: [id]);
+    final now = DateTime.now().toIso8601String();
+    return await db.update(
+      'debt_reminders',
+      {'is_deleted': 1, 'is_synced': 0, 'updated_at': now},
+      where: 'id = ?', whereArgs: [id],
+    );
   }
 
   Future<void> deleteBatch(List<String> ids) async {
     if (ids.isEmpty) return;
     final db = await _dbHelper.database;
+    final now = DateTime.now().toIso8601String();
     final placeholders = ids.map((_) => '?').join(',');
-    await db.delete(
+    await db.update(
       'debt_reminders',
+      {'is_deleted': 1, 'is_synced': 0, 'updated_at': now},
       where: 'id IN ($placeholders)', whereArgs: ids,
     );
   }
 
   Future<void> deleteByDebtId(String debtId) async {
     final db = await _dbHelper.database;
-    await db.delete('debt_reminders', where: 'debt_id = ?', whereArgs: [debtId]);
+    final now = DateTime.now().toIso8601String();
+    await db.update(
+      'debt_reminders',
+      {'is_deleted': 1, 'is_synced': 0, 'updated_at': now},
+      where: 'debt_id = ?', whereArgs: [debtId],
+    );
+  }
+
+  Future<void> deleteByCustomerId(String customerId) async {
+    final db = await _dbHelper.database;
+    final now = DateTime.now().toIso8601String();
+    await db.update(
+      'debt_reminders',
+      {'is_deleted': 1, 'is_synced': 0, 'updated_at': now},
+      where: 'customer_id = ?', whereArgs: [customerId],
+    );
   }
 
   Future<List<DebtReminder>> getAll({String? ownerId}) async {
     final db = await _dbHelper.database;
+    final conditions = ['is_deleted = 0'];
+    final args = <dynamic>[];
+    if (ownerId != null) {
+      conditions.add('owner_id = ?');
+      args.add(ownerId);
+    }
     final result = await db.query(
       'debt_reminders',
-      where: ownerId != null ? 'owner_id = ?' : null,
-      whereArgs: ownerId != null ? [ownerId] : null,
+      where: conditions.join(' AND '),
+      whereArgs: args,
       orderBy: 'reminder_date ASC',
     );
     return result.map((map) => DebtReminder.fromMap(map)).toList();
@@ -51,7 +79,7 @@ class DebtReminderRepository {
   Future<DebtReminder?> getById(String id) async {
     final db = await _dbHelper.database;
     final result = await db.query(
-      'debt_reminders', where: 'id = ?', whereArgs: [id],
+      'debt_reminders', where: 'id = ? AND is_deleted = 0', whereArgs: [id],
     );
     if (result.isEmpty) return null;
     return DebtReminder.fromMap(result.first);
@@ -61,7 +89,7 @@ class DebtReminderRepository {
     final db = await _dbHelper.database;
     final result = await db.query(
       'debt_reminders',
-      where: 'customer_id = ?', whereArgs: [customerId],
+      where: 'customer_id = ? AND is_deleted = 0', whereArgs: [customerId],
       orderBy: 'reminder_date ASC',
     );
     return result.map((map) => DebtReminder.fromMap(map)).toList();
@@ -69,11 +97,15 @@ class DebtReminderRepository {
 
   Future<List<DebtReminder>> getPending({String? ownerId}) async {
     final db = await _dbHelper.database;
-    final whereClause = ownerId != null ? 'AND owner_id = ?' : '';
-    final args = ownerId != null ? [ownerId] : <dynamic>[];
+    final conditions = ['is_completed = 0', 'is_deleted = 0'];
+    final args = <dynamic>[];
+    if (ownerId != null) {
+      conditions.add('owner_id = ?');
+      args.add(ownerId);
+    }
     final result = await db.query(
       'debt_reminders',
-      where: 'is_completed = 0 $whereClause',
+      where: conditions.join(' AND '),
       whereArgs: args,
       orderBy: 'reminder_date ASC',
     );
@@ -82,11 +114,15 @@ class DebtReminderRepository {
 
   Future<List<DebtReminder>> getCompleted({String? ownerId}) async {
     final db = await _dbHelper.database;
-    final whereClause = ownerId != null ? 'AND owner_id = ?' : '';
-    final args = ownerId != null ? [ownerId] : <dynamic>[];
+    final conditions = ['is_completed = 1', 'is_deleted = 0'];
+    final args = <dynamic>[];
+    if (ownerId != null) {
+      conditions.add('owner_id = ?');
+      args.add(ownerId);
+    }
     final result = await db.query(
       'debt_reminders',
-      where: 'is_completed = 1 $whereClause',
+      where: conditions.join(' AND '),
       whereArgs: args,
       orderBy: 'reminder_date DESC',
     );
@@ -95,16 +131,20 @@ class DebtReminderRepository {
 
   Future<int> markCompleted(String id) async {
     final db = await _dbHelper.database;
+    final now = DateTime.now().toIso8601String();
     return await db.update(
-      'debt_reminders', {'is_completed': 1},
+      'debt_reminders',
+      {'is_completed': 1, 'is_synced': 0, 'updated_at': now},
       where: 'id = ?', whereArgs: [id],
     );
   }
 
   Future<int> markPending(String id) async {
     final db = await _dbHelper.database;
+    final now = DateTime.now().toIso8601String();
     return await db.update(
-      'debt_reminders', {'is_completed': 0},
+      'debt_reminders',
+      {'is_completed': 0, 'is_synced': 0, 'updated_at': now},
       where: 'id = ?', whereArgs: [id],
     );
   }
@@ -114,7 +154,7 @@ class DebtReminderRepository {
     final now = (date ?? DateTime.now().toIso8601String().substring(0, 10));
     final result = await db.query(
       'debt_reminders',
-      where: 'is_completed = 0 AND reminder_date <= ?',
+      where: 'is_completed = 0 AND is_deleted = 0 AND reminder_date <= ?',
       whereArgs: [now],
       orderBy: 'reminder_date ASC',
     );
@@ -123,10 +163,14 @@ class DebtReminderRepository {
 
   Future<int> getPendingCount({String? ownerId}) async {
     final db = await _dbHelper.database;
-    final whereClause = ownerId != null ? 'AND owner_id = ?' : '';
-    final args = ownerId != null ? [ownerId] : <dynamic>[];
+    final conditions = ['is_completed = 0', 'is_deleted = 0'];
+    final args = <dynamic>[];
+    if (ownerId != null) {
+      conditions.add('owner_id = ?');
+      args.add(ownerId);
+    }
     final result = await db.rawQuery(
-      'SELECT COUNT(*) as count FROM debt_reminders WHERE is_completed = 0 $whereClause',
+      'SELECT COUNT(*) as count FROM debt_reminders WHERE ${conditions.join(' AND ')}',
       args,
     );
     return result.first['count'] as int;
@@ -153,18 +197,23 @@ class DebtReminderRepository {
   Future<void> upsertFromCloud(List<DebtReminder> records) async {
     final db = await _dbHelper.database;
     for (final r in records) {
-      final existing = await getById(r.id!);
-      if (existing == null) {
+      final existingResult = await db.query(
+        'debt_reminders', where: 'id = ?', whereArgs: [r.id],
+      );
+      if (existingResult.isEmpty) {
         final map = r.toMap();
         map['is_synced'] = 1;
         await db.insert('debt_reminders', map);
-      } else if (r.updatedAt.compareTo(existing.updatedAt) > 0) {
-        final map = r.toMap();
-        map['is_synced'] = 1;
-        await db.update(
-          'debt_reminders', map,
-          where: 'id = ?', whereArgs: [r.id],
-        );
+      } else {
+        final existing = DebtReminder.fromMap(existingResult.first);
+        if (r.updatedAt.compareTo(existing.updatedAt) > 0) {
+          final map = r.toMap();
+          map['is_synced'] = 1;
+          await db.update(
+            'debt_reminders', map,
+            where: 'id = ?', whereArgs: [r.id],
+          );
+        }
       }
     }
   }

@@ -140,6 +140,19 @@ Future<void> updateCustomer(
   ref.read(syncProvider.notifier).schedulePush();
 }
 
+Future<void> deleteCustomer(WidgetRef ref, String customerId) async {
+  final customerRepo = ref.read(customerRepositoryProvider);
+  final txRepo = ref.read(transactionRepositoryProvider);
+  final reminderRepo = ref.read(debtReminderRepositoryProvider);
+  await customerRepo.delete(customerId);
+  await txRepo.deleteByCustomerId(customerId);
+  await reminderRepo.deleteByCustomerId(customerId);
+  _invalidateCustomers(ref);
+  _invalidateTransactions(ref, customerId);
+  _invalidateReminders(ref);
+  ref.read(syncProvider.notifier).schedulePush();
+}
+
 // ============================================================================
 // TRANSACTION MUTATIONS
 // ============================================================================

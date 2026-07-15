@@ -16,7 +16,7 @@ class DatabaseHelper {
     final path = join(dbPath, 'debt_management.db');
     _database = await openDatabase(
       path,
-      version: 5,
+      version: 6,
       onCreate: _createDB,
       onUpgrade: _onUpgrade,
     );
@@ -32,6 +32,7 @@ class DatabaseHelper {
         created_at TEXT NOT NULL,
         owner_id TEXT NOT NULL DEFAULT '',
         is_synced INTEGER DEFAULT 0,
+        is_deleted INTEGER NOT NULL DEFAULT 0,
         updated_at TEXT
       )
     ''');
@@ -47,6 +48,7 @@ class DatabaseHelper {
         debt_id TEXT,
         owner_id TEXT NOT NULL DEFAULT '',
         is_synced INTEGER DEFAULT 0,
+        is_deleted INTEGER NOT NULL DEFAULT 0,
         updated_at TEXT,
         FOREIGN KEY (customer_id) REFERENCES customers (id) ON DELETE CASCADE,
         FOREIGN KEY (debt_id) REFERENCES transactions (id) ON DELETE SET NULL
@@ -63,6 +65,7 @@ class DatabaseHelper {
         message TEXT,
         owner_id TEXT NOT NULL DEFAULT '',
         is_synced INTEGER DEFAULT 0,
+        is_deleted INTEGER NOT NULL DEFAULT 0,
         updated_at TEXT,
         FOREIGN KEY (customer_id) REFERENCES customers (id) ON DELETE CASCADE,
         FOREIGN KEY (debt_id) REFERENCES transactions (id) ON DELETE SET NULL
@@ -98,7 +101,7 @@ class DatabaseHelper {
       await db.execute('DROP TABLE IF EXISTS transactions');
       await db.execute('DROP TABLE IF EXISTS customers');
 
-      await _createDB(db, 5);
+      await _createDB(db, 6);
 
       for (final c in customers) {
         final newId = generateId();
@@ -162,6 +165,18 @@ class DatabaseHelper {
       );
       await db.execute(
         "ALTER TABLE debt_reminders ADD COLUMN owner_id TEXT NOT NULL DEFAULT ''",
+      );
+    }
+
+    if (oldVersion < 6) {
+      await db.execute(
+        "ALTER TABLE customers ADD COLUMN is_deleted INTEGER NOT NULL DEFAULT 0",
+      );
+      await db.execute(
+        "ALTER TABLE transactions ADD COLUMN is_deleted INTEGER NOT NULL DEFAULT 0",
+      );
+      await db.execute(
+        "ALTER TABLE debt_reminders ADD COLUMN is_deleted INTEGER NOT NULL DEFAULT 0",
       );
     }
   }

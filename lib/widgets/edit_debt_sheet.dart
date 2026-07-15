@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../l10n/app_localizations.dart';
 import '../data/models/transaction.dart' as model;
 import '../Providers/database_provider.dart';
+import '../Providers/sync_provider.dart';
 import 'amount_input_formatter.dart';
 import 'app_snackbar.dart';
 
@@ -89,6 +90,7 @@ class _BodyState extends ConsumerState<_EditDebtBody> {
     await reminderRepo.deleteByDebtId(widget.debt.id!);
     final repo = ref.read(transactionRepositoryProvider);
     await repo.delete(widget.debt.id!);
+    ref.read(syncProvider.notifier).schedulePush();
     _invalidate(ref);
     ref.invalidate(allRemindersProvider);
     ref.invalidate(pendingRemindersProvider);

@@ -12,7 +12,7 @@ Future<void> _setupDb() async {
   final db = await databaseFactoryFfi.openDatabase(
     inMemoryDatabasePath,
     options: OpenDatabaseOptions(
-      version: 3,
+      version: 6,
       onCreate: (db, version) async {
         await db.execute('''
           CREATE TABLE customers (
@@ -20,7 +20,9 @@ Future<void> _setupDb() async {
             name TEXT NOT NULL, phone TEXT,
             created_at TEXT NOT NULL,
             owner_id TEXT NOT NULL DEFAULT '',
-            is_synced INTEGER DEFAULT 0, updated_at TEXT
+            is_synced INTEGER DEFAULT 0,
+            is_deleted INTEGER NOT NULL DEFAULT 0,
+            updated_at TEXT
           )''');
         await db.execute('''
           CREATE TABLE transactions (
@@ -29,7 +31,9 @@ Future<void> _setupDb() async {
             type INTEGER NOT NULL, note TEXT, date TEXT NOT NULL,
             debt_id TEXT,
             owner_id TEXT NOT NULL DEFAULT '',
-            is_synced INTEGER DEFAULT 0, updated_at TEXT,
+            is_synced INTEGER DEFAULT 0,
+            is_deleted INTEGER NOT NULL DEFAULT 0,
+            updated_at TEXT,
             FOREIGN KEY (customer_id) REFERENCES customers (id) ON DELETE CASCADE,
             FOREIGN KEY (debt_id) REFERENCES transactions (id) ON DELETE SET NULL
           )''');
@@ -40,7 +44,9 @@ Future<void> _setupDb() async {
             reminder_date TEXT NOT NULL, is_completed INTEGER NOT NULL DEFAULT 0,
             message TEXT,
             owner_id TEXT NOT NULL DEFAULT '',
-            is_synced INTEGER DEFAULT 0, updated_at TEXT,
+            is_synced INTEGER DEFAULT 0,
+            is_deleted INTEGER NOT NULL DEFAULT 0,
+            updated_at TEXT,
             FOREIGN KEY (customer_id) REFERENCES customers (id) ON DELETE CASCADE,
             FOREIGN KEY (debt_id) REFERENCES transactions (id) ON DELETE SET NULL
           )''');

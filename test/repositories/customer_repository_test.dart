@@ -12,7 +12,7 @@ Future<void> _setupDb() async {
   final db = await databaseFactoryFfi.openDatabase(
     inMemoryDatabasePath,
     options: OpenDatabaseOptions(
-      version: 3,
+      version: 6,
       onCreate: (db, version) async {
         await db.execute('''
           CREATE TABLE customers (
@@ -22,6 +22,7 @@ Future<void> _setupDb() async {
             created_at TEXT NOT NULL,
             owner_id TEXT NOT NULL DEFAULT '',
             is_synced INTEGER DEFAULT 0,
+            is_deleted INTEGER NOT NULL DEFAULT 0,
             updated_at TEXT
           )
         ''');
@@ -36,6 +37,7 @@ Future<void> _setupDb() async {
             debt_id TEXT,
             owner_id TEXT NOT NULL DEFAULT '',
             is_synced INTEGER DEFAULT 0,
+            is_deleted INTEGER NOT NULL DEFAULT 0,
             updated_at TEXT,
             FOREIGN KEY (customer_id) REFERENCES customers (id) ON DELETE CASCADE,
             FOREIGN KEY (debt_id) REFERENCES transactions (id) ON DELETE SET NULL
@@ -51,6 +53,7 @@ Future<void> _setupDb() async {
             message TEXT,
             owner_id TEXT NOT NULL DEFAULT '',
             is_synced INTEGER DEFAULT 0,
+            is_deleted INTEGER NOT NULL DEFAULT 0,
             updated_at TEXT,
             FOREIGN KEY (customer_id) REFERENCES customers (id) ON DELETE CASCADE,
             FOREIGN KEY (debt_id) REFERENCES transactions (id) ON DELETE SET NULL

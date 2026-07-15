@@ -7,6 +7,7 @@ class DebtReminder {
   final String? message;
   final String ownerId;
   final bool isSynced;
+  final bool isDeleted;
   final String updatedAt;
 
   const DebtReminder({
@@ -18,6 +19,7 @@ class DebtReminder {
     this.message,
     this.ownerId = '',
     this.isSynced = false,
+    this.isDeleted = false,
     this.updatedAt = '',
   });
 
@@ -33,6 +35,7 @@ class DebtReminder {
       'message': message,
       'owner_id': ownerId,
       'is_synced': isSynced ? 1 : 0,
+      'is_deleted': isDeleted ? 1 : 0,
       'updated_at': updatedAt,
     };
   }
@@ -47,6 +50,7 @@ class DebtReminder {
       message: map['message'] as String?,
       ownerId: map['owner_id'] as String? ?? '',
       isSynced: (map['is_synced'] as int? ?? 0) == 1,
+      isDeleted: (map['is_deleted'] as int? ?? 0) == 1,
       updatedAt: map['updated_at'] as String? ?? '',
     );
   }
@@ -60,6 +64,7 @@ class DebtReminder {
     String? message,
     String? ownerId,
     bool? isSynced,
+    bool? isDeleted,
     String? updatedAt,
   }) {
     return DebtReminder(
@@ -71,6 +76,7 @@ class DebtReminder {
       message: message ?? this.message,
       ownerId: ownerId ?? this.ownerId,
       isSynced: isSynced ?? this.isSynced,
+      isDeleted: isDeleted ?? this.isDeleted,
       updatedAt: updatedAt ?? this.updatedAt,
     );
   }

@@ -7,7 +7,7 @@ Future<Database> _setupDb() async {
   final db = await databaseFactoryFfi.openDatabase(
     inMemoryDatabasePath,
     options: OpenDatabaseOptions(
-      version: 5,
+      version: 6,
       onCreate: (db, version) async {
         await db.execute('''
           CREATE TABLE customers (
@@ -17,6 +17,7 @@ Future<Database> _setupDb() async {
             created_at TEXT NOT NULL,
             owner_id TEXT NOT NULL DEFAULT '',
             is_synced INTEGER DEFAULT 0,
+            is_deleted INTEGER NOT NULL DEFAULT 0,
             updated_at TEXT
           )
         ''');
@@ -31,6 +32,7 @@ Future<Database> _setupDb() async {
             debt_id TEXT,
             owner_id TEXT NOT NULL DEFAULT '',
             is_synced INTEGER DEFAULT 0,
+            is_deleted INTEGER NOT NULL DEFAULT 0,
             updated_at TEXT,
             FOREIGN KEY (customer_id) REFERENCES customers (id) ON DELETE CASCADE,
             FOREIGN KEY (debt_id) REFERENCES transactions (id) ON DELETE SET NULL
@@ -46,6 +48,7 @@ Future<Database> _setupDb() async {
             message TEXT,
             owner_id TEXT NOT NULL DEFAULT '',
             is_synced INTEGER DEFAULT 0,
+            is_deleted INTEGER NOT NULL DEFAULT 0,
             updated_at TEXT,
             FOREIGN KEY (customer_id) REFERENCES customers (id) ON DELETE CASCADE,
             FOREIGN KEY (debt_id) REFERENCES transactions (id) ON DELETE SET NULL
@@ -76,7 +79,7 @@ void main() {
       final names = cols.map((c) => c['name'] as String).toSet();
       expect(names, containsAll([
         'id', 'name', 'phone', 'created_at',
-        'owner_id', 'is_synced', 'updated_at',
+        'owner_id', 'is_synced', 'is_deleted', 'updated_at',
       ]));
     });
 
@@ -84,7 +87,7 @@ void main() {
       final cols = await db.rawQuery('PRAGMA table_info(transactions)');
       final names = cols.map((c) => c['name'] as String).toSet();
       expect(names, containsAll([
-        'debt_id', 'owner_id', 'is_synced', 'updated_at',
+        'debt_id', 'owner_id', 'is_synced', 'is_deleted', 'updated_at',
       ]));
     });
 

@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../l10n/app_localizations.dart';
 import '../data/models/transaction.dart' as model;
 import '../Providers/database_provider.dart';
+import '../Providers/sync_provider.dart';
 import 'amount_input_formatter.dart';
 import 'app_snackbar.dart';
 
@@ -75,6 +76,7 @@ class _BodyState extends ConsumerState<_EditPaymentBody> {
     setState(() => _saving = true);
     final repo = ref.read(transactionRepositoryProvider);
     await repo.delete(widget.payment.id!);
+    ref.read(syncProvider.notifier).schedulePush();
     _invalidate(ref);
     if (mounted) Navigator.pop(context);
   }

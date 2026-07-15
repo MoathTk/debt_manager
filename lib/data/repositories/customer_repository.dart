@@ -19,15 +19,26 @@ class CustomerRepository {
 
   Future<int> delete(String id) async {
     final db = await _dbHelper.database;
-    return await db.delete('customers', where: 'id = ?', whereArgs: [id]);
+    final now = DateTime.now().toIso8601String();
+    return await db.update(
+      'customers',
+      {'is_deleted': 1, 'is_synced': 0, 'updated_at': now},
+      where: 'id = ?', whereArgs: [id],
+    );
   }
 
   Future<List<Customer>> getAll({String? ownerId}) async {
     final db = await _dbHelper.database;
+    final conditions = ['is_deleted = 0'];
+    final args = <dynamic>[];
+    if (ownerId != null) {
+      conditions.add('owner_id = ?');
+      args.add(ownerId);
+    }
     final result = await db.query(
       'customers',
-      where: ownerId != null ? 'owner_id = ?' : null,
-      whereArgs: ownerId != null ? [ownerId] : null,
+      where: conditions.join(' AND '),
+      whereArgs: args,
       orderBy: 'created_at DESC',
     );
     return result.map((map) => Customer.fromMap(map)).toList();
@@ -36,7 +47,7 @@ class CustomerRepository {
   Future<Customer?> getById(String id) async {
     final db = await _dbHelper.database;
     final result = await db.query(
-      'customers', where: 'id = ?', whereArgs: [id],
+      'customers', where: 'id = ? AND is_deleted = 0', whereArgs: [id],
     );
     if (result.isEmpty) return null;
     return Customer.fromMap(result.first);
@@ -45,12 +56,18 @@ class CustomerRepository {
   Future<List<Customer>> search(String query, {String? ownerId}) async {
     final db = await _dbHelper.database;
     final escaped = query.replaceAll('%', '\\%').replaceAll('_', '\\_');
-    final whereClause = ownerId != null ? 'AND owner_id = ?' : '';
+    final conditions = [
+      "(name LIKE ? ESCAPE '\\' OR (phone IS NOT NULL AND phone LIKE ? ESCAPE '\\'))",
+      'is_deleted = 0',
+    ];
     final args = ['%$escaped%', '%$escaped%'];
-    if (ownerId != null) args.add(ownerId);
+    if (ownerId != null) {
+      conditions.add('owner_id = ?');
+      args.add(ownerId);
+    }
     final result = await db.query(
       'customers',
-      where: '(name LIKE ? ESCAPE \'\\\' OR (phone IS NOT NULL AND phone LIKE ? ESCAPE \'\\\')) $whereClause',
+      where: conditions.join(' AND '),
       whereArgs: args,
       orderBy: 'created_at DESC',
     );
@@ -59,11 +76,16 @@ class CustomerRepository {
 
   Future<int> getCustomerCount({String? ownerId}) async {
     final db = await _dbHelper.database;
-    final result = ownerId != null
-        ? await db.rawQuery(
-            'SELECT COUNT(*) as count FROM customers WHERE owner_id = ?',
-            [ownerId])
-        : await db.rawQuery('SELECT COUNT(*) as count FROM customers');
+    final conditions = ['is_deleted = 0'];
+    final args = <dynamic>[];
+    if (ownerId != null) {
+      conditions.add('owner_id = ?');
+      args.add(ownerId);
+    }
+    final result = await db.rawQuery(
+      'SELECT COUNT(*) as count FROM customers WHERE ${conditions.join(' AND ')}',
+      args,
+    );
     return result.first['count'] as int;
   }
 
@@ -86,18 +108,23 @@ class CustomerRepository {
   Future<void> upsertFromCloud(List<Customer> records) async {
     final db = await _dbHelper.database;
     for (final c in records) {
-      final existing = await getById(c.id!);
-      if (existing == null) {
+      final existingResult = await db.query(
+        'customers', where: 'id = ?', whereArgs: [c.id],
+      );
+      if (existingResult.isEmpty) {
         final map = c.toMap();
         map['is_synced'] = 1;
         await db.insert('customers', map);
-      } else if (c.updatedAt.compareTo(existing.updatedAt) > 0) {
-        final map = c.toMap();
-        map['is_synced'] = 1;
-        await db.update(
-          'customers', map,
-          where: 'id = ?', whereArgs: [c.id],
-        );
+      } else {
+        final existing = Customer.fromMap(existingResult.first);
+        if (c.updatedAt.compareTo(existing.updatedAt) > 0) {
+          final map = c.toMap();
+          map['is_synced'] = 1;
+          await db.update(
+            'customers', map,
+            where: 'id = ?', whereArgs: [c.id],
+          );
+        }
       }
     }
   }

@@ -218,13 +218,15 @@ class _CustomerSyncRepo {
     for (final c in records) {
       final existing = await _getById(c.id!);
       if (existing == null) {
-        await db.insert('customers', c.toMap());
+        final map = c.toMap();
+        map['is_synced'] = 1;
+        await db.insert('customers', map);
       } else if (c.updatedAt.compareTo(existing.updatedAt) > 0) {
+        final map = c.toMap();
+        map['is_synced'] = 1;
         await db.update(
-          'customers',
-          c.toMap(),
-          where: 'id = ?',
-          whereArgs: [c.id],
+          'customers', map,
+          where: 'id = ?', whereArgs: [c.id],
         );
       }
     }
@@ -269,13 +271,15 @@ class _TransactionSyncRepo {
     for (final t in records) {
       final existing = await _getById(t.id!);
       if (existing == null) {
-        await db.insert('transactions', t.toMap());
+        final map = t.toMap();
+        map['is_synced'] = 1;
+        await db.insert('transactions', map);
       } else if (t.updatedAt.compareTo(existing.updatedAt) > 0) {
+        final map = t.toMap();
+        map['is_synced'] = 1;
         await db.update(
-          'transactions',
-          t.toMap(),
-          where: 'id = ?',
-          whereArgs: [t.id],
+          'transactions', map,
+          where: 'id = ?', whereArgs: [t.id],
         );
       }
     }
@@ -320,13 +324,15 @@ class _ReminderSyncRepo {
     for (final r in records) {
       final existing = await _getById(r.id!);
       if (existing == null) {
-        await db.insert('debt_reminders', r.toMap());
+        final map = r.toMap();
+        map['is_synced'] = 1;
+        await db.insert('debt_reminders', map);
       } else if (r.updatedAt.compareTo(existing.updatedAt) > 0) {
+        final map = r.toMap();
+        map['is_synced'] = 1;
         await db.update(
-          'debt_reminders',
-          r.toMap(),
-          where: 'id = ?',
-          whereArgs: [r.id],
+          'debt_reminders', map,
+          where: 'id = ?', whereArgs: [r.id],
         );
       }
     }

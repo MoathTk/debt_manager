@@ -339,8 +339,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get deleteAll => 'حذف الكل';
 
   @override
-  String get confirmDeleteAll =>
-      'هل أنت متأكد من حذف جميع تذكيرات هذه القائمة؟';
+  String get confirmDeleteAll => 'هل أنت متأكد من حذف جميع تذكيرات هذه القائمة؟';
 
   @override
   String get yes => 'نعم';

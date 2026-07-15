@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'firebase_options.dart';
+import 'package:firebase_core/firebase_core.dart'; 
 import 'Providers/theme_provider.dart';
 import 'Providers/locale_provider.dart';
 import 'l10n/app_localizations.dart';

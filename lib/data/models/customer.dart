@@ -5,6 +5,7 @@ class Customer {
   final String createdAt;
   final String ownerId;
   final bool isSynced;
+  final bool isDeleted;
   final String updatedAt;
 
   const Customer({
@@ -14,6 +15,7 @@ class Customer {
     required this.createdAt,
     this.ownerId = '',
     this.isSynced = false,
+    this.isDeleted = false,
     this.updatedAt = '',
   });
 
@@ -25,6 +27,7 @@ class Customer {
       'created_at': createdAt,
       'owner_id': ownerId,
       'is_synced': isSynced ? 1 : 0,
+      'is_deleted': isDeleted ? 1 : 0,
       'updated_at': updatedAt,
     };
   }
@@ -37,6 +40,7 @@ class Customer {
       createdAt: map['created_at'] as String,
       ownerId: map['owner_id'] as String? ?? '',
       isSynced: (map['is_synced'] as int? ?? 0) == 1,
+      isDeleted: (map['is_deleted'] as int? ?? 0) == 1,
       updatedAt: map['updated_at'] as String? ?? '',
     );
   }
@@ -48,6 +52,7 @@ class Customer {
     String? createdAt,
     String? ownerId,
     bool? isSynced,
+    bool? isDeleted,
     String? updatedAt,
   }) {
     return Customer(
@@ -57,6 +62,7 @@ class Customer {
       createdAt: createdAt ?? this.createdAt,
       ownerId: ownerId ?? this.ownerId,
       isSynced: isSynced ?? this.isSynced,
+      isDeleted: isDeleted ?? this.isDeleted,
       updatedAt: updatedAt ?? this.updatedAt,
     );
   }

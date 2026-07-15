@@ -8,6 +8,7 @@ class Transaction {
   final String? debtId;
   final String ownerId;
   final bool isSynced;
+  final bool isDeleted;
   final String updatedAt;
 
   static const int debt = 0;
@@ -26,6 +27,7 @@ class Transaction {
     this.debtId,
     this.ownerId = '',
     this.isSynced = false,
+    this.isDeleted = false,
     this.updatedAt = '',
   });
 
@@ -40,6 +42,7 @@ class Transaction {
       'debt_id': debtId,
       'owner_id': ownerId,
       'is_synced': isSynced ? 1 : 0,
+      'is_deleted': isDeleted ? 1 : 0,
       'updated_at': updatedAt,
     };
   }
@@ -55,6 +58,7 @@ class Transaction {
       debtId: map['debt_id'] as String?,
       ownerId: map['owner_id'] as String? ?? '',
       isSynced: (map['is_synced'] as int? ?? 0) == 1,
+      isDeleted: (map['is_deleted'] as int? ?? 0) == 1,
       updatedAt: map['updated_at'] as String? ?? '',
     );
   }
@@ -69,6 +73,7 @@ class Transaction {
     String? debtId,
     String? ownerId,
     bool? isSynced,
+    bool? isDeleted,
     String? updatedAt,
   }) {
     return Transaction(
@@ -81,6 +86,7 @@ class Transaction {
       debtId: debtId ?? this.debtId,
       ownerId: ownerId ?? this.ownerId,
       isSynced: isSynced ?? this.isSynced,
+      isDeleted: isDeleted ?? this.isDeleted,
       updatedAt: updatedAt ?? this.updatedAt,
     );
   }
