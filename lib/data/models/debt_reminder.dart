@@ -5,6 +5,7 @@ class DebtReminder {
   final String reminderDate;
   final int isCompleted;
   final String? message;
+  final String ownerId;
   final bool isSynced;
   final String updatedAt;
 
@@ -15,6 +16,7 @@ class DebtReminder {
     required this.reminderDate,
     this.isCompleted = 0,
     this.message,
+    this.ownerId = '',
     this.isSynced = false,
     this.updatedAt = '',
   });
@@ -29,6 +31,7 @@ class DebtReminder {
       'reminder_date': reminderDate,
       'is_completed': isCompleted,
       'message': message,
+      'owner_id': ownerId,
       'is_synced': isSynced ? 1 : 0,
       'updated_at': updatedAt,
     };
@@ -42,6 +45,7 @@ class DebtReminder {
       reminderDate: map['reminder_date'] as String,
       isCompleted: map['is_completed'] as int? ?? 0,
       message: map['message'] as String?,
+      ownerId: map['owner_id'] as String? ?? '',
       isSynced: (map['is_synced'] as int? ?? 0) == 1,
       updatedAt: map['updated_at'] as String? ?? '',
     );
@@ -54,6 +58,7 @@ class DebtReminder {
     String? reminderDate,
     int? isCompleted,
     String? message,
+    String? ownerId,
     bool? isSynced,
     String? updatedAt,
   }) {
@@ -64,6 +69,7 @@ class DebtReminder {
       reminderDate: reminderDate ?? this.reminderDate,
       isCompleted: isCompleted ?? this.isCompleted,
       message: message ?? this.message,
+      ownerId: ownerId ?? this.ownerId,
       isSynced: isSynced ?? this.isSynced,
       updatedAt: updatedAt ?? this.updatedAt,
     );
@@ -71,6 +77,6 @@ class DebtReminder {
 
   @override
   String toString() {
-    return 'DebtReminder(id: $id, customerId: $customerId, debtId: $debtId, reminderDate: $reminderDate, isCompleted: $isCompleted, message: $message)';
+    return 'DebtReminder(id: $id, customerId: $customerId, debtId: $debtId)';
   }
 }

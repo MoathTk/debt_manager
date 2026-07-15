@@ -19,6 +19,7 @@ Future<void> _setupDb() async {
             id TEXT PRIMARY KEY,
             name TEXT NOT NULL, phone TEXT,
             created_at TEXT NOT NULL,
+            owner_id TEXT NOT NULL DEFAULT '',
             is_synced INTEGER DEFAULT 0, updated_at TEXT
           )''');
         await db.execute('''
@@ -27,6 +28,7 @@ Future<void> _setupDb() async {
             customer_id TEXT NOT NULL, amount REAL NOT NULL,
             type INTEGER NOT NULL, note TEXT, date TEXT NOT NULL,
             debt_id TEXT,
+            owner_id TEXT NOT NULL DEFAULT '',
             is_synced INTEGER DEFAULT 0, updated_at TEXT,
             FOREIGN KEY (customer_id) REFERENCES customers (id) ON DELETE CASCADE,
             FOREIGN KEY (debt_id) REFERENCES transactions (id) ON DELETE SET NULL
@@ -37,6 +39,7 @@ Future<void> _setupDb() async {
             customer_id TEXT NOT NULL, debt_id TEXT,
             reminder_date TEXT NOT NULL, is_completed INTEGER NOT NULL DEFAULT 0,
             message TEXT,
+            owner_id TEXT NOT NULL DEFAULT '',
             is_synced INTEGER DEFAULT 0, updated_at TEXT,
             FOREIGN KEY (customer_id) REFERENCES customers (id) ON DELETE CASCADE,
             FOREIGN KEY (debt_id) REFERENCES transactions (id) ON DELETE SET NULL

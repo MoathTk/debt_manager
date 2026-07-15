@@ -34,12 +34,13 @@ class SeedDatabase {
     null, null,
   ];
 
-  static Future<int> seedDemoData() async {
+  static Future<int> seedDemoData({String? ownerId}) async {
     final db = await _db.database;
     int count = 0;
 
     await db.transaction((txn) async {
       final now = DateTime.now().toIso8601String();
+      final ownerVal = ownerId ?? '';
       final customerIds = <String>[];
       for (var i = 0; i < 50; i++) {
         final id = generateId();
@@ -54,7 +55,8 @@ class SeedDatabase {
               ? '07${_rand.nextInt(90) + 10}${_rand.nextInt(9000000) + 1000000}'
               : null,
           'created_at': createdAt,
-          'is_synced': 0,
+          'owner_id': ownerVal,
+          'is_synced': 1,
           'updated_at': now,
         });
         count++;
@@ -80,7 +82,8 @@ class SeedDatabase {
           'type': 0,
           'note': note,
           'date': date,
-          'is_synced': 0,
+          'owner_id': ownerVal,
+          'is_synced': 1,
           'updated_at': now,
         });
         debtAmounts.putIfAbsent(cid, () => []);
@@ -115,7 +118,8 @@ class SeedDatabase {
           'note': note,
           'date': date,
           'debt_id': debt.key,
-          'is_synced': 0,
+          'owner_id': ownerVal,
+          'is_synced': 1,
           'updated_at': now,
         });
         count++;
@@ -146,7 +150,8 @@ class SeedDatabase {
           'reminder_date': dateStr,
           'is_completed': completed,
           'message': _reminderMessages[_rand.nextInt(_reminderMessages.length)],
-          'is_synced': 0,
+          'owner_id': ownerVal,
+          'is_synced': 1,
           'updated_at': now,
         });
         count++;

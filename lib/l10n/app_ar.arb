@@ -133,5 +133,16 @@
   "joined": "انضم {date}",
   "billion": "مليار",
   "million": "مليون",
-  "thousand": "ألف"
+  "thousand": "ألف",
+  "signInWithGoogle": "تسجيل الدخول بحساب Google",
+  "signOut": "تسجيل الخروج",
+  "cloudSync": "المزامنة السحابية",
+  "syncStatusConnected": "متصل",
+  "syncStatusSyncing": "جاري المزامنة...",
+  "syncStatusOffline": "غير متصل",
+  "syncStatusError": "خطأ في المزامنة",
+  "lastSynced": "آخر مزامنة",
+  "pendingSync": "بانتظار المزامنة",
+  "syncNow": "مزامنة الآن",
+  "notSynced": "غير متزامن"
 }

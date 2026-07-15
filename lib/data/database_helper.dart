@@ -16,7 +16,7 @@ class DatabaseHelper {
     final path = join(dbPath, 'debt_management.db');
     _database = await openDatabase(
       path,
-      version: 4,
+      version: 5,
       onCreate: _createDB,
       onUpgrade: _onUpgrade,
     );
@@ -30,6 +30,7 @@ class DatabaseHelper {
         name TEXT NOT NULL,
         phone TEXT,
         created_at TEXT NOT NULL,
+        owner_id TEXT NOT NULL DEFAULT '',
         is_synced INTEGER DEFAULT 0,
         updated_at TEXT
       )
@@ -44,6 +45,7 @@ class DatabaseHelper {
         note TEXT,
         date TEXT NOT NULL,
         debt_id TEXT,
+        owner_id TEXT NOT NULL DEFAULT '',
         is_synced INTEGER DEFAULT 0,
         updated_at TEXT,
         FOREIGN KEY (customer_id) REFERENCES customers (id) ON DELETE CASCADE,
@@ -59,6 +61,7 @@ class DatabaseHelper {
         reminder_date TEXT NOT NULL,
         is_completed INTEGER NOT NULL DEFAULT 0,
         message TEXT,
+        owner_id TEXT NOT NULL DEFAULT '',
         is_synced INTEGER DEFAULT 0,
         updated_at TEXT,
         FOREIGN KEY (customer_id) REFERENCES customers (id) ON DELETE CASCADE,
@@ -81,9 +84,7 @@ class DatabaseHelper {
   }
 
   Future<void> _onUpgrade(
-    Database db,
-    int oldVersion,
-    int newVersion,
+    Database db, int oldVersion, int newVersion,
   ) async {
     if (oldVersion < 4) {
       final customers = await db.query('customers');
@@ -97,7 +98,7 @@ class DatabaseHelper {
       await db.execute('DROP TABLE IF EXISTS transactions');
       await db.execute('DROP TABLE IF EXISTS customers');
 
-      await _createDB(db, 4);
+      await _createDB(db, 5);
 
       for (final c in customers) {
         final newId = generateId();
@@ -117,8 +118,7 @@ class DatabaseHelper {
         final oldId = t['id'] as int;
         final newCustId = customerMap[t['customer_id'] as int] ?? '';
         final oldDebtId = t['debt_id'] as int?;
-        final newDebtId =
-            oldDebtId != null ? debtMap[oldDebtId] : null;
+        final newDebtId = oldDebtId != null ? debtMap[oldDebtId] : null;
         debtMap[oldId] = newId;
 
         await db.insert('transactions', {
@@ -138,8 +138,7 @@ class DatabaseHelper {
         final newId = generateId();
         final newCustId = customerMap[r['customer_id'] as int] ?? '';
         final oldDebtId = r['debt_id'] as int?;
-        final newDebtId =
-            oldDebtId != null ? debtMap[oldDebtId] : null;
+        final newDebtId = oldDebtId != null ? debtMap[oldDebtId] : null;
 
         await db.insert('debt_reminders', {
           'id': newId,
@@ -152,6 +151,18 @@ class DatabaseHelper {
           'updated_at': DateTime.now().toIso8601String(),
         });
       }
+    }
+
+    if (oldVersion < 5) {
+      await db.execute(
+        "ALTER TABLE customers ADD COLUMN owner_id TEXT NOT NULL DEFAULT ''",
+      );
+      await db.execute(
+        "ALTER TABLE transactions ADD COLUMN owner_id TEXT NOT NULL DEFAULT ''",
+      );
+      await db.execute(
+        "ALTER TABLE debt_reminders ADD COLUMN owner_id TEXT NOT NULL DEFAULT ''",
+      );
     }
   }
 

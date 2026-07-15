@@ -3,6 +3,7 @@ class Customer {
   final String name;
   final String? phone;
   final String createdAt;
+  final String ownerId;
   final bool isSynced;
   final String updatedAt;
 
@@ -11,6 +12,7 @@ class Customer {
     required this.name,
     this.phone,
     required this.createdAt,
+    this.ownerId = '',
     this.isSynced = false,
     this.updatedAt = '',
   });
@@ -21,6 +23,7 @@ class Customer {
       'name': name,
       'phone': phone,
       'created_at': createdAt,
+      'owner_id': ownerId,
       'is_synced': isSynced ? 1 : 0,
       'updated_at': updatedAt,
     };
@@ -32,6 +35,7 @@ class Customer {
       name: map['name'] as String,
       phone: map['phone'] as String?,
       createdAt: map['created_at'] as String,
+      ownerId: map['owner_id'] as String? ?? '',
       isSynced: (map['is_synced'] as int? ?? 0) == 1,
       updatedAt: map['updated_at'] as String? ?? '',
     );
@@ -42,6 +46,7 @@ class Customer {
     String? name,
     String? phone,
     String? createdAt,
+    String? ownerId,
     bool? isSynced,
     String? updatedAt,
   }) {
@@ -50,6 +55,7 @@ class Customer {
       name: name ?? this.name,
       phone: phone ?? this.phone,
       createdAt: createdAt ?? this.createdAt,
+      ownerId: ownerId ?? this.ownerId,
       isSynced: isSynced ?? this.isSynced,
       updatedAt: updatedAt ?? this.updatedAt,
     );

@@ -6,6 +6,7 @@ class Transaction {
   final String? note;
   final String date;
   final String? debtId;
+  final String ownerId;
   final bool isSynced;
   final String updatedAt;
 
@@ -23,6 +24,7 @@ class Transaction {
     this.note,
     required this.date,
     this.debtId,
+    this.ownerId = '',
     this.isSynced = false,
     this.updatedAt = '',
   });
@@ -36,6 +38,7 @@ class Transaction {
       'note': note,
       'date': date,
       'debt_id': debtId,
+      'owner_id': ownerId,
       'is_synced': isSynced ? 1 : 0,
       'updated_at': updatedAt,
     };
@@ -50,6 +53,7 @@ class Transaction {
       note: map['note'] as String?,
       date: map['date'] as String,
       debtId: map['debt_id'] as String?,
+      ownerId: map['owner_id'] as String? ?? '',
       isSynced: (map['is_synced'] as int? ?? 0) == 1,
       updatedAt: map['updated_at'] as String? ?? '',
     );
@@ -63,6 +67,7 @@ class Transaction {
     String? note,
     String? date,
     String? debtId,
+    String? ownerId,
     bool? isSynced,
     String? updatedAt,
   }) {
@@ -74,6 +79,7 @@ class Transaction {
       note: note ?? this.note,
       date: date ?? this.date,
       debtId: debtId ?? this.debtId,
+      ownerId: ownerId ?? this.ownerId,
       isSynced: isSynced ?? this.isSynced,
       updatedAt: updatedAt ?? this.updatedAt,
     );
@@ -81,6 +87,6 @@ class Transaction {
 
   @override
   String toString() {
-    return 'Transaction(id: $id, customerId: $customerId, amount: $amount, type: $type, note: $note, date: $date)';
+    return 'Transaction(id: $id, customerId: $customerId, amount: $amount, type: $type)';
   }
 }

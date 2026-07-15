@@ -415,4 +415,37 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get thousand => 'ألف';
+
+  @override
+  String get signInWithGoogle => 'تسجيل الدخول بحساب Google';
+
+  @override
+  String get signOut => 'تسجيل الخروج';
+
+  @override
+  String get cloudSync => 'المزامنة السحابية';
+
+  @override
+  String get syncStatusConnected => 'متصل';
+
+  @override
+  String get syncStatusSyncing => 'جاري المزامنة...';
+
+  @override
+  String get syncStatusOffline => 'غير متصل';
+
+  @override
+  String get syncStatusError => 'خطأ في المزامنة';
+
+  @override
+  String get lastSynced => 'آخر مزامنة';
+
+  @override
+  String get pendingSync => 'بانتظار المزامنة';
+
+  @override
+  String get syncNow => 'مزامنة الآن';
+
+  @override
+  String get notSynced => 'غير متزامن';
 }

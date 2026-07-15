@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:local_debt_management/widgets/side_drawer.dart';
+import 'package:local_debt_management/widgets/sync_status_indicator.dart';
 import '../l10n/app_localizations.dart';
 import '../Providers/database_provider.dart';
+import '../Providers/sync_provider.dart';
 
 import 'dashboard_screen.dart';
 import 'customers_screen.dart';
@@ -30,6 +32,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   ];
 
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(syncProvider.notifier).syncNow();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final pendingAsync = ref.watch(pendingRemindersProvider);
@@ -46,6 +56,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       appBar: AppBar(
         title: Text(l10n.appTitle),
         actions: [
+          const SyncStatusIndicator(),
           IconButton(
             icon: const Icon(Icons.settings),
             onPressed: () => _scaffoldKey.currentState!.openEndDrawer(),

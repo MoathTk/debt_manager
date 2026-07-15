@@ -6,6 +6,7 @@ import '../data/repositories/debt_reminder_repository.dart';
 import '../data/models/customer.dart';
 import '../data/models/transaction.dart' as model;
 import '../data/models/debt_reminder.dart';
+import '../services/auth_service.dart';
 import 'mutations.dart';
 
 final databaseProvider = Provider<DatabaseHelper>((ref) {
@@ -24,9 +25,14 @@ final debtReminderRepositoryProvider = Provider<DebtReminderRepository>((ref) {
   return DebtReminderRepository();
 });
 
+final _ownerIdProvider = Provider<String>((ref) {
+  return ref.watch(authServiceProvider).ownerId ?? '';
+});
+
 final customersProvider = FutureProvider<List<Customer>>((ref) async {
   final repo = ref.watch(customerRepositoryProvider);
-  return repo.getAll();
+  final ownerId = ref.watch(_ownerIdProvider);
+  return repo.getAll(ownerId: ownerId.isEmpty ? null : ownerId);
 });
 
 final customerByIdProvider =
@@ -39,7 +45,8 @@ final transactionsProvider = FutureProvider<List<model.Transaction>>((
   ref,
 ) async {
   final repo = ref.watch(transactionRepositoryProvider);
-  return repo.getAll();
+  final ownerId = ref.watch(_ownerIdProvider);
+  return repo.getAll(ownerId: ownerId.isEmpty ? null : ownerId);
 });
 
 final transactionsByCustomerProvider =
@@ -72,7 +79,8 @@ final pendingRemindersProvider = FutureProvider<List<DebtReminder>>((
   ref,
 ) async {
   final repo = ref.watch(debtReminderRepositoryProvider);
-  return repo.getPending();
+  final ownerId = ref.watch(_ownerIdProvider);
+  return repo.getPending(ownerId: ownerId.isEmpty ? null : ownerId);
 });
 
 final dueTodayProvider = FutureProvider<List<DebtReminder>>((ref) async {
@@ -84,10 +92,12 @@ final dashboardStatsProvider = FutureProvider<DashboardStats>((ref) async {
   final customerRepo = ref.watch(customerRepositoryProvider);
   final transactionRepo = ref.watch(transactionRepositoryProvider);
   final reminderRepo = ref.watch(debtReminderRepositoryProvider);
-  final customerCount = await customerRepo.getCustomerCount();
-  final totalDebts = await transactionRepo.getTotalDebts();
-  final totalPayments = await transactionRepo.getTotalPayments();
-  final pendingReminders = await reminderRepo.getPendingCount();
+  final ownerId = ref.watch(_ownerIdProvider);
+  final ownerFilter = ownerId.isEmpty ? null : ownerId;
+  final customerCount = await customerRepo.getCustomerCount(ownerId: ownerFilter);
+  final totalDebts = await transactionRepo.getTotalDebts(ownerId: ownerFilter);
+  final totalPayments = await transactionRepo.getTotalPayments(ownerId: ownerFilter);
+  final pendingReminders = await reminderRepo.getPendingCount(ownerId: ownerFilter);
   final periodic = await transactionRepo.getPeriodicData();
   final topDebtors = await transactionRepo.getTopDebtors(5);
   return DashboardStats(
@@ -132,5 +142,6 @@ final totalsByDateRangeProvider =
 
 final allRemindersProvider = FutureProvider<List<DebtReminder>>((ref) async {
   final repo = ref.watch(debtReminderRepositoryProvider);
-  return repo.getAll();
+  final ownerId = ref.watch(_ownerIdProvider);
+  return repo.getAll(ownerId: ownerId.isEmpty ? null : ownerId);
 });

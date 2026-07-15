@@ -134,5 +134,16 @@
   "joined": "Joined {date}",
   "billion": "Billion",
   "million": "Million",
-  "thousand": "Thousand"
+  "thousand": "Thousand",
+  "signInWithGoogle": "Sign in with Google",
+  "signOut": "Sign Out",
+  "cloudSync": "Cloud Sync",
+  "syncStatusConnected": "Connected",
+  "syncStatusSyncing": "Syncing...",
+  "syncStatusOffline": "Offline",
+  "syncStatusError": "Sync Error",
+  "lastSynced": "Last synced",
+  "pendingSync": "Pending sync",
+  "syncNow": "Sync Now",
+  "notSynced": "Not synced"
 }

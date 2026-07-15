@@ -416,4 +416,37 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get thousand => 'Thousand';
+
+  @override
+  String get signInWithGoogle => 'Sign in with Google';
+
+  @override
+  String get signOut => 'Sign Out';
+
+  @override
+  String get cloudSync => 'Cloud Sync';
+
+  @override
+  String get syncStatusConnected => 'Connected';
+
+  @override
+  String get syncStatusSyncing => 'Syncing...';
+
+  @override
+  String get syncStatusOffline => 'Offline';
+
+  @override
+  String get syncStatusError => 'Sync Error';
+
+  @override
+  String get lastSynced => 'Last synced';
+
+  @override
+  String get pendingSync => 'Pending sync';
+
+  @override
+  String get syncNow => 'Sync Now';
+
+  @override
+  String get notSynced => 'Not synced';
 }

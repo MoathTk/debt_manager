@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:local_debt_management/Providers/database_provider.dart';
 import 'package:local_debt_management/Providers/locale_provider.dart';
+import 'package:local_debt_management/Providers/sync_provider.dart';
 import 'package:local_debt_management/Providers/theme_provider.dart';
 import 'package:local_debt_management/l10n/app_localizations.dart';
 import 'package:local_debt_management/utils/seed_database.dart';
+import 'package:local_debt_management/services/auth_service.dart';
 
 class SettingsDrawer extends StatelessWidget {
   const SettingsDrawer({
@@ -21,6 +23,8 @@ class SettingsDrawer extends StatelessWidget {
   Widget build(BuildContext context) {
     final currentLocale = ref.watch(localeProvider);
     final currentTheme = ref.watch(themeProvider);
+    final syncState = ref.watch(syncProvider);
+    final user = ref.watch(authServiceProvider).currentUser;
 
     final screenWidth = MediaQuery.of(context).size.width;
     final theme = Theme.of(context);
@@ -46,13 +50,22 @@ class SettingsDrawer extends StatelessWidget {
                     radius: 28,
                     backgroundColor: colorScheme.primary,
                     foregroundColor: colorScheme.onPrimary,
-                    child: const Text(
-                      'AJ', // Placeholder for user initials
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 20,
-                      ),
-                    ),
+                    child: user?.photoURL != null
+                        ? ClipOval(
+                            child: Image.network(
+                              user!.photoURL!,
+                              width: 56,
+                              height: 56,
+                              fit: BoxFit.cover,
+                            ),
+                          )
+                        : Text(
+                            (user?.displayName ?? 'U')[0].toUpperCase(),
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20,
+                            ),
+                          ),
                   ),
                   const SizedBox(width: 16),
                   Expanded(
@@ -60,7 +73,7 @@ class SettingsDrawer extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Alex Johnson', // Placeholder for User Name
+                          user?.displayName ?? 'User',
                           style: textTheme.titleLarge?.copyWith(
                             fontWeight: FontWeight.bold,
                           ),
@@ -68,10 +81,12 @@ class SettingsDrawer extends StatelessWidget {
                           overflow: TextOverflow.ellipsis,
                         ),
                         Text(
-                          l10n.administrator, // Placeholder for role or email
+                          user?.email ?? '',
                           style: textTheme.bodyMedium?.copyWith(
                             color: colorScheme.onSurfaceVariant,
                           ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ],
                     ),
@@ -89,6 +104,79 @@ class SettingsDrawer extends StatelessWidget {
                   vertical: 16,
                 ),
                 children: [
+                  // SECTION: CLOUD SYNC
+                  Text(
+                    l10n.cloudSync,
+                    style: textTheme.labelSmall?.copyWith(
+                      color: colorScheme.primary,
+                      letterSpacing: 1.2,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(
+                              syncState.status == SyncStatus.offline
+                                  ? Icons.cloud_off
+                                  : syncState.status == SyncStatus.syncing
+                                      ? Icons.sync
+                                      : Icons.cloud_done,
+                              size: 20,
+                              color: colorScheme.onSurfaceVariant,
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Text(
+                                syncState.status == SyncStatus.offline
+                                    ? l10n.syncStatusOffline
+                                    : syncState.status == SyncStatus.syncing
+                                        ? l10n.syncStatusSyncing
+                                        : syncState.status == SyncStatus.error
+                                            ? l10n.syncStatusError
+                                            : l10n.syncStatusConnected,
+                                style: textTheme.titleMedium,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        if (syncState.unsyncedCount > 0)
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 8),
+                            child: Text(
+                              '${syncState.unsyncedCount} ${l10n.pendingSync}',
+                              style: textTheme.bodySmall?.copyWith(
+                                color: colorScheme.error,
+                              ),
+                            ),
+                          ),
+                        FilledButton.tonalIcon(
+                          onPressed: () {
+                            ref.read(syncProvider.notifier).syncNow();
+                            onClose();
+                          },
+                          icon: const Icon(Icons.sync),
+                          label: Center(child: Text(l10n.syncNow)),
+                          style: FilledButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            alignment: Alignment.centerLeft,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+
                   // SECTION 1: PREFERENCES
                   Text(
                     l10n.preferences,
@@ -294,7 +382,29 @@ class SettingsDrawer extends StatelessWidget {
               ),
             ),
 
-            // Optional footer (App version, etc.)
+            // Sign Out
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: OutlinedButton.icon(
+                onPressed: () async {
+                  await ref.read(authServiceProvider).signOut();
+                  if (context.mounted) onClose();
+                },
+                icon: const Icon(Icons.logout),
+                label: Center(child: Text(l10n.signOut)),
+                style: OutlinedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  alignment: Alignment.centerLeft,
+                  foregroundColor: colorScheme.error,
+                  side: BorderSide(
+                    color: colorScheme.error.withValues(alpha: 0.5),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 8),
+
+            // App version
             Padding(
               padding: const EdgeInsets.all(24.0),
               child: Center(

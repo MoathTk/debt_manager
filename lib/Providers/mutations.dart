@@ -3,6 +3,7 @@ import '../data/models/customer.dart';
 import '../data/models/transaction.dart' as model;
 import '../data/models/debt_reminder.dart';
 import '../utils/sync_id.dart';
+import '../services/auth_service.dart';
 import 'database_provider.dart';
 
 // ============================================================================
@@ -86,6 +87,10 @@ Future<void> deleteRemindersBatch(WidgetRef ref, List<String> ids) async {
 // CUSTOMER MUTATIONS
 // ============================================================================
 
+String _getOwnerId(WidgetRef ref) {
+  return ref.read(authServiceProvider).ownerId ?? '';
+}
+
 Future<void> addCustomer(
   WidgetRef ref, {
   required String name,
@@ -99,6 +104,7 @@ Future<void> addCustomer(
       name: name,
       phone: phone,
       createdAt: now,
+      ownerId: _getOwnerId(ref),
       updatedAt: now,
     ),
   );
@@ -118,6 +124,7 @@ Future<void> updateCustomer(
       name: name,
       phone: phone,
       createdAt: customer.createdAt,
+      ownerId: customer.ownerId,
       updatedAt: DateTime.now().toIso8601String(),
     ),
   );
@@ -139,6 +146,7 @@ Future<void> addDebt(
   final repo = ref.read(transactionRepositoryProvider);
   final now = DateTime.now().toIso8601String();
   final debtId = generateId();
+  final ownerId = _getOwnerId(ref);
   await repo.insert(
     model.Transaction(
       id: debtId,
@@ -147,6 +155,7 @@ Future<void> addDebt(
       type: model.Transaction.debt,
       note: note,
       date: now,
+      ownerId: ownerId,
       updatedAt: now,
     ),
   );
@@ -158,6 +167,7 @@ Future<void> addDebt(
       debtId: debtId,
       reminderDate: now.substring(0, 10),
       message: note,
+      ownerId: ownerId,
       updatedAt: now,
     ),
   );
@@ -183,6 +193,7 @@ Future<void> recordPayment(
       note: note,
       date: now,
       debtId: debtId,
+      ownerId: _getOwnerId(ref),
       updatedAt: now,
     ),
   );
@@ -215,6 +226,7 @@ Future<void> updateTransaction(
       note: note,
       date: transaction.date,
       debtId: transaction.debtId,
+      ownerId: transaction.ownerId,
       updatedAt: DateTime.now().toIso8601String(),
     ),
   );
@@ -239,6 +251,7 @@ Future<void> settleDebt(
       note: note ?? 'Settle',
       date: now,
       debtId: debtId,
+      ownerId: _getOwnerId(ref),
       updatedAt: now,
     ),
   );

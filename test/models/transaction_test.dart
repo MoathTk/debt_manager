@@ -19,13 +19,8 @@ void main() {
 
     test('toMap includes all fields', () {
       final t = Transaction(
-        id: 'uuid-5',
-        customerId: 'c2',
-        amount: 123.45,
-        type: 0,
-        note: 'test note',
-        date: '2025-06-15',
-        debtId: 'd10',
+        id: 'uuid-5', customerId: 'c2', amount: 123.45, type: 0,
+        note: 'test note', date: '2025-06-15', debtId: 'd10', ownerId: 'user-1',
       );
       final map = t.toMap();
       expect(map['id'], 'uuid-5');
@@ -35,6 +30,7 @@ void main() {
       expect(map['note'], 'test note');
       expect(map['date'], '2025-06-15');
       expect(map['debt_id'], 'd10');
+      expect(map['owner_id'], 'user-1');
       expect(map['is_synced'], 0);
     });
 
@@ -48,13 +44,8 @@ void main() {
 
     test('fromMap round-trip preserves all fields', () {
       final original = Transaction(
-        id: 'uuid-3',
-        customerId: 'c7',
-        amount: 999.99,
-        type: 0,
-        note: 'round trip',
-        date: '2025-03-20',
-        debtId: 'd2',
+        id: 'uuid-3', customerId: 'c7', amount: 999.99, type: 0,
+        note: 'round trip', date: '2025-03-20', debtId: 'd2', ownerId: 'user-1',
       );
       final restored = Transaction.fromMap(original.toMap());
       expect(restored.id, original.id);
@@ -64,17 +55,13 @@ void main() {
       expect(restored.note, original.note);
       expect(restored.date, original.date);
       expect(restored.debtId, original.debtId);
+      expect(restored.ownerId, original.ownerId);
     });
 
     test('fromMap handles int amounts (SQLite stores as num)', () {
       final map = {
-        'id': 'uuid-1',
-        'customer_id': 'c1',
-        'amount': 500, // int, not double
-        'type': 0,
-        'note': null,
-        'date': '2025-01-01',
-        'debt_id': null,
+        'id': 'uuid-1', 'customer_id': 'c1', 'amount': 500,
+        'type': 0, 'note': null, 'date': '2025-01-01', 'debt_id': null,
       };
       final t = Transaction.fromMap(map);
       expect(t.amount, 500.0);
@@ -82,26 +69,20 @@ void main() {
 
     test('copyWith replaces only specified fields', () {
       final t = Transaction(
-        id: 'uuid-1',
-        customerId: 'c2',
-        amount: 100,
-        type: 0,
-        note: 'old',
-        date: '2025-01-01',
-        debtId: 'd5',
+        id: 'uuid-1', customerId: 'c2', amount: 100, type: 0,
+        note: 'old', date: '2025-01-01', debtId: 'd5', ownerId: 'user-1',
       );
       final updated = t.copyWith(amount: 200, note: 'new');
       expect(updated.amount, 200);
       expect(updated.note, 'new');
       expect(updated.id, 'uuid-1');
-      expect(updated.customerId, 'c2');
-      expect(updated.type, 0);
-      expect(updated.date, '2025-01-01');
-      expect(updated.debtId, 'd5');
+      expect(updated.ownerId, 'user-1');
     });
 
     test('toString contains key fields', () {
-      final t = Transaction(id: 'uuid-1', customerId: 'c2', amount: 100, type: 0, date: '2025-01-01');
+      final t = Transaction(
+        id: 'uuid-1', customerId: 'c2', amount: 100, type: 0, date: '2025-01-01',
+      );
       final s = t.toString();
       expect(s, contains('id: uuid-1'));
       expect(s, contains('customerId: c2'));

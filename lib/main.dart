@@ -1,23 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 import 'Providers/theme_provider.dart';
 import 'Providers/locale_provider.dart';
 import 'l10n/app_localizations.dart';
 import 'screens/home_screen.dart';
+import 'screens/login_screen.dart';
+import 'services/auth_service.dart';
 
-/// Main entry point of the Debt Management application.
-///
-/// Wraps the app with [ProviderScope] for Riverpod state management,
-/// enabling access to theme, locale, and database providers.
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   runApp(const ProviderScope(child: DebtManagementApp()));
 }
 
-/// Root widget of the application.
-///
-/// Consumes [themeProvider] and [localeProvider] to provide
-/// reactive theme and language switching across the entire app.
 class DebtManagementApp extends ConsumerWidget {
   const DebtManagementApp({super.key});
 
@@ -48,7 +46,23 @@ class DebtManagementApp extends ConsumerWidget {
         }
         return supportedLocales.first;
       },
-      home: const HomeScreen(),
+      home: const AuthGate(),
+    );
+  }
+}
+
+class AuthGate extends ConsumerWidget {
+  const AuthGate({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final authState = ref.watch(authStateProvider);
+    return authState.when(
+      data: (user) => user != null ? const HomeScreen() : const LoginScreen(),
+      loading: () => const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      ),
+      error: (_, __) => const LoginScreen(),
     );
   }
 }
