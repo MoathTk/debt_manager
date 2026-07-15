@@ -38,14 +38,24 @@ class SyncNotifier extends StateNotifier<SyncState> {
   final Ref _ref;
   final _firestoreSync = FirestoreSync();
   final _connectivity = ConnectivityService();
+  StreamSubscription<bool>? _connectivitySub;
   Timer? _debounce;
+  Timer? _retryTimer;
+  int _retryCount = 0;
+  static const _maxRetries = 3;
+  static const _retryDelays = [
+    Duration(seconds: 30),
+    Duration(seconds: 60),
+    Duration(seconds: 120),
+  ];
 
   SyncNotifier(this._ref) : super(const SyncState()) {
+    _connectivity.init();
     _init();
   }
 
   void _init() {
-    _connectivity.isConnected.listen((connected) {
+    _connectivitySub = _connectivity.isConnected.listen((connected) {
       if (connected && state.status == SyncStatus.offline) {
         syncNow();
       } else if (!connected) {
@@ -66,13 +76,32 @@ class SyncNotifier extends StateNotifier<SyncState> {
     state = state.copyWith(status: SyncStatus.syncing);
     try {
       await _firestoreSync.syncAll(uid);
+      _retryCount = 0;
       state = state.copyWith(
         status: SyncStatus.idle,
         unsyncedCount: 0,
         lastSynced: DateTime.now().toIso8601String(),
       );
     } catch (e) {
-      state = state.copyWith(status: SyncStatus.error, error: e.toString());
+      _scheduleRetry(e.toString());
+    }
+  }
+
+  void _scheduleRetry(String error) {
+    if (_retryCount < _maxRetries) {
+      final delay = _retryDelays[_retryCount];
+      _retryCount++;
+      state = state.copyWith(
+        status: SyncStatus.error,
+        error: 'Retry $_retryCount/$_maxRetries in ${delay.inSeconds}s',
+      );
+      _retryTimer?.cancel();
+      _retryTimer = Timer(delay, () => syncNow());
+    } else {
+      state = state.copyWith(
+        status: SyncStatus.error,
+        error: error,
+      );
     }
   }
 
@@ -90,8 +119,9 @@ class SyncNotifier extends StateNotifier<SyncState> {
 
   @override
   void dispose() {
+    _connectivitySub?.cancel();
     _debounce?.cancel();
-    _connectivity.dispose();
+    _retryTimer?.cancel();
     super.dispose();
   }
 }

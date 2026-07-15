@@ -155,10 +155,14 @@ class DebtReminderRepository {
     for (final r in records) {
       final existing = await getById(r.id!);
       if (existing == null) {
-        await db.insert('debt_reminders', r.toMap());
+        final map = r.toMap();
+        map['is_synced'] = 1;
+        await db.insert('debt_reminders', map);
       } else if (r.updatedAt.compareTo(existing.updatedAt) > 0) {
+        final map = r.toMap();
+        map['is_synced'] = 1;
         await db.update(
-          'debt_reminders', r.toMap(),
+          'debt_reminders', map,
           where: 'id = ?', whereArgs: [r.id],
         );
       }

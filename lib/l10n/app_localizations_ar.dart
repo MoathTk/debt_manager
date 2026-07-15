@@ -448,4 +448,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get notSynced => 'غير متزامن';
+
+  @override
+  String get signInCancelled => 'تم إلغاء تسجيل الدخول';
 }

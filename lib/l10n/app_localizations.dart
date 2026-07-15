@@ -973,6 +973,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Not synced'**
   String get notSynced;
+
+  /// No description provided for @signInCancelled.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in was cancelled'**
+  String get signInCancelled;
 }
 
 class _AppLocalizationsDelegate

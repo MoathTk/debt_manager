@@ -145,5 +145,6 @@
   "lastSynced": "Last synced",
   "pendingSync": "Pending sync",
   "syncNow": "Sync Now",
-  "notSynced": "Not synced"
+  "notSynced": "Not synced",
+  "signInCancelled": "Sign in was cancelled"
 }

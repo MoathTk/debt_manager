@@ -5,6 +5,7 @@ import '../data/models/debt_reminder.dart';
 import '../utils/sync_id.dart';
 import '../services/auth_service.dart';
 import 'database_provider.dart';
+import 'sync_provider.dart';
 
 // ============================================================================
 // DATA CLASSES
@@ -63,24 +64,28 @@ Future<void> markReminderCompleted(WidgetRef ref, String id) async {
   final repo = ref.read(debtReminderRepositoryProvider);
   await repo.markCompleted(id);
   _invalidateReminders(ref);
+  ref.read(syncProvider.notifier).schedulePush();
 }
 
 Future<void> markReminderPending(WidgetRef ref, String id) async {
   final repo = ref.read(debtReminderRepositoryProvider);
   await repo.markPending(id);
   _invalidateReminders(ref);
+  ref.read(syncProvider.notifier).schedulePush();
 }
 
 Future<void> deleteReminder(WidgetRef ref, String id) async {
   final repo = ref.read(debtReminderRepositoryProvider);
   await repo.delete(id);
   _invalidateReminders(ref);
+  ref.read(syncProvider.notifier).schedulePush();
 }
 
 Future<void> deleteRemindersBatch(WidgetRef ref, List<String> ids) async {
   final repo = ref.read(debtReminderRepositoryProvider);
   await repo.deleteBatch(ids);
   _invalidateReminders(ref);
+  ref.read(syncProvider.notifier).schedulePush();
 }
 
 // ============================================================================
@@ -109,6 +114,7 @@ Future<void> addCustomer(
     ),
   );
   _invalidateCustomers(ref);
+  ref.read(syncProvider.notifier).schedulePush();
 }
 
 Future<void> updateCustomer(
@@ -131,6 +137,7 @@ Future<void> updateCustomer(
   ref.invalidate(customersProvider);
   ref.invalidate(customerByIdProvider(customer.id!));
   ref.invalidate(dashboardStatsProvider);
+  ref.read(syncProvider.notifier).schedulePush();
 }
 
 // ============================================================================
@@ -173,6 +180,7 @@ Future<void> addDebt(
   );
   _invalidateTransactions(ref, customerId);
   _invalidateReminders(ref);
+  ref.read(syncProvider.notifier).schedulePush();
 }
 
 Future<void> recordPayment(
@@ -198,6 +206,7 @@ Future<void> recordPayment(
     ),
   );
   _invalidateTransactions(ref, customerId);
+  ref.read(syncProvider.notifier).schedulePush();
 }
 
 Future<void> deleteTransaction(
@@ -208,6 +217,7 @@ Future<void> deleteTransaction(
   final repo = ref.read(transactionRepositoryProvider);
   await repo.delete(transactionId);
   _invalidateTransactions(ref, customerId);
+  ref.read(syncProvider.notifier).schedulePush();
 }
 
 Future<void> updateTransaction(
@@ -231,6 +241,7 @@ Future<void> updateTransaction(
     ),
   );
   _invalidateTransactions(ref, transaction.customerId);
+  ref.read(syncProvider.notifier).schedulePush();
 }
 
 Future<void> settleDebt(
@@ -264,4 +275,5 @@ Future<void> settleDebt(
   }
   _invalidateTransactions(ref, customerId);
   _invalidateReminders(ref);
+  ref.read(syncProvider.notifier).schedulePush();
 }

@@ -144,5 +144,6 @@
   "lastSynced": "آخر مزامنة",
   "pendingSync": "بانتظار المزامنة",
   "syncNow": "مزامنة الآن",
-  "notSynced": "غير متزامن"
+  "notSynced": "غير متزامن",
+  "signInCancelled": "تم إلغاء تسجيل الدخول"
 }

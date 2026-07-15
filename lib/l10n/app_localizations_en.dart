@@ -449,4 +449,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get notSynced => 'Not synced';
+
+  @override
+  String get signInCancelled => 'Sign in was cancelled';
 }

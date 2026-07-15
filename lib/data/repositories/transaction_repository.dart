@@ -210,10 +210,14 @@ class TransactionRepository {
     for (final t in records) {
       final existing = await getById(t.id!);
       if (existing == null) {
-        await db.insert('transactions', t.toMap());
+        final map = t.toMap();
+        map['is_synced'] = 1;
+        await db.insert('transactions', map);
       } else if (t.updatedAt.compareTo(existing.updatedAt) > 0) {
+        final map = t.toMap();
+        map['is_synced'] = 1;
         await db.update(
-          'transactions', t.toMap(),
+          'transactions', map,
           where: 'id = ?', whereArgs: [t.id],
         );
       }

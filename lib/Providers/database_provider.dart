@@ -38,7 +38,12 @@ final customersProvider = FutureProvider<List<Customer>>((ref) async {
 final customerByIdProvider =
     FutureProvider.family<Customer?, String>((ref, id) async {
   final repo = ref.watch(customerRepositoryProvider);
-  return repo.getById(id);
+  final ownerId = ref.watch(_ownerIdProvider);
+  final customer = await repo.getById(id);
+  if (customer != null && ownerId.isNotEmpty && customer.ownerId != ownerId) {
+    return null;
+  }
+  return customer;
 });
 
 final transactionsProvider = FutureProvider<List<model.Transaction>>((
@@ -55,6 +60,14 @@ final transactionsByCustomerProvider =
       customerId,
     ) async {
       final repo = ref.watch(transactionRepositoryProvider);
+      final customerRepo = ref.watch(customerRepositoryProvider);
+      final ownerId = ref.watch(_ownerIdProvider);
+      if (ownerId.isNotEmpty) {
+        final customer = await customerRepo.getById(customerId);
+        if (customer == null || customer.ownerId != ownerId) {
+          return [];
+        }
+      }
       return repo.getByCustomer(customerId);
     });
 

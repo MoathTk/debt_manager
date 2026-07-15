@@ -88,10 +88,14 @@ class CustomerRepository {
     for (final c in records) {
       final existing = await getById(c.id!);
       if (existing == null) {
-        await db.insert('customers', c.toMap());
+        final map = c.toMap();
+        map['is_synced'] = 1;
+        await db.insert('customers', map);
       } else if (c.updatedAt.compareTo(existing.updatedAt) > 0) {
+        final map = c.toMap();
+        map['is_synced'] = 1;
         await db.update(
-          'customers', c.toMap(),
+          'customers', map,
           where: 'id = ?', whereArgs: [c.id],
         );
       }

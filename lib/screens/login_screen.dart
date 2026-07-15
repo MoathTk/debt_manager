@@ -24,7 +24,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       if (result == null && mounted) {
         setState(() {
           _loading = false;
-          _error = 'تم إلغاء تسجيل الدخول';
+          _error = AppLocalizations.of(context)!.signInCancelled;
         });
       }
     } catch (e) {
