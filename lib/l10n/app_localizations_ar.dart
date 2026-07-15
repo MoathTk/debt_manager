@@ -339,7 +339,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get deleteAll => 'حذف الكل';
 
   @override
-  String get confirmDeleteAll => 'هل أنت متأكد من حذف جميع تذكيرات هذه القائمة؟';
+  String get confirmDeleteAll =>
+      'هل أنت متأكد من حذف جميع تذكيرات هذه القائمة؟';
 
   @override
   String get yes => 'نعم';
@@ -450,4 +451,11 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get signInCancelled => 'تم إلغاء تسجيل الدخول';
+
+  @override
+  String get deleteLocalDatabase => 'حذف قاعدة البيانات المحلية';
+
+  @override
+  String get confirmDeleteLocalDatabase =>
+      'سيؤدي هذا إلى حذف جميع البيانات المحلية بشكل دائم (العملاء، الديون، الدفعات، التذكيرات). بياناتك في السحابة آمنة. هل تريد المتابعة؟';
 }

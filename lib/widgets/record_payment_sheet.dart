@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../l10n/app_localizations.dart';
-import '../data/models/transaction.dart' as model;
+import '../Providers/mutations.dart';
 import '../Providers/database_provider.dart';
-import '../utils/sync_id.dart';
 import 'amount_input_formatter.dart';
 import 'app_snackbar.dart';
 import 'debt_selector_tile.dart';
@@ -56,24 +55,13 @@ class _S extends ConsumerState<_Body> {
       return;
     }
     setState(() => _busy = true);
-    await ref
-        .read(transactionRepositoryProvider)
-        .insert(
-          model.Transaction(
-            id: generateId(),
-            customerId: widget.customerId,
-            amount: v,
-            type: model.Transaction.payment,
-            debtId: _debtId,
-            note: _note.text.trim().isEmpty ? null : _note.text.trim(),
-            date: DateTime.now().toIso8601String(),
-          ),
-        );
-    ref.invalidate(transactionsByCustomerProvider(widget.customerId));
-    ref.invalidate(customerBalanceProvider(widget.customerId));
-    ref.invalidate(debtsWithRemainingProvider(widget.customerId));
-    ref.invalidate(transactionsProvider);
-    ref.invalidate(dashboardStatsProvider);
+    await recordPayment(
+      ref,
+      customerId: widget.customerId,
+      amount: v,
+      debtId: _debtId,
+      note: _note.text.trim().isEmpty ? null : _note.text.trim(),
+    );
     if (mounted) Navigator.pop(context);
   }
 

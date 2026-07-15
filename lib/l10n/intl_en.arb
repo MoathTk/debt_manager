@@ -146,5 +146,7 @@
   "pendingSync": "Pending sync",
   "syncNow": "Sync Now",
   "notSynced": "Not synced",
-  "signInCancelled": "Sign in was cancelled"
+  "signInCancelled": "Sign in was cancelled",
+  "deleteLocalDatabase": "Delete Local Database",
+  "confirmDeleteLocalDatabase": "This will permanently delete all local data (customers, debts, payments, reminders). Your cloud data is safe. Continue?"
 }

@@ -162,6 +162,7 @@ Future<void> addDebt(
   required String customerId,
   required double amount,
   String? note,
+  DateTime? reminderDate,
 }) async {
   final repo = ref.read(transactionRepositoryProvider);
   final now = DateTime.now().toIso8601String();
@@ -179,20 +180,22 @@ Future<void> addDebt(
       updatedAt: now,
     ),
   );
-  final reminderRepo = ref.read(debtReminderRepositoryProvider);
-  await reminderRepo.insert(
-    DebtReminder(
-      id: generateId(),
-      customerId: customerId,
-      debtId: debtId,
-      reminderDate: now.substring(0, 10),
-      message: note,
-      ownerId: ownerId,
-      updatedAt: now,
-    ),
-  );
+  if (reminderDate != null) {
+    final reminderRepo = ref.read(debtReminderRepositoryProvider);
+    await reminderRepo.insert(
+      DebtReminder(
+        id: generateId(),
+        customerId: customerId,
+        debtId: debtId,
+        reminderDate: reminderDate.toIso8601String().substring(0, 10),
+        message: note,
+        ownerId: ownerId,
+        updatedAt: now,
+      ),
+    );
+    _invalidateReminders(ref);
+  }
   _invalidateTransactions(ref, customerId);
-  _invalidateReminders(ref);
   ref.read(syncProvider.notifier).schedulePush();
 }
 

@@ -7,10 +7,11 @@ import 'package:local_debt_management/Providers/theme_provider.dart';
 import 'package:local_debt_management/l10n/app_localizations.dart';
 import 'package:local_debt_management/utils/seed_database.dart';
 import 'package:local_debt_management/services/auth_service.dart';
+import 'package:local_debt_management/services/firestore_sync.dart';
 
 class SettingsDrawer extends StatelessWidget {
   const SettingsDrawer({
-    super.key, // Added super.key for best practices
+    super.key,
     required this.l10n,
     required this.ref,
     required this.onClose,
@@ -32,16 +33,13 @@ class SettingsDrawer extends StatelessWidget {
     final textTheme = theme.textTheme;
 
     return Drawer(
-      width:
-          screenWidth *
-          0.85, // Slightly wider for a better layout breathing room
+      width: screenWidth * 0.85,
       backgroundColor: colorScheme.surface,
       elevation: 1,
       child: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // --- USER PROFILE HEADER ---
             Padding(
               padding: const EdgeInsets.fromLTRB(24, 32, 24, 16),
               child: Row(
@@ -95,8 +93,6 @@ class SettingsDrawer extends StatelessWidget {
               ),
             ),
             const Divider(indent: 24, endIndent: 24),
-
-            // --- SCROLLABLE SETTINGS LIST ---
             Expanded(
               child: ListView(
                 padding: const EdgeInsets.symmetric(
@@ -104,7 +100,6 @@ class SettingsDrawer extends StatelessWidget {
                   vertical: 16,
                 ),
                 children: [
-                  // SECTION: CLOUD SYNC
                   Text(
                     l10n.cloudSync,
                     style: textTheme.labelSmall?.copyWith(
@@ -117,7 +112,8 @@ class SettingsDrawer extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
+                      color: colorScheme.surfaceContainerHighest
+                          .withValues(alpha: 0.4),
                       borderRadius: BorderRadius.circular(16),
                     ),
                     child: Column(
@@ -141,7 +137,8 @@ class SettingsDrawer extends StatelessWidget {
                                     ? l10n.syncStatusOffline
                                     : syncState.status == SyncStatus.syncing
                                         ? l10n.syncStatusSyncing
-                                        : syncState.status == SyncStatus.error
+                                        : syncState.status ==
+                                                SyncStatus.error
                                             ? l10n.syncStatusError
                                             : l10n.syncStatusConnected,
                                 style: textTheme.titleMedium,
@@ -176,8 +173,6 @@ class SettingsDrawer extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 24),
-
-                  // SECTION 1: PREFERENCES
                   Text(
                     l10n.preferences,
                     style: textTheme.labelSmall?.copyWith(
@@ -187,14 +182,11 @@ class SettingsDrawer extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 12),
-
-                  // Preferences Container
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: colorScheme.surfaceContainerHighest.withValues(
-                        alpha: 0.4,
-                      ),
+                      color: colorScheme.surfaceContainerHighest
+                          .withValues(alpha: 0.4),
                       borderRadius: BorderRadius.circular(16),
                     ),
                     child: Column(
@@ -275,10 +267,7 @@ class SettingsDrawer extends StatelessWidget {
                       ],
                     ),
                   ),
-
                   const SizedBox(height: 32),
-
-                  // SECTION 2: DATA MANAGEMENT
                   Text(
                     l10n.dataManagement,
                     style: textTheme.labelSmall?.copyWith(
@@ -288,14 +277,11 @@ class SettingsDrawer extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 12),
-
-                  // Database Container
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: colorScheme.surfaceContainerHighest.withValues(
-                        alpha: 0.4,
-                      ),
+                      color: colorScheme.surfaceContainerHighest
+                          .withValues(alpha: 0.4),
                       borderRadius: BorderRadius.circular(16),
                     ),
                     child: Column(
@@ -371,7 +357,77 @@ class SettingsDrawer extends StatelessWidget {
                             alignment: Alignment.centerLeft,
                             foregroundColor: colorScheme.error,
                             side: BorderSide(
-                              color: colorScheme.error.withValues(alpha: 0.5),
+                              color:
+                                  colorScheme.error.withValues(alpha: 0.5),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        OutlinedButton.icon(
+                          onPressed: () async {
+                            final confirm = await showDialog<bool>(
+                              context: context,
+                              builder: (_) => AlertDialog(
+                                title: Text(l10n.deleteLocalDatabase),
+                                content:
+                                    Text(l10n.confirmDeleteLocalDatabase),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () =>
+                                        Navigator.pop(context, false),
+                                    child: Text(l10n.cancel),
+                                  ),
+                                  FilledButton(
+                                    style: FilledButton.styleFrom(
+                                      backgroundColor: colorScheme.error,
+                                      foregroundColor: colorScheme.onError,
+                                    ),
+                                    onPressed: () =>
+                                        Navigator.pop(context, true),
+                                    child:
+                                        Text(l10n.deleteLocalDatabase),
+                                  ),
+                                ],
+                              ),
+                            );
+                            if (confirm == true) {
+                              await SeedDatabase.clearDemoData();
+                              final uid =
+                                  ref.read(authServiceProvider).ownerId;
+                              if (uid != null) {
+                                try {
+                                  await FirestoreSync()
+                                      .deleteLastSyncMetadata(uid);
+                                } catch (_) {}
+                              }
+                              ref.invalidate(dashboardStatsProvider);
+                              ref.invalidate(customersProvider);
+                              ref.invalidate(transactionsProvider);
+                              ref.invalidate(allRemindersProvider);
+                              ref.invalidate(pendingRemindersProvider);
+                              ref.invalidate(dueTodayProvider);
+                              if (context.mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(l10n.demoDataCleared),
+                                    behavior: SnackBarBehavior.floating,
+                                  ),
+                                );
+                              }
+                            }
+                          },
+                          icon: const Icon(Icons.storage_outlined),
+                          label: Center(
+                            child: Text(l10n.deleteLocalDatabase),
+                          ),
+                          style: OutlinedButton.styleFrom(
+                            padding:
+                                const EdgeInsets.symmetric(vertical: 12),
+                            alignment: Alignment.centerLeft,
+                            foregroundColor: colorScheme.error,
+                            side: BorderSide(
+                              color:
+                                  colorScheme.error.withValues(alpha: 0.5),
                             ),
                           ),
                         ),
@@ -381,8 +437,6 @@ class SettingsDrawer extends StatelessWidget {
                 ],
               ),
             ),
-
-            // Sign Out
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24),
               child: OutlinedButton.icon(
@@ -403,8 +457,6 @@ class SettingsDrawer extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 8),
-
-            // App version
             Padding(
               padding: const EdgeInsets.all(24.0),
               child: Center(

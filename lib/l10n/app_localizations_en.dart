@@ -162,7 +162,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get deletePayment => 'Delete Payment';
 
   @override
-  String get amountCannotExceedRemaining => 'Amount cannot exceed remaining balance';
+  String get amountCannotExceedRemaining =>
+      'Amount cannot exceed remaining balance';
 
   @override
   String get editRecords => 'Edit ';
@@ -324,7 +325,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get deleteReminder => 'Delete Reminder';
 
   @override
-  String get confirmDeleteReminder => 'Are you sure you want to delete this reminder?';
+  String get confirmDeleteReminder =>
+      'Are you sure you want to delete this reminder?';
 
   @override
   String get reminderDate => 'Reminder Date';
@@ -450,4 +452,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get signInCancelled => 'Sign in was cancelled';
+
+  @override
+  String get deleteLocalDatabase => 'Delete Local Database';
+
+  @override
+  String get confirmDeleteLocalDatabase =>
+      'This will permanently delete all local data (customers, debts, payments, reminders). Your cloud data is safe. Continue?';
 }

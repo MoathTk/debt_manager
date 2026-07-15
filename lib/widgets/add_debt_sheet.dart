@@ -2,10 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../l10n/app_localizations.dart';
-import '../data/models/transaction.dart' as model;
-import '../data/models/debt_reminder.dart';
-import '../Providers/database_provider.dart';
-import '../utils/sync_id.dart';
+import '../Providers/mutations.dart';
 import 'amount_input_formatter.dart';
 import 'reminder_date_picker.dart';
 
@@ -45,38 +42,13 @@ class _BodyState extends ConsumerState<_AddDebtBody> {
     final val = parseAmount(_amount.text.trim());
     if (val == null || val <= 0) return;
     setState(() => _saving = true);
-    final txnRepo = ref.read(transactionRepositoryProvider);
-    final txnId = generateId();
-    await txnRepo.insert(
-      model.Transaction(
-        id: txnId,
-        customerId: widget.customerId,
-        amount: val,
-        type: model.Transaction.debt,
-        note: _note.text.trim().isEmpty ? null : _note.text.trim(),
-        date: DateTime.now().toIso8601String(),
-      ),
+    await addDebt(
+      ref,
+      customerId: widget.customerId,
+      amount: val,
+      note: _note.text.trim().isEmpty ? null : _note.text.trim(),
+      reminderDate: _reminderDate,
     );
-    if (_reminderDate != null) {
-      final reminderRepo = ref.read(debtReminderRepositoryProvider);
-      await reminderRepo.insert(
-        DebtReminder(
-          id: generateId(),
-          customerId: widget.customerId,
-          debtId: txnId,
-          reminderDate: _reminderDate!.toIso8601String().substring(0, 10),
-          message: _note.text.trim().isEmpty ? null : _note.text.trim(),
-        ),
-      );
-      ref.invalidate(allRemindersProvider);
-      ref.invalidate(pendingRemindersProvider);
-      ref.invalidate(dueTodayProvider);
-    }
-    ref.invalidate(transactionsByCustomerProvider(widget.customerId));
-    ref.invalidate(customerBalanceProvider(widget.customerId));
-    ref.invalidate(debtsWithRemainingProvider(widget.customerId));
-    ref.invalidate(transactionsProvider);
-    ref.invalidate(dashboardStatsProvider);
     if (mounted) Navigator.pop(context);
   }
 

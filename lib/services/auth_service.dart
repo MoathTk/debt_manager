@@ -9,8 +9,12 @@ final authStateProvider = StreamProvider<User?>((ref) {
 });
 
 class AuthService {
-  final _auth = FirebaseAuth.instance;
-  final _google = GoogleSignIn(scopes: ['email']);
+  final FirebaseAuth _auth;
+  final GoogleSignIn _google;
+
+  AuthService({FirebaseAuth? auth, GoogleSignIn? google})
+      : _auth = auth ?? FirebaseAuth.instance,
+        _google = google ?? GoogleSignIn(scopes: ['email']);
 
   User? get currentUser => _auth.currentUser;
   Stream<User?> get authStateChanges => _auth.authStateChanges();

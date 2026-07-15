@@ -6,8 +6,10 @@ import '../data/models/debt_reminder.dart';
 
 class FirestoreSync {
   final _db = DatabaseHelper.instance;
+  final FirebaseFirestore _firestore;
 
-  FirebaseFirestore get _firestore => FirebaseFirestore.instance;
+  FirestoreSync({FirebaseFirestore? firestore})
+      : _firestore = firestore ?? FirebaseFirestore.instance;
 
   String _userPath(String uid) => 'users/$uid';
 
@@ -186,6 +188,10 @@ class FirestoreSync {
       count += result.first['c'] as int;
     }
     return count;
+  }
+
+  Future<void> deleteLastSyncMetadata(String uid) async {
+    await _firestore.doc('${_userPath(uid)}/meta/lastSync').delete();
   }
 }
 

@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../l10n/app_localizations.dart';
 import '../data/models/transaction.dart' as model;
 import '../Providers/database_provider.dart';
+import '../Providers/mutations.dart';
 import '../Providers/sync_provider.dart';
 import 'amount_input_formatter.dart';
 import 'app_snackbar.dart';
@@ -61,14 +62,12 @@ class _BodyState extends ConsumerState<_EditPaymentBody> {
     }
 
     setState(() => _saving = true);
-    final repo = ref.read(transactionRepositoryProvider);
-    await repo.update(model.Transaction(
-      id: widget.payment.id, customerId: widget.payment.customerId, amount: val,
-      type: model.Transaction.payment, debtId: widget.payment.debtId,
+    await updateTransaction(
+      ref,
+      transaction: widget.payment,
+      amount: val,
       note: _note.text.trim().isEmpty ? null : _note.text.trim(),
-      date: widget.payment.date,
-    ));
-    _invalidate(ref);
+    );
     if (mounted) Navigator.pop(context);
   }
 
