@@ -128,7 +128,7 @@ class FirestoreSync {
     if (lastSync != null) {
       query = query.where('updated_at', isGreaterThan: lastSync);
     }
-    final snap = await query.get();//might null!!!!.
+    final snap = await query.get(); //might null!!!!.
     final records = snap.docs
         .map((d) => Customer.fromMap(d.data() as Map<String, dynamic>))
         .toList();
