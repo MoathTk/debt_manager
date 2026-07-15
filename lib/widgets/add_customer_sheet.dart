@@ -191,7 +191,9 @@ class _NameField extends StatelessWidget {
         hintText: 'Mohammed Ali',
         prefixIcon: const Icon(Icons.person_outline_rounded),
         filled: true,
-        fillColor: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
+        fillColor: Theme.of(
+          context,
+        ).colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
           borderSide: BorderSide.none,
@@ -205,9 +207,7 @@ class _NameField extends StatelessWidget {
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide(
-            color: Theme.of(context).colorScheme.error,
-          ),
+          borderSide: BorderSide(color: Theme.of(context).colorScheme.error),
         ),
         focusedErrorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
@@ -216,9 +216,13 @@ class _NameField extends StatelessWidget {
             width: 2,
           ),
         ),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 18,
+          vertical: 18,
+        ),
       ),
-      validator: (v) => (v == null || v.trim().isEmpty) ? l10n.nameRequired : null,
+      validator: (v) =>
+          (v == null || v.trim().isEmpty) ? l10n.nameRequired : null,
     );
   }
 }
@@ -236,14 +240,19 @@ class _PhoneField extends StatelessWidget {
       controller: controller,
       keyboardType: TextInputType.phone,
       textInputAction: TextInputAction.done,
-      inputFormatters: [FilteringTextInputFormatter.digitsOnly, LengthLimitingTextInputFormatter(11)],
+      inputFormatters: [
+        FilteringTextInputFormatter.digitsOnly,
+        LengthLimitingTextInputFormatter(11),
+      ],
       style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w500),
       decoration: InputDecoration(
         labelText: l10n.customerPhone,
         hintText: '07XX XXX XXXX',
         prefixIcon: const Icon(Icons.phone_rounded),
         filled: true,
-        fillColor: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
+        fillColor: Theme.of(
+          context,
+        ).colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
           borderSide: BorderSide.none,
@@ -255,7 +264,10 @@ class _PhoneField extends StatelessWidget {
             width: 2,
           ),
         ),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 18,
+          vertical: 18,
+        ),
       ),
       validator: (v) {
         if (v == null || v.trim().isEmpty) return null;

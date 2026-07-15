@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:local_debt_management/widgets/side_drawer.dart';
+import 'package:local_debt_management/widgets/drawer/side_drawer.dart';
 import 'package:local_debt_management/widgets/sync_status_indicator.dart';
 import '../l10n/app_localizations.dart';
 import '../Providers/database_provider.dart';
@@ -65,7 +65,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       ),
       endDrawer: SettingsDrawer(
         l10n: l10n,
-        ref: ref,
         onClose: () => _scaffoldKey.currentState?.closeEndDrawer(),
       ),
       body: IndexedStack(index: _currentIndex, children: _screens),

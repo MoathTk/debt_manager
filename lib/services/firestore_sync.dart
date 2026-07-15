@@ -9,64 +9,93 @@ class FirestoreSync {
   final FirebaseFirestore _firestore;
 
   FirestoreSync({FirebaseFirestore? firestore})
-      : _firestore = firestore ?? FirebaseFirestore.instance;
+    : _firestore = firestore ?? FirebaseFirestore.instance;
 
   String _userPath(String uid) => 'users/$uid';
 
+  String? _maxTimestamp(String? a, String? b) {
+    if (a == null) return b;
+    if (b == null) return a;
+    return a.compareTo(b) > 0 ? a : b;
+  }
+
   Future<void> syncAll(String uid) async {
+    String? pushMax;
     bool customersPushed = false;
     bool transactionsPushed = false;
 
     // PUSH PHASE (dependency chain: customers → transactions → reminders)
     try {
-      await _pushCustomers(uid);
+      final m = await _pushCustomers(uid);
+      pushMax = _maxTimestamp(pushMax, m);
       customersPushed = true;
-    } catch (_) {
-      print("fail customer");
-      // customers push failed → skip transactions & reminders
+    } catch (e) {
+      print('Push customers failed: $e');
     }
 
     if (customersPushed) {
       try {
-        await _pushTransactions(uid);
+        final m = await _pushTransactions(uid);
+        pushMax = _maxTimestamp(pushMax, m);
         transactionsPushed = true;
       } catch (e) {
-        print("fail transaction error: " + e.toString());
-        // transactions push failed → s
-        //kip reminders
+        print('Push transactions failed: $e');
       }
     }
 
     if (transactionsPushed) {
       try {
-        await _pushReminders(uid);
-      } catch (_) {
-        print("fail reminder");
+        final m = await _pushReminders(uid);
+        pushMax = _maxTimestamp(pushMax, m);
+      } catch (e) {
+        print('Push reminders failed: $e');
       }
     }
 
-    // PULL PHASE (always runs to get latest data from other devices)
-    try {
-      await _pullCustomers(uid);
-    } catch (_) {}
-    try {
-      await _pullTransactions(uid);
-    } catch (_) {}
-    try {
-      await _pullReminders(uid);
-    } catch (_) {}
+    // PULL PHASE — only advance lastSync if ALL pulls succeed
+    bool pullOk = true;
+    String? pullMax;
 
-    await _saveLastSync(uid);
+    try {
+      final m = await _pullCustomers(uid);
+      pullMax = _maxTimestamp(pullMax, m);
+    } catch (e) {
+      print('Pull customers failed: $e');
+      pullOk = false;
+    }
+    try {
+      final m = await _pullTransactions(uid);
+      pullMax = _maxTimestamp(pullMax, m);
+    } catch (e) {
+      print('Pull transactions failed: $e');
+      pullOk = false;
+    }
+    try {
+      final m = await _pullReminders(uid);
+      pullMax = _maxTimestamp(pullMax, m);
+    } catch (e) {
+      print('Pull reminders failed: $e');
+      pullOk = false;
+    }
+
+    // Use max of push and pull timestamps — never use DateTime.now()
+    final bestTimestamp = _maxTimestamp(pushMax, pullMax);
+    if (pullOk && bestTimestamp != null) {
+      await _saveLastSync(uid, bestTimestamp);
+    } else if (!pullOk) {
+      print('Sync partial — lastSync NOT advanced');
+    }
   }
 
   // ======================== PUSH ========================
 
   static const _batchLimit = 500;
 
-  Future<void> _pushCustomers(String uid) async {
+  Future<String?> _pushCustomers(String uid) async {
     final repo = _CustomerSyncRepo(_db);
     final unsynced = await repo.getUnsynced();
-    if (unsynced.isEmpty) return;
+    if (unsynced.isEmpty) return null;
+    String? maxTs;
     final col = _firestore.collection('${_userPath(uid)}/customers');
     final ids = <String>[];
     for (var i = 0; i < unsynced.length; i += _batchLimit) {
@@ -78,16 +107,19 @@ class FirestoreSync {
       for (final c in chunk) {
         batch.set(col.doc(c.id), c.toMap());
         ids.add(c.id);
+        maxTs = _maxTimestamp(maxTs, c.updatedAt);
       }
       await batch.commit();
     }
     await repo.markSynced(ids);
+    return maxTs;
   }
 
-  Future<void> _pushTransactions(String uid) async {
+  Future<String?> _pushTransactions(String uid) async {
     final repo = _TransactionSyncRepo(_db);
     final unsynced = await repo.getUnsynced();
-    if (unsynced.isEmpty) return;
+    if (unsynced.isEmpty) return null;
+    String? maxTs;
     final col = _firestore.collection('${_userPath(uid)}/transactions');
     final ids = <String>[];
     for (var i = 0; i < unsynced.length; i += _batchLimit) {
@@ -99,16 +131,19 @@ class FirestoreSync {
       for (final t in chunk) {
         batch.set(col.doc(t.id), t.toMap());
         ids.add(t.id);
+        maxTs = _maxTimestamp(maxTs, t.updatedAt);
       }
       await batch.commit();
     }
     await repo.markSynced(ids);
+    return maxTs;
   }
 
-  Future<void> _pushReminders(String uid) async {
+  Future<String?> _pushReminders(String uid) async {
     final repo = _ReminderSyncRepo(_db);
     final unsynced = await repo.getUnsynced();
-    if (unsynced.isEmpty) return;
+    if (unsynced.isEmpty) return null;
+    String? maxTs;
     final col = _firestore.collection('${_userPath(uid)}/reminders');
     final ids = <String>[];
     for (var i = 0; i < unsynced.length; i += _batchLimit) {
@@ -120,29 +155,33 @@ class FirestoreSync {
       for (final r in chunk) {
         batch.set(col.doc(r.id), r.toMap());
         ids.add(r.id);
+        maxTs = _maxTimestamp(maxTs, r.updatedAt);
       }
       await batch.commit();
     }
     await repo.markSynced(ids);
+    return maxTs;
   }
 
   // ======================== PULL ========================
 
-  Future<void> _pullCustomers(String uid) async {
+  Future<String?> _pullCustomers(String uid) async {
     final repo = _CustomerSyncRepo(_db);
     final lastSync = await _getLastSync(uid);
     Query query = _firestore.collection('${_userPath(uid)}/customers');
     if (lastSync != null) {
       query = query.where('updated_at', isGreaterThan: lastSync);
     }
-    final snap = await query.get(); //might null!!!!.
+    final snap = await query.get();
     final records = snap.docs
         .map((d) => Customer.fromMap(d.data() as Map<String, dynamic>))
         .toList();
-    if (records.isNotEmpty) await repo.upsertFromCloud(records);
+    if (records.isEmpty) return null;
+    await repo.upsertFromCloud(records);
+    return records.map((r) => r.updatedAt).reduce((a, b) => a.compareTo(b) > 0 ? a : b);
   }
 
-  Future<void> _pullTransactions(String uid) async {
+  Future<String?> _pullTransactions(String uid) async {
     final repo = _TransactionSyncRepo(_db);
     final lastSync = await _getLastSync(uid);
     Query query = _firestore.collection('${_userPath(uid)}/transactions');
@@ -153,10 +192,12 @@ class FirestoreSync {
     final records = snap.docs
         .map((d) => model.Transaction.fromMap(d.data() as Map<String, dynamic>))
         .toList();
-    if (records.isNotEmpty) await repo.upsertFromCloud(records);
+    if (records.isEmpty) return null;
+    await repo.upsertFromCloud(records);
+    return records.map((r) => r.updatedAt).reduce((a, b) => a.compareTo(b) > 0 ? a : b);
   }
 
-  Future<void> _pullReminders(String uid) async {
+  Future<String?> _pullReminders(String uid) async {
     final repo = _ReminderSyncRepo(_db);
     final lastSync = await _getLastSync(uid);
     Query query = _firestore.collection('${_userPath(uid)}/reminders');
@@ -167,7 +208,9 @@ class FirestoreSync {
     final records = snap.docs
         .map((d) => DebtReminder.fromMap(d.data() as Map<String, dynamic>))
         .toList();
-    if (records.isNotEmpty) await repo.upsertFromCloud(records);
+    if (records.isEmpty) return null;
+    await repo.upsertFromCloud(records);
+    return records.map((r) => r.updatedAt).reduce((a, b) => a.compareTo(b) > 0 ? a : b);
   }
 
   // ======================== META ========================
@@ -177,9 +220,9 @@ class FirestoreSync {
     return doc.data()?['timestamp'] as String?;
   }
 
-  Future<void> _saveLastSync(String uid) async {
+  Future<void> _saveLastSync(String uid, String maxUpdatedAt) async {
     await _firestore.doc('${_userPath(uid)}/meta/lastSync').set({
-      'timestamp': DateTime.now().toIso8601String(),
+      'timestamp': maxUpdatedAt,
     });
   }
 
@@ -208,10 +251,7 @@ class _CustomerSyncRepo {
 
   Future<List<Customer>> getUnsynced() async {
     final db = await _db.database;
-    final result = await db.query(
-      'customers',
-      where: 'is_synced = 0',
-    );
+    final result = await db.query('customers', where: 'is_synced = 0');
     return result.map((m) => Customer.fromMap(m)).toList();
   }
 
@@ -238,10 +278,7 @@ class _CustomerSyncRepo {
       } else if (c.updatedAt.compareTo(existing.updatedAt) > 0) {
         final map = c.toMap();
         map['is_synced'] = 1;
-        await db.update(
-          'customers', map,
-          where: 'id = ?', whereArgs: [c.id],
-        );
+        await db.update('customers', map, where: 'id = ?', whereArgs: [c.id]);
       }
     }
   }
@@ -264,10 +301,7 @@ class _TransactionSyncRepo {
 
   Future<List<model.Transaction>> getUnsynced() async {
     final db = await _db.database;
-    final result = await db.query(
-      'transactions',
-      where: 'is_synced = 0',
-    );
+    final result = await db.query('transactions', where: 'is_synced = 0');
     return result.map((m) => model.Transaction.fromMap(m)).toList();
   }
 
@@ -295,8 +329,10 @@ class _TransactionSyncRepo {
         final map = t.toMap();
         map['is_synced'] = 1;
         await db.update(
-          'transactions', map,
-          where: 'id = ?', whereArgs: [t.id],
+          'transactions',
+          map,
+          where: 'id = ?',
+          whereArgs: [t.id],
         );
       }
     }
@@ -320,10 +356,7 @@ class _ReminderSyncRepo {
 
   Future<List<DebtReminder>> getUnsynced() async {
     final db = await _db.database;
-    final result = await db.query(
-      'debt_reminders',
-      where: 'is_synced = 0',
-    );
+    final result = await db.query('debt_reminders', where: 'is_synced = 0');
     return result.map((m) => DebtReminder.fromMap(m)).toList();
   }
 
@@ -351,8 +384,10 @@ class _ReminderSyncRepo {
         final map = r.toMap();
         map['is_synced'] = 1;
         await db.update(
-          'debt_reminders', map,
-          where: 'id = ?', whereArgs: [r.id],
+          'debt_reminders',
+          map,
+          where: 'id = ?',
+          whereArgs: [r.id],
         );
       }
     }

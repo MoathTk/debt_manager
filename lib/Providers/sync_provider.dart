@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../services/auth_service.dart';
 import '../services/firestore_sync.dart';
 import '../services/connectivity_service.dart';
+import 'database_provider.dart';
 
 enum SyncStatus { idle, syncing, error, offline }
 
@@ -41,6 +42,7 @@ class SyncNotifier extends StateNotifier<SyncState> {
   StreamSubscription<bool>? _connectivitySub;
   Timer? _debounce;
   Timer? _retryTimer;
+  Timer? _periodicTimer;
   int _retryCount = 0;
   static const _maxRetries = 3;
   static const _retryDelays = [
@@ -63,6 +65,12 @@ class SyncNotifier extends StateNotifier<SyncState> {
       }
     });
     _refreshUnsyncedCount();
+    _periodicTimer = Timer.periodic(
+      const Duration(seconds: 30),
+      (_) {
+        if (state.status != SyncStatus.syncing) syncNow();
+      },
+    );
   }
 
   Future<void> syncNow() async {
@@ -77,13 +85,19 @@ class SyncNotifier extends StateNotifier<SyncState> {
     try {
       await _firestoreSync.syncAll(uid);
       _retryCount = 0;
+      _ref.invalidate(customersProvider);
+      _ref.invalidate(transactionsProvider);
+      _ref.invalidate(allRemindersProvider);
+      _ref.invalidate(pendingRemindersProvider);
+      _ref.invalidate(dueTodayProvider);
+      _ref.invalidate(dashboardStatsProvider);
       state = state.copyWith(
         status: SyncStatus.idle,
         unsyncedCount: 0,
         lastSynced: DateTime.now().toIso8601String(),
       );
     } catch (e) {
-      print("transaction failed");
+      print("sync failed: $e");
       _scheduleRetry(e.toString());
     }
   }
@@ -123,6 +137,7 @@ class SyncNotifier extends StateNotifier<SyncState> {
     _connectivitySub?.cancel();
     _debounce?.cancel();
     _retryTimer?.cancel();
+    _periodicTimer?.cancel();
     super.dispose();
   }
 }
