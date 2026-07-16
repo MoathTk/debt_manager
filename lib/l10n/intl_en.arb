@@ -148,5 +148,8 @@
   "notSynced": "Not synced",
   "signInCancelled": "Sign in was cancelled",
   "deleteLocalDatabase": "Delete Local Database",
-  "confirmDeleteLocalDatabase": "This will permanently delete all local data (customers, debts, payments, reminders). Your cloud data is safe. Continue?"
+  "confirmDeleteLocalDatabase": "This will permanently delete all local data (customers, debts, payments, reminders). Your cloud data is safe. Continue?",
+  "welcomeTo": "Welcome to",
+  "tagline": "Manage your debts with ease",
+  "subtitle": "Digital debt tracking for your business"
 }

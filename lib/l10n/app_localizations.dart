@@ -991,6 +991,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'This will permanently delete all local data (customers, debts, payments, reminders). Your cloud data is safe. Continue?'**
   String get confirmDeleteLocalDatabase;
+
+  /// No description provided for @welcomeTo.
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome to'**
+  String get welcomeTo;
+
+  /// No description provided for @tagline.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage your debts with ease'**
+  String get tagline;
+
+  /// No description provided for @subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Digital debt tracking for your business'**
+  String get subtitle;
 }
 
 class _AppLocalizationsDelegate

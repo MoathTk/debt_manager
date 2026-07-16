@@ -459,4 +459,13 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get confirmDeleteLocalDatabase =>
       'This will permanently delete all local data (customers, debts, payments, reminders). Your cloud data is safe. Continue?';
+
+  @override
+  String get welcomeTo => 'Welcome to';
+
+  @override
+  String get tagline => 'Manage your debts with ease';
+
+  @override
+  String get subtitle => 'Digital debt tracking for your business';
 }

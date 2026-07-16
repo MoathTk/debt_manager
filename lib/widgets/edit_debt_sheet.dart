@@ -40,9 +40,7 @@ class _BodyState extends ConsumerState<_EditDebtBody> {
   @override
   void initState() {
     super.initState();
-    _amount = TextEditingController(
-      text: formatAmount(widget.debt.amount),
-    );
+    _amount = TextEditingController(text: formatAmount(widget.debt.amount));
     _note = TextEditingController(text: widget.debt.note ?? '');
   }
 
@@ -69,12 +67,15 @@ class _BodyState extends ConsumerState<_EditDebtBody> {
     }
 
     setState(() => _saving = true);
-    await updateTransaction(
-      ProviderScope.containerOf(context),
-      transaction: widget.debt,
-      amount: val,
-      note: _note.text.trim().isEmpty ? null : _note.text.trim(),
-    );
+    if (mounted) {
+      await updateTransaction(
+        ProviderScope.containerOf(context),
+        transaction: widget.debt,
+        amount: val,
+        note: _note.text.trim().isEmpty ? null : _note.text.trim(),
+      );
+    }
+
     if (mounted) Navigator.pop(context);
   }
 
@@ -123,8 +124,13 @@ class _BodyState extends ConsumerState<_EditDebtBody> {
             ),
           ),
           const SizedBox(height: 24),
-          _Field(ctrl: _amount, label: l10n.amount, decimal: true, autofocus: true,
-            formatters: [ThousandsSeparatorInputFormatter()]),
+          _Field(
+            ctrl: _amount,
+            label: l10n.amount,
+            decimal: true,
+            autofocus: true,
+            formatters: [ThousandsSeparatorInputFormatter()],
+          ),
           const SizedBox(height: 16),
           _Field(ctrl: _note, label: l10n.noteOptional),
           const SizedBox(height: 24),
@@ -188,7 +194,13 @@ class _Field extends StatelessWidget {
   final bool decimal;
   final bool autofocus;
   final List<TextInputFormatter>? formatters;
-  const _Field({required this.ctrl, required this.label, this.decimal = false, this.autofocus = false, this.formatters});
+  const _Field({
+    required this.ctrl,
+    required this.label,
+    this.decimal = false,
+    this.autofocus = false,
+    this.formatters,
+  });
 
   @override
   Widget build(BuildContext context) {

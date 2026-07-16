@@ -458,4 +458,13 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get confirmDeleteLocalDatabase =>
       'سيؤدي هذا إلى حذف جميع البيانات المحلية بشكل دائم (العملاء، الديون، الدفعات، التذكيرات). بياناتك في السحابة آمنة. هل تريد المتابعة؟';
+
+  @override
+  String get welcomeTo => 'مرحباً بك في';
+
+  @override
+  String get tagline => 'أدر ديونك بسهولة';
+
+  @override
+  String get subtitle => 'تتبع الديون رقمياً لأعمالك';
 }
