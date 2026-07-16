@@ -19,6 +19,8 @@ class FirestoreSync {
     return a.compareTo(b) > 0 ? a : b;
   }
 
+   
+
   Future<void> syncAll(String uid) async {
     print('[SYNC] syncAll started uid=$uid');
     String? pushMax;

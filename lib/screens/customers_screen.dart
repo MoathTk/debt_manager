@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../l10n/app_localizations.dart';
 import '../Providers/database_provider.dart';
-import '../widgets/customer_tile.dart';
+import '../widgets/customerTile/customer_tile.dart';
 import '../widgets/empty_state.dart';
 import '../widgets/add_customer_sheet.dart';
 import 'customer_detail_screen.dart';

@@ -25,4 +25,17 @@ class NumberFormatter {
     final trimmed = s.replaceAll(RegExp(r'0+$'), '').replaceAll(RegExp(r'\.$'), '');
     return '$trimmed $suffix';
   }
+
+  /// Card-friendly format: truncates numbers >= 10,000,000 (e.g. 11,800,000 -> 11,800,0...)
+  static String formatForCard(double n) {
+    final s = n % 1 == 0 ? n.toStringAsFixed(0) : n.toStringAsFixed(2);
+    final formatted = s.replaceAllMapped(
+      RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+      (Match m) => '${m[1]},',
+    );
+    if (n >= 10000000) {
+      return '${formatted.substring(0, formatted.length - 2)}...';
+    }
+    return formatted;
+  }
 }
