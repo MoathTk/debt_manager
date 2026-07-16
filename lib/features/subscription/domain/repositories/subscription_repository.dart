@@ -26,7 +26,7 @@ abstract class SubscriptionRepository {
   Future<void> saveLocal(Subscription sub);
 
   /// Write subscription to Firestore (source of truth).
-  Future<void> saveRemote(String uid, Subscription sub);
+  Future<void> saveRemote(String uid, Subscription sub, {String userName, String userEmail});
 
   /// Delete local cache (e.g., on sign-out or DB reset).
   Future<void> deleteLocal();

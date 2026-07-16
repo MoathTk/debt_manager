@@ -516,4 +516,28 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get subExpiredReadonly => 'Subscription expired — read only mode';
+
+  @override
+  String get admin => 'ADMIN';
+
+  @override
+  String get subscribersDashboard => 'Subscribers';
+
+  @override
+  String get noSubscribers => 'No subscribers yet';
+
+  @override
+  String get updateExpiry => 'Update Expiry Date';
+
+  @override
+  String get extendWeek => '+1 Week';
+
+  @override
+  String get extend2Weeks => '+2 Weeks';
+
+  @override
+  String get extendMonth => '+1 Month';
+
+  @override
+  String get accessDenied => 'Access Denied';
 }

@@ -1105,6 +1105,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Subscription expired — read only mode'**
   String get subExpiredReadonly;
+
+  /// No description provided for @admin.
+  ///
+  /// In en, this message translates to:
+  /// **'ADMIN'**
+  String get admin;
+
+  /// No description provided for @subscribersDashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Subscribers'**
+  String get subscribersDashboard;
+
+  /// No description provided for @noSubscribers.
+  ///
+  /// In en, this message translates to:
+  /// **'No subscribers yet'**
+  String get noSubscribers;
+
+  /// No description provided for @updateExpiry.
+  ///
+  /// In en, this message translates to:
+  /// **'Update Expiry Date'**
+  String get updateExpiry;
+
+  /// No description provided for @extendWeek.
+  ///
+  /// In en, this message translates to:
+  /// **'+1 Week'**
+  String get extendWeek;
+
+  /// No description provided for @extend2Weeks.
+  ///
+  /// In en, this message translates to:
+  /// **'+2 Weeks'**
+  String get extend2Weeks;
+
+  /// No description provided for @extendMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'+1 Month'**
+  String get extendMonth;
+
+  /// No description provided for @accessDenied.
+  ///
+  /// In en, this message translates to:
+  /// **'Access Denied'**
+  String get accessDenied;
 }
 
 class _AppLocalizationsDelegate

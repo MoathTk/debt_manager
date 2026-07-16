@@ -60,7 +60,12 @@ class SubscriptionNotifier extends StateNotifier<SubscriptionState> {
     if (uid == null) return;
     state = state.copyWith(isLoading: true, error: null);
     try {
-      final sub = await _activateTrial(uid);
+      final user = _auth.currentUser;
+      final sub = await _activateTrial(
+        uid,
+        userName: user?.displayName ?? '',
+        userEmail: user?.email ?? '',
+      );
       state = state.copyWith(isLoading: false, subscription: sub);
     } catch (e) {
       state = state.copyWith(isLoading: false, error: e.toString());

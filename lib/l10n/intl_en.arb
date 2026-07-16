@@ -167,5 +167,13 @@
   "subGrace": "Grace Period",
   "subBlocked": "Blocked",
   "subNoData": "No Subscription",
-  "subExpiredReadonly": "Subscription expired — read only mode"
+  "subExpiredReadonly": "Subscription expired — read only mode",
+  "admin": "ADMIN",
+  "subscribersDashboard": "Subscribers",
+  "noSubscribers": "No subscribers yet",
+  "updateExpiry": "Update Expiry Date",
+  "extendWeek": "+1 Week",
+  "extend2Weeks": "+2 Weeks",
+  "extendMonth": "+1 Month",
+  "accessDenied": "Access Denied"
 }

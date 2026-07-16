@@ -18,6 +18,7 @@
 library;
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:local_debt_management/features/subscription/domain/exceptions/subscription_exception.dart';
 import '../models/subscription_model.dart';
 
@@ -28,7 +29,7 @@ class SubscriptionRemoteDatasource {
 
   /// Fetch subscription from Firestore for the given user.
   /// Returns null if the document doesn't exist (new user).
-  /// Throws [SubscriptionRemoteException] on Firestore or network error.
+  /// Also mirrors to top-level `subscriptions/{uid}` for admin dashboard backfill.
   Future<SubscriptionModel?> get(String uid) async {
     try {
       final doc = await _firestore
@@ -39,7 +40,18 @@ class SubscriptionRemoteDatasource {
           .get();
       final data = doc.data();
       if (data == null) return null;
-      
+
+      // Backfill: mirror to top-level collection for admin dashboard
+      final adminDoc = await _firestore.collection('subscriptions').doc(uid).get();
+      if (!adminDoc.exists) {
+        final user = FirebaseAuth.instance.currentUser;
+        await _firestore.collection('subscriptions').doc(uid).set({
+          ...data,
+          'userName': user?.displayName ?? '',
+          'userEmail': user?.email ?? '',
+        }, SetOptions(merge: true));
+      }
+
       return SubscriptionModel.fromFirestore(data);
     } on FirebaseException catch (e) {
       throw SubscriptionRemoteException(
@@ -55,15 +67,28 @@ class SubscriptionRemoteDatasource {
   }
 
   /// Write subscription to Firestore (set = create or overwrite).
+  /// Also mirrors to top-level `subscriptions/{uid}` for admin dashboard.
   /// Throws [SubscriptionRemoteException] on Firestore or network error.
-  Future<void> save(String uid, SubscriptionModel sub) async {
+  Future<void> save(String uid, SubscriptionModel sub, {String userName = '', String userEmail = ''}) async {
     try {
-      await _firestore
+      final data = sub.toFirestore();
+      final batch = _firestore.batch();
+
+      final userSubRef = _firestore
           .collection('users')
           .doc(uid)
           .collection('subscription')
-          .doc('status')
-          .set(sub.toFirestore());
+          .doc('status');
+      batch.set(userSubRef, data);
+
+      final adminRef = _firestore.collection('subscriptions').doc(uid);
+      batch.set(adminRef, {
+        ...data,
+        'userName': userName,
+        'userEmail': userEmail,
+      }, SetOptions(merge: true));
+
+      await batch.commit();
     } on FirebaseException catch (e) {
       throw SubscriptionRemoteException(
         'Firestore write failed: ${e.message}',

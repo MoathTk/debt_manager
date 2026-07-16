@@ -64,23 +64,18 @@ class SubscriptionBanner extends ConsumerWidget {
   }
 
   (Color, IconData) _style(SubscriptionStatus s) => switch (s) {
-        SubscriptionStatus.active =>
-          (Colors.green, Icons.check_circle_outline),
-        SubscriptionStatus.expiring =>
-          (Colors.orange, Icons.warning_amber_rounded),
-        SubscriptionStatus.grace =>
-          (Colors.red, Icons.error_outline),
-        SubscriptionStatus.blocked =>
-          (Colors.red.shade900, Icons.block),
-        SubscriptionStatus.noData =>
-          (Colors.blue, Icons.info_outline),
-      };
+    SubscriptionStatus.active => (Colors.green, Icons.check_circle_outline),
+    SubscriptionStatus.expiring => (Colors.orange, Icons.warning_amber_rounded),
+    SubscriptionStatus.grace => (Colors.red, Icons.error_outline),
+    SubscriptionStatus.blocked => (Colors.red.shade900, Icons.block),
+    SubscriptionStatus.noData => (Colors.blue, Icons.info_outline),
+  };
 
   String _label(SubscriptionStatus s, AppLocalizations l10n) => switch (s) {
-        SubscriptionStatus.active => l10n.subActive,
-        SubscriptionStatus.expiring => l10n.subExpiring,
-        SubscriptionStatus.grace => l10n.subGrace,
-        SubscriptionStatus.blocked => l10n.subBlocked,
-        SubscriptionStatus.noData => l10n.subNoData,
-      };
+    SubscriptionStatus.active => l10n.subActive,
+    SubscriptionStatus.expiring => l10n.subExpiring,
+    SubscriptionStatus.grace => l10n.subGrace,
+    SubscriptionStatus.blocked => l10n.subBlocked,
+    SubscriptionStatus.noData => l10n.subNoData,
+  };
 }

@@ -166,5 +166,13 @@
   "subGrace": "فترة السماح",
   "subBlocked": "محظور",
   "subNoData": "لا يوجد اشتراك",
-  "subExpiredReadonly": "انتهى الاشتراك — وضع القراءة فقط"
+  "subExpiredReadonly": "انتهى الاشتراك — وضع القراءة فقط",
+  "admin": "الإدارة",
+  "subscribersDashboard": "المشتركون",
+  "noSubscribers": "لا يوجد مشتركون بعد",
+  "updateExpiry": "تحديث تاريخ الانتهاء",
+  "extendWeek": "+أسبوع",
+  "extend2Weeks": "+أسبوعين",
+  "extendMonth": "+شهر",
+  "accessDenied": "غير مصرح بالدخول"
 }

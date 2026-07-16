@@ -515,4 +515,28 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get subExpiredReadonly => 'انتهى الاشتراك — وضع القراءة فقط';
+
+  @override
+  String get admin => 'الإدارة';
+
+  @override
+  String get subscribersDashboard => 'المشتركون';
+
+  @override
+  String get noSubscribers => 'لا يوجد مشتركون بعد';
+
+  @override
+  String get updateExpiry => 'تحديث تاريخ الانتهاء';
+
+  @override
+  String get extendWeek => '+أسبوع';
+
+  @override
+  String get extend2Weeks => '+أسبوعين';
+
+  @override
+  String get extendMonth => '+شهر';
+
+  @override
+  String get accessDenied => 'غير مصرح بالدخول';
 }
