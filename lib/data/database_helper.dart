@@ -16,7 +16,7 @@ class DatabaseHelper {
     final path = join(dbPath, 'debt_management.db');
     _database = await openDatabase(
       path,
-      version: 6,
+      version: 7,
       onCreate: _createDB,
       onUpgrade: _onUpgrade,
     );
@@ -85,6 +85,16 @@ class DatabaseHelper {
     await db.execute(
       'CREATE INDEX idx_debt_reminders_date ON debt_reminders (reminder_date)',
     );
+
+    await db.execute('''
+      CREATE TABLE user_subscription (
+        user_id TEXT PRIMARY KEY,
+        plan TEXT NOT NULL,
+        expires_at TEXT NOT NULL,
+        activated_at TEXT NOT NULL,
+        is_active INTEGER NOT NULL DEFAULT 1
+      )
+    ''');
   }
 
   Future<void> _onUpgrade(
@@ -179,6 +189,18 @@ class DatabaseHelper {
       await db.execute(
         "ALTER TABLE debt_reminders ADD COLUMN is_deleted INTEGER NOT NULL DEFAULT 0",
       );
+    }
+
+    if (oldVersion < 7) {
+      await db.execute('''
+        CREATE TABLE IF NOT EXISTS user_subscription (
+          user_id TEXT PRIMARY KEY,
+          plan TEXT NOT NULL,
+          expires_at TEXT NOT NULL,
+          activated_at TEXT NOT NULL,
+          is_active INTEGER NOT NULL DEFAULT 1
+        )
+      ''');
     }
   }
 
