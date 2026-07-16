@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:local_debt_management/Providers/database_provider.dart';
+import 'package:local_debt_management/Providers/sync_provider.dart';
 import 'package:local_debt_management/l10n/app_localizations.dart';
 import 'package:local_debt_management/utils/seed_database.dart';
 import 'package:local_debt_management/services/auth_service.dart';
@@ -97,6 +98,30 @@ class DataManagementSection extends ConsumerWidget {
                 style: OutlinedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 12), alignment: Alignment.centerLeft,
                   foregroundColor: cs.error, side: BorderSide(color: cs.error.withValues(alpha: 0.5)),
+                ),
+              ),
+              const SizedBox(height: 12),
+              OutlinedButton.icon(
+                onPressed: () async {
+                  final ok = await confirm('Reset Sync', 'Force a full re-sync from cloud? This will re-download all your data.');
+                  if (ok == true) {
+                    final uid = ref.read(authServiceProvider).ownerId;
+                    if (uid != null) {
+                      try { await FirestoreSync().deleteLastSyncMetadata(uid); } catch (_) {}
+                    }
+                    invalidateAll();
+                    ref.read(syncProvider.notifier).syncNow();
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: const Text('Sync reset — pulling all data from cloud'), behavior: SnackBarBehavior.floating),
+                      );
+                    }
+                  }
+                },
+                icon: const Icon(Icons.cloud_download_outlined),
+                label: Center(child: const Text('Reset Sync')),
+                style: OutlinedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 12), alignment: Alignment.centerLeft,
                 ),
               ),
               const SizedBox(height: 12),

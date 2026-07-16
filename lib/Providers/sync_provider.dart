@@ -75,12 +75,17 @@ class SyncNotifier extends StateNotifier<SyncState> {
 
   Future<void> syncNow() async {
     final uid = _ref.read(authServiceProvider).ownerId;
-    if (uid == null || uid.isEmpty) return;
+    if (uid == null || uid.isEmpty) {
+      print('[SYNC] skipped — uid is null or empty');
+      return;
+    }
     final online = await _connectivity.checkConnection();
     if (!online) {
+      print('[SYNC] skipped — offline');
       state = state.copyWith(status: SyncStatus.offline);
       return;
     }
+    print('[SYNC] syncNow started uid=$uid');
     state = state.copyWith(status: SyncStatus.syncing);
     try {
       await _firestoreSync.syncAll(uid);
@@ -91,13 +96,15 @@ class SyncNotifier extends StateNotifier<SyncState> {
       _ref.invalidate(pendingRemindersProvider);
       _ref.invalidate(dueTodayProvider);
       _ref.invalidate(dashboardStatsProvider);
+      final count = await _firestoreSync.getUnsyncedCount(uid);
       state = state.copyWith(
         status: SyncStatus.idle,
-        unsyncedCount: 0,
+        unsyncedCount: count,
         lastSynced: DateTime.now().toIso8601String(),
       );
+      print('[SYNC] completed — $count records still unsynced');
     } catch (e) {
-      print("sync failed: $e");
+      print('[SYNC] FAILED: $e');
       _scheduleRetry(e.toString());
     }
   }
