@@ -171,13 +171,16 @@ class FirestoreSync {
 
   Future<String?> _pullCustomers(String uid) async {
     final repo = _CustomerSyncRepo(_db);
-    final snap = await _firestore
-        .collection('${_userPath(uid)}/customers')
-        .get();
+    final lastSync = await _getLastSync(uid);
+    Query query = _firestore.collection('${_userPath(uid)}/customers');
+    if (lastSync != null) {
+      query = query.where('updated_at', isGreaterThan: lastSync);
+    }
+    final snap = await query.get();
     final records = snap.docs
-        .map((d) => Customer.fromMap(d.data()))
+        .map((d) => Customer.fromMap(d.data() as Map<String, dynamic>))
         .toList();
-    print('[PULL] customers: ${records.length} fetched from Firestore');
+    print('[PULL] customers: ${records.length} fetched (lastSync=$lastSync)');
     if (records.isEmpty) return null;
     await repo.upsertFromCloud(records);
     return records.map((r) => r.updatedAt).reduce((a, b) => a.compareTo(b) > 0 ? a : b);
@@ -185,13 +188,16 @@ class FirestoreSync {
 
   Future<String?> _pullTransactions(String uid) async {
     final repo = _TransactionSyncRepo(_db);
-    final snap = await _firestore
-        .collection('${_userPath(uid)}/transactions')
-        .get();
+    final lastSync = await _getLastSync(uid);
+    Query query = _firestore.collection('${_userPath(uid)}/transactions');
+    if (lastSync != null) {
+      query = query.where('updated_at', isGreaterThan: lastSync);
+    }
+    final snap = await query.get();
     final records = snap.docs
-        .map((d) => model.Transaction.fromMap(d.data()))
+        .map((d) => model.Transaction.fromMap(d.data() as Map<String, dynamic>))
         .toList();
-    print('[PULL] transactions: ${records.length} fetched from Firestore');
+    print('[PULL] transactions: ${records.length} fetched (lastSync=$lastSync)');
     if (records.isEmpty) return null;
     await repo.upsertFromCloud(records);
     return records.map((r) => r.updatedAt).reduce((a, b) => a.compareTo(b) > 0 ? a : b);
@@ -199,19 +205,27 @@ class FirestoreSync {
 
   Future<String?> _pullReminders(String uid) async {
     final repo = _ReminderSyncRepo(_db);
-    final snap = await _firestore
-        .collection('${_userPath(uid)}/reminders')
-        .get();
+    final lastSync = await _getLastSync(uid);
+    Query query = _firestore.collection('${_userPath(uid)}/reminders');
+    if (lastSync != null) {
+      query = query.where('updated_at', isGreaterThan: lastSync);
+    }
+    final snap = await query.get();
     final records = snap.docs
-        .map((d) => DebtReminder.fromMap(d.data()))
+        .map((d) => DebtReminder.fromMap(d.data() as Map<String, dynamic>))
         .toList();
-    print('[PULL] reminders: ${records.length} fetched from Firestore');
+    print('[PULL] reminders: ${records.length} fetched (lastSync=$lastSync)');
     if (records.isEmpty) return null;
     await repo.upsertFromCloud(records);
     return records.map((r) => r.updatedAt).reduce((a, b) => a.compareTo(b) > 0 ? a : b);
   }
 
   // ======================== META ========================
+
+  Future<String?> _getLastSync(String uid) async {
+    final doc = await _firestore.doc('${_userPath(uid)}/meta/lastSync').get();
+    return doc.data()?['timestamp'] as String?;
+  }
 
   Future<void> _saveLastSync(String uid, String maxUpdatedAt) async {
     await _firestore.doc('${_userPath(uid)}/meta/lastSync').set({
