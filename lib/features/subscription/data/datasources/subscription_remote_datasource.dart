@@ -39,6 +39,7 @@ class SubscriptionRemoteDatasource {
           .get();
       final data = doc.data();
       if (data == null) return null;
+      
       return SubscriptionModel.fromFirestore(data);
     } on FirebaseException catch (e) {
       throw SubscriptionRemoteException(

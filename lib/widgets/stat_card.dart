@@ -31,6 +31,7 @@ class StatCard extends StatelessWidget {
           billion: l10n!.billion, million: l10n.million, thousand: l10n.thousand)
       : null;
     return Container(
+      margin: EdgeInsets.all(3),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,

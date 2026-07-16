@@ -29,23 +29,23 @@ abstract class SubscriptionException implements Exception {
 /// user is offline AND has no local cache.
 class RequiresInternetException extends SubscriptionException {
   const RequiresInternetException()
-      : super('Connect to internet to verify subscription');
+    : super('Connect to internet to verify subscription');
 }
 
 /// Thrown when a SQLite operation fails (read, write, or delete).
 class SubscriptionLocalException extends SubscriptionException {
   const SubscriptionLocalException(String detail, [Object? cause])
-      : super('Local database error: $detail', cause);
+    : super('Local database error: $detail', cause);
 }
 
 /// Thrown when a Firestore operation fails (read or write).
 class SubscriptionRemoteException extends SubscriptionException {
   const SubscriptionRemoteException(String detail, [Object? cause])
-      : super('Cloud sync error: $detail', cause);
+    : super('Cloud sync error: $detail', cause);
 }
 
 /// Thrown when stored data cannot be parsed (corrupted or format changed).
 class SubscriptionParsingException extends SubscriptionException {
   const SubscriptionParsingException(String detail, [Object? cause])
-      : super('Data format error: $detail', cause);
+    : super('Data format error: $detail', cause);
 }

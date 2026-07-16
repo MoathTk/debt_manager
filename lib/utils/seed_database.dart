@@ -166,5 +166,6 @@ class SeedDatabase {
     await db.delete('debt_reminders');
     await db.delete('transactions');
     await db.delete('customers');
+    await db.delete('user_subscription');
   }
 }

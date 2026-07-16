@@ -150,5 +150,21 @@
   "confirmDeleteLocalDatabase": "سيؤدي هذا إلى حذف جميع البيانات المحلية بشكل دائم (العملاء، الديون، الدفعات، التذكيرات). بياناتك في السحابة آمنة. هل تريد المتابعة؟",
   "welcomeTo": "مرحباً بك في",
   "tagline": "أدر ديونك بسهولة",
-  "subtitle": "تتبع الديون رقمياً لأعمالك"
+  "subtitle": "تتبع الديون رقمياً لأعمالك",
+  "choosePlan": "اختر خطتك",
+  "choosePlanSubtitle": "اختر اشتراكاً للبدء",
+  "planTrial": "تجربة مجانية",
+  "planTrialDesc": "7 أيام وصول كامل، بدون بطاقة ائتمان",
+  "planWeekly": "خطة أسبوعية",
+  "planWeeklyDesc": "7 أيام وصول، تتجدد أسبوعياً",
+  "planMonthly": "خطة شهرية",
+  "planMonthlyDesc": "30 يوم وصول، تتجدد شهرياً",
+  "free": "مجاني",
+  "contactAdmin": "تواصل مع المدير",
+  "subActive": "نشط",
+  "subExpiring": "ينتهي قريباً",
+  "subGrace": "فترة السماح",
+  "subBlocked": "محظور",
+  "subNoData": "لا يوجد اشتراك",
+  "subExpiredReadonly": "انتهى الاشتراك — وضع القراءة فقط"
 }

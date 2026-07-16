@@ -3,11 +3,13 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../l10n/app_localizations.dart';
 import '../Providers/mutations.dart';
+import '../features/subscription/presentation/widgets/mutation_guard.dart';
 import 'amount_input_formatter.dart';
 import 'reminder_date_picker.dart';
 
 /// Bottom sheet for adding a new debt (pure addition, no linking).
 void showAddDebtSheet(BuildContext context, WidgetRef ref, String customerId) {
+  if (MutationGuard.checkBlocked(context, ref)) return;
   showModalBottomSheet(
     context: context,
     isScrollControlled: true,

@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../l10n/app_localizations.dart';
 import '../data/models/customer.dart';
 import '../Providers/mutations.dart';
+import '../features/subscription/presentation/widgets/mutation_guard.dart';
 import 'app_snackbar.dart';
 
 void showEditCustomerSheet(
@@ -11,6 +12,7 @@ void showEditCustomerSheet(
   WidgetRef ref,
   Customer customer,
 ) {
+  if (MutationGuard.checkBlocked(context, ref)) return;
   final l10n = AppLocalizations.of(context)!;
   final nameController = TextEditingController(text: customer.name);
   final phoneController = TextEditingController(text: customer.phone ?? '');

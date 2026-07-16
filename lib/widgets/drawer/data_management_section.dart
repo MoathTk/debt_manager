@@ -6,6 +6,7 @@ import 'package:local_debt_management/l10n/app_localizations.dart';
 import 'package:local_debt_management/utils/seed_database.dart';
 import 'package:local_debt_management/services/auth_service.dart';
 import 'package:local_debt_management/services/firestore_sync.dart';
+import 'package:local_debt_management/features/subscription/presentation/widgets/mutation_guard.dart';
 
 class DataManagementSection extends ConsumerWidget {
   const DataManagementSection({super.key});
@@ -65,6 +66,7 @@ class DataManagementSection extends ConsumerWidget {
             children: [
               FilledButton.tonalIcon(
                 onPressed: () async {
+                  if (MutationGuard.checkBlocked(context, ref)) return;
                   await SeedDatabase.seedDemoData();
                   ref.invalidate(dashboardStatsProvider);
                   ref.invalidate(customersProvider);
@@ -82,6 +84,7 @@ class DataManagementSection extends ConsumerWidget {
               const SizedBox(height: 12),
               OutlinedButton.icon(
                 onPressed: () async {
+                  if (MutationGuard.checkBlocked(context, ref)) return;
                   final ok = await confirm(l10n.clearDemoData, l10n.confirmDelete);
                   if (ok == true) {
                     await SeedDatabase.clearDemoData();
@@ -103,6 +106,7 @@ class DataManagementSection extends ConsumerWidget {
               const SizedBox(height: 12),
               OutlinedButton.icon(
                 onPressed: () async {
+                  if (MutationGuard.checkBlocked(context, ref)) return;
                   final ok = await confirm('Reset Sync', 'Force a full re-sync from cloud? This will re-download all your data.');
                   if (ok == true) {
                     final uid = ref.read(authServiceProvider).ownerId;
@@ -127,6 +131,7 @@ class DataManagementSection extends ConsumerWidget {
               const SizedBox(height: 12),
               OutlinedButton.icon(
                 onPressed: () async {
+                  if (MutationGuard.checkBlocked(context, ref)) return;
                   final ok = await confirm(l10n.deleteLocalDatabase, l10n.confirmDeleteLocalDatabase);
                   if (ok == true) {
                     await SeedDatabase.clearDemoData();

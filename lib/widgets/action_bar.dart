@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../l10n/app_localizations.dart';
+import '../features/subscription/presentation/widgets/mutation_guard.dart';
 import 'add_debt_sheet.dart';
 import 'record_payment_sheet.dart';
 import 'records_list_sheet.dart';
@@ -42,7 +43,10 @@ class ActionBar extends ConsumerWidget {
                   theme.colorScheme.error.withValues(alpha: 0.8),
                 ],
                 shadowColor: theme.colorScheme.error.withValues(alpha: 0.3),
-                onTap: () => showAddDebtSheet(context, ref, customerId),
+                onTap: () {
+                  if (MutationGuard.checkBlocked(context, ref)) return;
+                  showAddDebtSheet(context, ref, customerId);
+                },
               ),
             ),
             const SizedBox(width: 10),
@@ -55,7 +59,10 @@ class ActionBar extends ConsumerWidget {
                   theme.colorScheme.primary.withValues(alpha: 0.8),
                 ],
                 shadowColor: theme.colorScheme.primary.withValues(alpha: 0.3),
-                onTap: () => showRecordPaymentSheet(context, ref, customerId),
+                onTap: () {
+                  if (MutationGuard.checkBlocked(context, ref)) return;
+                  showRecordPaymentSheet(context, ref, customerId);
+                },
               ),
             ),
             const SizedBox(width: 10),
@@ -68,7 +75,10 @@ class ActionBar extends ConsumerWidget {
                   theme.colorScheme.tertiary.withValues(alpha: 0.8),
                 ],
                 shadowColor: theme.colorScheme.tertiary.withValues(alpha: 0.3),
-                onTap: () => showRecordsListSheet(context, ref, customerId),
+                onTap: () {
+                  if (MutationGuard.checkBlocked(context, ref)) return;
+                  showRecordsListSheet(context, ref, customerId);
+                },
               ),
             ),
           ],

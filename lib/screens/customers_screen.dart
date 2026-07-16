@@ -5,6 +5,7 @@ import '../Providers/database_provider.dart';
 import '../widgets/customerTile/customer_tile.dart';
 import '../widgets/empty_state.dart';
 import '../widgets/add_customer_sheet.dart';
+import '../features/subscription/presentation/widgets/mutation_guard.dart';
 import 'customer_detail_screen.dart';
 
 /// Customers list screen with search and add functionality.
@@ -59,7 +60,10 @@ class _CustomersScreenState extends ConsumerState<CustomersScreen> {
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => showAddCustomerSheet(context, ref),
+        onPressed: () {
+          if (MutationGuard.checkBlocked(context, ref)) return;
+          showAddCustomerSheet(context, ref);
+        },
         child: const Icon(Icons.add, size: 30),
       ),
     );

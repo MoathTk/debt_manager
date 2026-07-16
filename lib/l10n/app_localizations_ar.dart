@@ -467,4 +467,52 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get subtitle => 'تتبع الديون رقمياً لأعمالك';
+
+  @override
+  String get choosePlan => 'اختر خطتك';
+
+  @override
+  String get choosePlanSubtitle => 'اختر اشتراكاً للبدء';
+
+  @override
+  String get planTrial => 'تجربة مجانية';
+
+  @override
+  String get planTrialDesc => '7 أيام وصول كامل، بدون بطاقة ائتمان';
+
+  @override
+  String get planWeekly => 'خطة أسبوعية';
+
+  @override
+  String get planWeeklyDesc => '7 أيام وصول، تتجدد أسبوعياً';
+
+  @override
+  String get planMonthly => 'خطة شهرية';
+
+  @override
+  String get planMonthlyDesc => '30 يوم وصول، تتجدد شهرياً';
+
+  @override
+  String get free => 'مجاني';
+
+  @override
+  String get contactAdmin => 'تواصل مع المدير';
+
+  @override
+  String get subActive => 'نشط';
+
+  @override
+  String get subExpiring => 'ينتهي قريباً';
+
+  @override
+  String get subGrace => 'فترة السماح';
+
+  @override
+  String get subBlocked => 'محظور';
+
+  @override
+  String get subNoData => 'لا يوجد اشتراك';
+
+  @override
+  String get subExpiredReadonly => 'انتهى الاشتراك — وضع القراءة فقط';
 }

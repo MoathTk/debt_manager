@@ -6,6 +6,7 @@ import '../data/models/transaction.dart' as model;
 import '../Providers/database_provider.dart';
 import '../Providers/mutations.dart';
 import '../Providers/sync_provider.dart';
+import '../features/subscription/presentation/widgets/mutation_guard.dart';
 import 'amount_input_formatter.dart';
 import 'app_snackbar.dart';
 
@@ -15,6 +16,7 @@ void showEditDebtSheet(
   WidgetRef ref,
   model.Transaction debt,
 ) {
+  if (MutationGuard.checkBlocked(context, ref)) return;
   showModalBottomSheet(
     context: context,
     isScrollControlled: true,

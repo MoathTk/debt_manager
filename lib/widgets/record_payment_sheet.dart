@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../l10n/app_localizations.dart';
 import '../Providers/mutations.dart';
 import '../Providers/database_provider.dart';
+import '../features/subscription/presentation/widgets/mutation_guard.dart';
 import 'amount_input_formatter.dart';
 import 'app_snackbar.dart';
 import 'debt_selector_tile.dart';
@@ -12,6 +13,7 @@ void showRecordPaymentSheet(
   WidgetRef ref,
   String customerId,
 ) {
+  if (MutationGuard.checkBlocked(context, ref)) return;
   showModalBottomSheet(
     context: context,
     isScrollControlled: true,

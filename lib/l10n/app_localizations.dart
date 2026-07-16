@@ -1009,6 +1009,102 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Digital debt tracking for your business'**
   String get subtitle;
+
+  /// No description provided for @choosePlan.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose Your Plan'**
+  String get choosePlan;
+
+  /// No description provided for @choosePlanSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Select a subscription plan to get started'**
+  String get choosePlanSubtitle;
+
+  /// No description provided for @planTrial.
+  ///
+  /// In en, this message translates to:
+  /// **'Free Trial'**
+  String get planTrial;
+
+  /// No description provided for @planTrialDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'7 days full access, no credit card required'**
+  String get planTrialDesc;
+
+  /// No description provided for @planWeekly.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekly Plan'**
+  String get planWeekly;
+
+  /// No description provided for @planWeeklyDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'7 days access, renewed weekly'**
+  String get planWeeklyDesc;
+
+  /// No description provided for @planMonthly.
+  ///
+  /// In en, this message translates to:
+  /// **'Monthly Plan'**
+  String get planMonthly;
+
+  /// No description provided for @planMonthlyDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'30 days access, renewed monthly'**
+  String get planMonthlyDesc;
+
+  /// No description provided for @free.
+  ///
+  /// In en, this message translates to:
+  /// **'Free'**
+  String get free;
+
+  /// No description provided for @contactAdmin.
+  ///
+  /// In en, this message translates to:
+  /// **'Contact Admin'**
+  String get contactAdmin;
+
+  /// No description provided for @subActive.
+  ///
+  /// In en, this message translates to:
+  /// **'Active'**
+  String get subActive;
+
+  /// No description provided for @subExpiring.
+  ///
+  /// In en, this message translates to:
+  /// **'Expiring Soon'**
+  String get subExpiring;
+
+  /// No description provided for @subGrace.
+  ///
+  /// In en, this message translates to:
+  /// **'Grace Period'**
+  String get subGrace;
+
+  /// No description provided for @subBlocked.
+  ///
+  /// In en, this message translates to:
+  /// **'Blocked'**
+  String get subBlocked;
+
+  /// No description provided for @subNoData.
+  ///
+  /// In en, this message translates to:
+  /// **'No Subscription'**
+  String get subNoData;
+
+  /// No description provided for @subExpiredReadonly.
+  ///
+  /// In en, this message translates to:
+  /// **'Subscription expired — read only mode'**
+  String get subExpiredReadonly;
 }
 
 class _AppLocalizationsDelegate

@@ -8,6 +8,7 @@ import '../widgets/transaction_tile.dart';
 import '../widgets/empty_state.dart';
 import '../widgets/action_bar.dart';
 import '../widgets/edit_customer_sheet.dart';
+import '../features/subscription/presentation/widgets/mutation_guard.dart';
 
 /// Customer detail screen showing profile, balance, and transaction history.
 class CustomerDetailScreen extends ConsumerWidget {
@@ -26,6 +27,7 @@ class CustomerDetailScreen extends ConsumerWidget {
             icon: const Icon(Icons.edit_rounded),
             tooltip: l10n.editCustomer,
             onPressed: () {
+              if (MutationGuard.checkBlocked(context, ref)) return;
               final c = ref.read(customerByIdProvider(customerId)).valueOrNull;
               if (c != null) showEditCustomerSheet(context, ref, c);
             },

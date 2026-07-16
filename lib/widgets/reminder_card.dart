@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:local_debt_management/features/subscription/presentation/widgets/mutation_guard.dart';
 import '../l10n/app_localizations.dart';
 import '../Providers/database_provider.dart';
 import '../Providers/mutations.dart';
@@ -132,14 +133,13 @@ class ReminderCard extends ConsumerWidget {
                       ReminderActionBtn(
                         icon: Icons.check_circle_outline_rounded,
                         color: const Color(0xFF43A047),
-                        onTap: () => _confirmToggle(context, l10n),
+                        onTap: () => _confirmToggle(context, ref, l10n),
                       ),
-                    if (!reminder.completed)
-                      const SizedBox(width: 8),
+                    if (!reminder.completed) const SizedBox(width: 8),
                     ReminderActionBtn(
                       icon: Icons.delete_outline_rounded,
                       color: cs.error,
-                      onTap: () => _confirmDelete(context, l10n),
+                      onTap: () => _confirmDelete(context, ref, l10n),
                     ),
                   ],
                 ),
@@ -162,7 +162,8 @@ class ReminderCard extends ConsumerWidget {
     return '$d  ·  ${-diff} ${l10n.daysUntilDue}';
   }
 
-  void _confirmToggle(BuildContext ctx, AppLocalizations l10n) {
+  void _confirmToggle(BuildContext ctx, WidgetRef ref, AppLocalizations l10n) {
+    if (MutationGuard.checkBlocked(ctx, ref)) return;
     final msg = reminder.completed
         ? l10n.confirmMarkPending
         : l10n.confirmMarkCompleted;
@@ -182,7 +183,11 @@ class ReminderCard extends ConsumerWidget {
               final container = ProviderScope.containerOf(ctx);
               reminder.completed
                   ? markReminderPending(container, reminder.id)
-                  : markReminderCompleted(container, reminder.id,l10n.autoSettledViaReminder);
+                  : markReminderCompleted(
+                      container,
+                      reminder.id,
+                      l10n.autoSettledViaReminder,
+                    );
             },
             child: Text(l10n.yes),
           ),
@@ -191,7 +196,8 @@ class ReminderCard extends ConsumerWidget {
     );
   }
 
-  void _confirmDelete(BuildContext ctx, AppLocalizations l10n) {
+  void _confirmDelete(BuildContext ctx, WidgetRef ref, AppLocalizations l10n) {
+    if (MutationGuard.checkBlocked(ctx, ref)) return;
     showDialog(
       context: ctx,
       builder: (_) => AlertDialog(

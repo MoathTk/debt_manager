@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../l10n/app_localizations.dart';
 import '../Providers/mutations.dart';
+import '../features/subscription/presentation/widgets/mutation_guard.dart';
 import 'app_snackbar.dart';
 
 /// Modern bottom sheet form for adding a new customer.
@@ -10,6 +11,7 @@ import 'app_snackbar.dart';
 /// Features filled input fields, smooth animations, and clear hierarchy.
 /// Designed for quick, effortless customer creation.
 void showAddCustomerSheet(BuildContext context, WidgetRef ref) {
+  if (MutationGuard.checkBlocked(context, ref)) return;
   final l10n = AppLocalizations.of(context)!;
   final nameController = TextEditingController();
   final phoneController = TextEditingController();

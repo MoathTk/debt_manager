@@ -468,4 +468,52 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get subtitle => 'Digital debt tracking for your business';
+
+  @override
+  String get choosePlan => 'Choose Your Plan';
+
+  @override
+  String get choosePlanSubtitle => 'Select a subscription plan to get started';
+
+  @override
+  String get planTrial => 'Free Trial';
+
+  @override
+  String get planTrialDesc => '7 days full access, no credit card required';
+
+  @override
+  String get planWeekly => 'Weekly Plan';
+
+  @override
+  String get planWeeklyDesc => '7 days access, renewed weekly';
+
+  @override
+  String get planMonthly => 'Monthly Plan';
+
+  @override
+  String get planMonthlyDesc => '30 days access, renewed monthly';
+
+  @override
+  String get free => 'Free';
+
+  @override
+  String get contactAdmin => 'Contact Admin';
+
+  @override
+  String get subActive => 'Active';
+
+  @override
+  String get subExpiring => 'Expiring Soon';
+
+  @override
+  String get subGrace => 'Grace Period';
+
+  @override
+  String get subBlocked => 'Blocked';
+
+  @override
+  String get subNoData => 'No Subscription';
+
+  @override
+  String get subExpiredReadonly => 'Subscription expired — read only mode';
 }

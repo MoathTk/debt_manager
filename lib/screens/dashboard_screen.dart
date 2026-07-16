@@ -5,6 +5,7 @@ import '../Providers/database_provider.dart';
 import '../Providers/mutations.dart';
 import '../widgets/stat_card.dart';
 import '../widgets/recent_transactions_list.dart';
+import '../features/subscription/presentation/widgets/subscription_banner.dart';
 import 'all_transactions_screen.dart';
 import 'analytics_screen.dart';
 
@@ -30,10 +31,12 @@ class DashboardScreen extends ConsumerWidget {
   Widget _body(BuildContext ctx, AppLocalizations l10n, DashboardStats s) {
     return SingleChildScrollView(
       physics: const AlwaysScrollableScrollPhysics(),
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
+      //padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          const SubscriptionBanner(),
+          const SizedBox(height: 8),
           GridView.count(
             crossAxisCount: 2,
             shrinkWrap: true,
@@ -73,24 +76,27 @@ class DashboardScreen extends ConsumerWidget {
           const SizedBox(height: 16),
           _analyticsCard(ctx, l10n, s),
           const SizedBox(height: 24),
-          Row(
-            children: [
-              Expanded(
-                child: Text(
-                  l10n.recentTransactions,
-                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700),
-                ),
-              ),
-              IconButton(
-                icon: const Icon(Icons.arrow_forward_rounded, size: 22),
-                onPressed: () => Navigator.push(
-                  ctx,
-                  MaterialPageRoute(
-                    builder: (_) => const AllTransactionsScreen(),
+          Container(
+            margin: EdgeInsets.only(left: 3, right: 3),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    l10n.recentTransactions,
+                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700),
                   ),
                 ),
-              ),
-            ],
+                IconButton(
+                  icon: const Icon(Icons.arrow_forward_rounded, size: 22),
+                  onPressed: () => Navigator.push(
+                    ctx,
+                    MaterialPageRoute(
+                      builder: (_) => const AllTransactionsScreen(),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
           const SizedBox(height: 12),
           const RecentTransactionsList(),
@@ -112,6 +118,7 @@ class DashboardScreen extends ConsumerWidget {
         MaterialPageRoute(builder: (_) => const AnalyticsScreen()),
       ),
       child: Container(
+        margin: EdgeInsets.only(left: 3,right: 3),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           gradient: LinearGradient(

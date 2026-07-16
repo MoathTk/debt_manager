@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:firebase_core/firebase_core.dart'; 
+import 'package:firebase_core/firebase_core.dart';
 import 'Providers/theme_provider.dart';
 import 'Providers/locale_provider.dart';
 import 'l10n/app_localizations.dart';
-import 'screens/home_screen.dart';
+import 'features/subscription/presentation/screens/subscription_check_screen.dart';
 import 'screens/login_screen.dart';
 import 'services/auth_service.dart';
 
@@ -57,7 +57,9 @@ class AuthGate extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final authState = ref.watch(authStateProvider);
     return authState.when(
-      data: (user) => user != null ? const HomeScreen() : const LoginScreen(),
+        data: (user) => user != null
+            ? const SubscriptionCheckScreen()
+            : const LoginScreen(),
       loading: () => const Scaffold(
         body: Center(child: CircularProgressIndicator()),
       ),

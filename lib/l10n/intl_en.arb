@@ -151,5 +151,21 @@
   "confirmDeleteLocalDatabase": "This will permanently delete all local data (customers, debts, payments, reminders). Your cloud data is safe. Continue?",
   "welcomeTo": "Welcome to",
   "tagline": "Manage your debts with ease",
-  "subtitle": "Digital debt tracking for your business"
+  "subtitle": "Digital debt tracking for your business",
+  "choosePlan": "Choose Your Plan",
+  "choosePlanSubtitle": "Select a subscription plan to get started",
+  "planTrial": "Free Trial",
+  "planTrialDesc": "7 days full access, no credit card required",
+  "planWeekly": "Weekly Plan",
+  "planWeeklyDesc": "7 days access, renewed weekly",
+  "planMonthly": "Monthly Plan",
+  "planMonthlyDesc": "30 days access, renewed monthly",
+  "free": "Free",
+  "contactAdmin": "Contact Admin",
+  "subActive": "Active",
+  "subExpiring": "Expiring Soon",
+  "subGrace": "Grace Period",
+  "subBlocked": "Blocked",
+  "subNoData": "No Subscription",
+  "subExpiredReadonly": "Subscription expired — read only mode"
 }
