@@ -1178,6 +1178,24 @@ abstract class AppLocalizations {
   /// **'Update Expiry Date'**
   String get updateExpiry;
 
+  /// No description provided for @extend15min.
+  ///
+  /// In en, this message translates to:
+  /// **'+15 min'**
+  String get extend15min;
+
+  /// No description provided for @extend30min.
+  ///
+  /// In en, this message translates to:
+  /// **'+30 min'**
+  String get extend30min;
+
+  /// No description provided for @extend1hour.
+  ///
+  /// In en, this message translates to:
+  /// **'+1 Hour'**
+  String get extend1hour;
+
   /// No description provided for @extendWeek.
   ///
   /// In en, this message translates to:

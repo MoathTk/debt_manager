@@ -557,6 +557,15 @@ class AppLocalizationsAr extends AppLocalizations {
   String get updateExpiry => 'تحديث تاريخ الانتهاء';
 
   @override
+  String get extend15min => '+15 دقيقة';
+
+  @override
+  String get extend30min => '+30 دقيقة';
+
+  @override
+  String get extend1hour => '+ساعة';
+
+  @override
   String get extendWeek => '+أسبوع';
 
   @override

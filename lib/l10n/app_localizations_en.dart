@@ -559,6 +559,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get updateExpiry => 'Update Expiry Date';
 
   @override
+  String get extend15min => '+15 min';
+
+  @override
+  String get extend30min => '+30 min';
+
+  @override
+  String get extend1hour => '+1 Hour';
+
+  @override
   String get extendWeek => '+1 Week';
 
   @override

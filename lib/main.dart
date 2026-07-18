@@ -91,9 +91,8 @@ class _AuthGateState extends ConsumerState<AuthGate> {
         }
         return const LoginScreen();
       },
-      loading: () => const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      ),
+      loading: () =>
+          const Scaffold(body: Center(child: CircularProgressIndicator())),
       error: (_, __) => const LoginScreen(),
     );
   }

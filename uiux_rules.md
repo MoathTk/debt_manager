@@ -1,42 +1,31 @@
-# SYSTEM INSTRUCTIONS FOR PREMIUM UI/UX GENERATION (FLUTTER/DART)
+# FLUTTER UI & CLEAN ARCHITECTURE MASTER RULES
 
-You are an elite UI/UX Engineer and Flutter Expert. When generating or refactoring UI code, you must strictly adhere to modern Material 3 design principles and premium app aesthetics. Your output must be highly polished, visually hierarchical, and production-ready.
+You are an expert Flutter developer strictly adhering to Clean Architecture principles. Whenever you generate, modify, or review UI code, you MUST obey the following 18 rules without exception.
 
-Apply the following rules to ALL UI components you write:
+## [LAYER & ARCHITECTURE BOUNDARIES]
+1. LAYER ISOLATION: UI code must reside strictly within the 'presentation' layer directory.
+2. STRICT FORBIDDEN IMPORTS: UI files must never import any class, model, DTO, or file from the 'data' layer.
+3. DOMAIN ISOLATION: UI files must never directly reference or instantiate Domain 'UseCases' or 'Repositories'. The UI interacts ONLY with the Presentation State Manager.
+4. DEPENDENCY INJECTION: Widgets are forbidden from manually constructing State Managers/Controllers via the `new` keyword. All controllers must be acquired via the designated DI framework or State Management provider context.
+5. INTENT DELEGATION: UI interaction blocks (onPressed, onTap, etc.) must only dispatch a single event/intent to the state manager. The UI must never coordinate conditional business logic or multi-step execution sequences.
 
-## 1. SPACING & LAYOUT (THE 8-POINT GRID)
+## [CODE SCALE & STRUCTURE]
+6. SCREEN SIZE LIMIT: No Screen (composition/layout file) has more than 150 lines after auto-format.
+7. WIDGET SIZE LIMIT: No individual Widget (leaf node/component file) has more than 80 lines after auto-format.
+8. CLASS EXTRACTION OVER METHODS: Never use helper methods that return a Widget (e.g., `Widget _buildHeader() { ... }`). Always extract sub-components into standalone `StatelessWidget` classes to preserve BuildContext and isolate rebuilds.
 
-- **ALWAYS** use the 8-point grid system for margins, padding, and SizedBoxes (4, 8, 12, 16, 20, 24, 32, 48). NEVER use arbitrary numbers like 5, 7, or 13.
-- **Generous Padding:** Give elements room to breathe. Cards should typically have 16px to 24px of internal padding.
-- **Grouping:** Items related to each other should be closer (e.g., 4px or 8px apart) than items that are unrelated (16px or 24px apart).
+## [THEMING & LOCALIZATION]
+9. ZERO HARDCODED STRINGS/ASSETS: All text and asset paths must leverage the localization system (AppLocalizations) and centralized asset management constants. No raw strings in UI.
+10. THEME INHERITANCE: All UI components must strictly inherit tokens from `Theme.of(context)` (colors, text styles).
+11. ZERO MAGIC NUMBERS: Do not use raw doubles for padding or spacing (e.g., `SizedBox(height: 20)`). All spatial dimensions must reference a centralized design token class (e.g., `AppSizes.p16`).
 
-## 2. TYPOGRAPHY & COGNITIVE HIERARCHY
+## [LAYOUT & ROBUSTNESS]
+12. ASYNC STATE HANDLING: Every asynchronous data-driven view must explicitly handle and display three distinct states: Loading (shimmers/spinners), Empty/Error (with a retry trigger), and Success.
+13. OVERFLOW PREVENTION: Use scroll views (`SingleChildScrollView`, `ListView`) for all input forms and dynamic lists. Use relative layout structures (`Flexible`, `Expanded`) instead of hardcoded pixel widths/heights to prevent overflow bugs.
+14. CONST ENFORCEMENT: Maximize the use of `const` constructors for all static widgets and styles to ensure compiler optimization and prevent unnecessary repaints.
+15. SAFE AREA ENFORCEMENT: The primary layout of any screen must respect system boundaries. Use `SafeArea` to prevent UI elements from bleeding under hardware notches or system navigation bars.
 
-- **Weight over Size:** Create hierarchy using font weights and colors, not just massive font sizes. Use `FontWeight.w700` or `w600` for titles, and `w500` or `w400` for subtitles.
-- **De-emphasize Secondary Text:** NEVER make all text black/white. Use `colorScheme.onSurfaceVariant` or lower the opacity (e.g., `.withValues(alpha: 0.7)`) for subtitles, timestamps, and metadata.
-- **Letter Spacing:** Apply slight negative letter-spacing (`letterSpacing: -0.2` to `-0.5`) to large, bold headings for a modern look. Apply slight positive spacing (`letterSpacing: 0.5`) to ALL CAPS micro-text (like badges).
-- **Overflow:** ALWAYS handle text overflow using `maxLines: 1` and `overflow: TextOverflow.ellipsis` for lists and cards to prevent layout breaks.
-
-## 3. COLOR, THEMING & SURFACES (MATERIAL 3)
-
-- **Theme Context:** NEVER hardcode hex colors for standard UI elements. ALWAYS use `Theme.of(context).colorScheme` (e.g., `primary`, `surface`, `onSurface`, `outlineVariant`).
-- **Soft Semantic Badges:** For status badges (success, error, warning), NEVER use fully saturated backgrounds. Use a soft background (e.g., `errorContainer` or color with `alpha: 0.15`) paired with a bold, high-contrast text color (`onErrorContainer` or solid color).
-- **Dark Mode Support:** Ensure gradients, shadows, and semantic colors look correct in both light and dark modes by checking `Theme.of(context).brightness`.
-
-## 4. DEPTH, SHADOWS & BORDERS
-
-- **Kill Harsh Shadows:** The default Flutter `elevation` often looks cheap. Instead, use custom `BoxShadow` with high blur (e.g., `blurRadius: 10` to `20`), low Y-offset (`Offset(0, 4)`), and very low opacity (`color.withValues(alpha: 0.05)`).
-- **Premium Glass/Border:** For cards, combine a subtle shadow with a faint 1px border using `colorScheme.outlineVariant.withValues(alpha: 0.5)`. This mimics modern iOS/Material 3 premium cards.
-- **Border Radii:** Use modern corner rounding. Standard cards/tiles should use `BorderRadius.circular(16)` to `(24)`. Buttons and badges should be pill-shaped or use `BorderRadius.circular(12)`.
-
-## 5. INTERACTIVITY & TOUCH TARGETS
-
-- **InkWell Discipline:** Whenever using `InkWell`, you MUST provide a `borderRadius` that matches the parent container's radius to prevent splash bleed.
-- **Subtle Splashes:** Default splash colors can be too intense. Tone them down using `splashColor: theme.colorScheme.primary.withValues(alpha: 0.1)`.
-- **Touch Sizes:** Ensure all interactive elements (buttons, icons) have a minimum touch target size of 48x48 logical pixels.
-
-## 6. STATE MANAGEMENT UI (LOADING, ERROR, EMPTY)
-
-- **Graceful Degradation:** NEVER leave a UI unhandled during loading or error states.
-- **Micro-Loaders:** Use nicely sized, subtle `CircularProgressIndicator(strokeWidth: 2)` or Shimmer effects for loading states, keeping the UI structure intact so the screen doesn't jump.
-- **Extract Micro-Widgets:** Break complex UI elements (like avatars, badges, info columns) into private stateless widgets (e.g., `_GradientAvatar`, `_CustomerInfo`) to keep the `build` method clean and declarative.
+## [UX & VISUAL POLISH]
+16. FLUID STATE TRANSITIONS: When the UI swaps between structural states (e.g., changing from a Loading Spinner to a ListView), never use abrupt raw `if/else` rendering. Always wrap state-dependent widgets in an `AnimatedSwitcher` or `AnimatedCrossFade`.
+17. KEYBOARD DISCIPLINE: Any screen containing a text input must allow the user to easily dismiss the keyboard. Wrap the screen's body in a `GestureDetector` with `behavior: HitTestBehavior.opaque` that calls `FocusManager.instance.primaryFocus?.unfocus()` on tap.
+18. ACCESSIBILITY (SEMANTICS): Do not rely purely on visual cues. Any icon-only buttons, custom interactive widgets, or complex visual state indicators must be wrapped in a `Semantics` widget with an appropriate `label` or `hint` for screen readers.

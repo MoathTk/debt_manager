@@ -20,9 +20,27 @@ class SubscribersDatasource {
   }
 
   Future<void> updateExpiry(String uid, DateTime newExpiry) async {
-    await _col.doc(uid).update({
-      'expiresAt': Timestamp.fromDate(newExpiry),
-    });
+    final ts = Timestamp.fromDate(newExpiry);
+    final batch = _firestore.batch();
+
+    batch.update(_col.doc(uid), {'expiresAt': ts});
+
+    batch.update(
+      _firestore
+          .collection('users')
+          .doc(uid)
+          .collection('subscription')
+          .doc('status'),
+      {'expiresAt': ts},
+    );
+
+    try {
+      await batch.commit();
+    } on FirebaseException catch (e) {
+      throw Exception(
+        "Failed to update subscription for $uid: ${e.message}",
+      );
+    }
   }
 
   Stream<List<SubscriberModel>> watchAll() {
