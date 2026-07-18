@@ -6,6 +6,7 @@ import 'Providers/theme_provider.dart';
 import 'Providers/locale_provider.dart';
 import 'data/database_helper.dart';
 import 'l10n/app_localizations.dart';
+import 'Providers/sync_provider.dart';
 import 'features/subscription/presentation/screens/subscription_check_screen.dart';
 import 'screens/login_screen.dart';
 import 'services/auth_service.dart';
@@ -73,6 +74,7 @@ class _AuthGateState extends ConsumerState<AuthGate> {
     } catch (_) {}
     if (!mounted) return;
     setState(() => _dbReady = true);
+    ref.read(syncProvider.notifier).onAuthChanged(uid);
   }
 
   @override
@@ -88,6 +90,9 @@ class _AuthGateState extends ConsumerState<AuthGate> {
             );
           }
           return const SubscriptionCheckScreen();
+        }
+        if (_currentUid != null) {
+          ref.read(syncProvider.notifier).onAuthChanged(null);
         }
         return const LoginScreen();
       },

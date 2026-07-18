@@ -1,5 +1,9 @@
 import 'dart:async';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../data/models/customer.dart';
+import '../data/models/transaction.dart' as model;
+import '../data/models/debt_reminder.dart';
 import '../services/auth_service.dart';
 import '../services/firestore_sync.dart';
 import '../services/connectivity_service.dart';
@@ -30,7 +34,7 @@ class SyncState {
       status: status ?? this.status,
       unsyncedCount: unsyncedCount ?? this.unsyncedCount,
       lastSynced: lastSynced ?? this.lastSynced,
-      error: error ?? this.error,
+      error: error,
     );
   }
 }
@@ -39,11 +43,16 @@ class SyncNotifier extends StateNotifier<SyncState> {
   final Ref _ref;
   final _firestoreSync = FirestoreSync();
   final _connectivity = ConnectivityService();
+  final _firestore = FirebaseFirestore.instance;
+
   StreamSubscription<bool>? _connectivitySub;
+  StreamSubscription? _customersSub;
+  StreamSubscription? _transactionsSub;
+  StreamSubscription? _remindersSub;
   Timer? _debounce;
   Timer? _retryTimer;
-  Timer? _periodicTimer;
   int _retryCount = 0;
+  String? _currentUid;
   static const _maxRetries = 3;
   static const _retryDelays = [
     Duration(seconds: 30),
@@ -65,12 +74,83 @@ class SyncNotifier extends StateNotifier<SyncState> {
       }
     });
     _refreshUnsyncedCount();
-    _periodicTimer = Timer.periodic(
-      const Duration(seconds: 30),
-      (_) {
-        if (state.status != SyncStatus.syncing) syncNow();
+  }
+
+  void _startListeners(String uid) {
+    _stopListeners();
+    _currentUid = uid;
+    _listenCustomers(uid);
+    _listenTransactions(uid);
+    _listenReminders(uid);
+    print('[WS] listeners started for $uid');
+  }
+
+  void _listenCustomers(String uid) {
+    _customersSub = _firestore
+        .collection('users/$uid/customers')
+        .snapshots()
+        .listen(
+      (snap) {
+        final records = snap.docs.map((d) => Customer.fromMap(d.data())).toList();
+        _firestoreSync.upsertCustomers(records);
+        _ref.invalidate(customersProvider);
+        _refreshUnsyncedCount();
       },
+      onError: (e) => print('[WS] customers stream error: $e'),
     );
+  }
+
+  void _listenTransactions(String uid) {
+    _transactionsSub = _firestore
+        .collection('users/$uid/transactions')
+        .snapshots()
+        .listen(
+      (snap) {
+        final records = snap.docs.map((d) => model.Transaction.fromMap(d.data())).toList();
+        _firestoreSync.upsertTransactions(records);
+        _ref.invalidate(transactionsProvider);
+        _refreshUnsyncedCount();
+      },
+      onError: (e) => print('[WS] transactions stream error: $e'),
+    );
+  }
+
+  void _listenReminders(String uid) {
+    _remindersSub = _firestore
+        .collection('users/$uid/reminders')
+        .snapshots()
+        .listen(
+      (snap) {
+        final records = snap.docs.map((d) => DebtReminder.fromMap(d.data())).toList();
+        _firestoreSync.upsertReminders(records);
+        _ref.invalidate(allRemindersProvider);
+        _ref.invalidate(pendingRemindersProvider);
+        _ref.invalidate(dueTodayProvider);
+        _refreshUnsyncedCount();
+      },
+      onError: (e) => print('[WS] reminders stream error: $e'),
+    );
+  }
+
+  void _stopListeners() {
+    _customersSub?.cancel();
+    _transactionsSub?.cancel();
+    _remindersSub?.cancel();
+    _customersSub = null;
+    _transactionsSub = null;
+    _remindersSub = null;
+  }
+
+  void onAuthChanged(String? uid) {
+    if (uid == null || uid.isEmpty) {
+      _stopListeners();
+      _currentUid = null;
+      return;
+    }
+    if (uid != _currentUid) {
+      _startListeners(uid);
+      syncNow();
+    }
   }
 
   Future<void> syncNow() async {
@@ -85,16 +165,11 @@ class SyncNotifier extends StateNotifier<SyncState> {
       state = state.copyWith(status: SyncStatus.offline);
       return;
     }
-    print('[SYNC] syncNow started uid=$uid');
+    print('[SYNC] push started uid=$uid');
     state = state.copyWith(status: SyncStatus.syncing);
     try {
       await _firestoreSync.syncAll(uid);
       _retryCount = 0;
-      _ref.invalidate(customersProvider);
-      _ref.invalidate(transactionsProvider);
-      _ref.invalidate(allRemindersProvider);
-      _ref.invalidate(pendingRemindersProvider);
-      _ref.invalidate(dueTodayProvider);
       _ref.invalidate(dashboardStatsProvider);
       final count = await _firestoreSync.getUnsyncedCount(uid);
       state = state.copyWith(
@@ -102,7 +177,7 @@ class SyncNotifier extends StateNotifier<SyncState> {
         unsyncedCount: count,
         lastSynced: DateTime.now().toIso8601String(),
       );
-      print('[SYNC] completed — $count records still unsynced');
+      print('[SYNC] push done — $count records still unsynced');
     } catch (e) {
       print('[SYNC] FAILED: $e');
       _scheduleRetry(e.toString());
@@ -142,9 +217,9 @@ class SyncNotifier extends StateNotifier<SyncState> {
   @override
   void dispose() {
     _connectivitySub?.cancel();
+    _stopListeners();
     _debounce?.cancel();
     _retryTimer?.cancel();
-    _periodicTimer?.cancel();
     super.dispose();
   }
 }

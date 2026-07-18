@@ -22,7 +22,7 @@ void main() {
       expect(updated.status, SyncStatus.idle);
       expect(updated.unsyncedCount, 5);
       expect(updated.lastSynced, '2025-01-01');
-      expect(updated.error, 'some error');
+      expect(updated.error, null);
     });
 
     test('copyWith updates specified fields', () {
@@ -48,7 +48,7 @@ void main() {
       final updated = state.copyWith(unsyncedCount: 0);
       expect(updated.status, SyncStatus.error);
       expect(updated.unsyncedCount, 0);
-      expect(updated.error, 'old error');
+      expect(updated.error, null);
     });
   });
 

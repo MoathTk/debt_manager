@@ -13,24 +13,15 @@ class FirestoreSync {
 
   String _userPath(String uid) => 'users/$uid';
 
-  String? _maxTimestamp(String? a, String? b) {
-    if (a == null) return b;
-    if (b == null) return a;
-    return a.compareTo(b) > 0 ? a : b;
-  }
-
-   
-
+  /// Push all unsynced local records to Firestore.
+  /// Pull is handled by snapshots() listeners in SyncNotifier.
   Future<void> syncAll(String uid) async {
-    print('[SYNC] syncAll started uid=$uid');
-    String? pushMax;
+    print('[SYNC] push started uid=$uid');
     bool customersPushed = false;
     bool transactionsPushed = false;
 
-    // PUSH PHASE (dependency chain: customers → transactions → reminders)
     try {
-      final m = await _pushCustomers(uid);
-      pushMax = _maxTimestamp(pushMax, m);
+      await _pushCustomers(uid);
       customersPushed = true;
     } catch (e) {
       print('[PUSH] customers FAILED: $e');
@@ -38,8 +29,7 @@ class FirestoreSync {
 
     if (customersPushed) {
       try {
-        final m = await _pushTransactions(uid);
-        pushMax = _maxTimestamp(pushMax, m);
+        await _pushTransactions(uid);
         transactionsPushed = true;
       } catch (e) {
         print('[PUSH] transactions FAILED: $e');
@@ -48,58 +38,41 @@ class FirestoreSync {
 
     if (transactionsPushed) {
       try {
-        final m = await _pushReminders(uid);
-        pushMax = _maxTimestamp(pushMax, m);
+        await _pushReminders(uid);
       } catch (e) {
         print('[PUSH] reminders FAILED: $e');
       }
     }
 
-    // PULL PHASE — always fetch ALL records (no lastSync filter)
-    bool pullOk = true;
-    String? pullMax;
+    print('[SYNC] push done');
+  }
 
-    try {
-      final m = await _pullCustomers(uid);
-      pullMax = _maxTimestamp(pullMax, m);
-    } catch (e) {
-      print('[PULL] customers FAILED: $e');
-      pullOk = false;
-    }
-    try {
-      final m = await _pullTransactions(uid);
-      pullMax = _maxTimestamp(pullMax, m);
-    } catch (e) {
-      print('[PULL] transactions FAILED: $e');
-      pullOk = false;
-    }
-    try {
-      final m = await _pullReminders(uid);
-      pullMax = _maxTimestamp(pullMax, m);
-    } catch (e) {
-      print('[PULL] reminders FAILED: $e');
-      pullOk = false;
-    }
+  // ======================== PUBLIC UPSERT (for snapshots) ========================
 
-    final bestTimestamp = _maxTimestamp(pushMax, pullMax);
-    if (pullOk && bestTimestamp != null) {
-      await _saveLastSync(uid, bestTimestamp);
-    } else if (!pullOk) {
-      print('[SYNC] partial — lastSync NOT advanced');
-    }
-    print('[SYNC] syncAll done pushMax=$pushMax pullMax=$pullMax pullOk=$pullOk');
+  Future<void> upsertCustomers(List<Customer> records) async {
+    if (records.isEmpty) return;
+    await _CustomerSyncRepo(_db).upsertFromCloud(records);
+  }
+
+  Future<void> upsertTransactions(List<model.Transaction> records) async {
+    if (records.isEmpty) return;
+    await _TransactionSyncRepo(_db).upsertFromCloud(records);
+  }
+
+  Future<void> upsertReminders(List<DebtReminder> records) async {
+    if (records.isEmpty) return;
+    await _ReminderSyncRepo(_db).upsertFromCloud(records);
   }
 
   // ======================== PUSH ========================
 
   static const _batchLimit = 500;
 
-  Future<String?> _pushCustomers(String uid) async {
+  Future<void> _pushCustomers(String uid) async {
     final repo = _CustomerSyncRepo(_db);
     final unsynced = await repo.getUnsynced();
-    if (unsynced.isEmpty) return null;
+    if (unsynced.isEmpty) return;
     print('[PUSH] customers: ${unsynced.length} unsynced');
-    String? maxTs;
     final col = _firestore.collection('${_userPath(uid)}/customers');
     final ids = <String>[];
     for (var i = 0; i < unsynced.length; i += _batchLimit) {
@@ -111,20 +84,17 @@ class FirestoreSync {
       for (final c in chunk) {
         batch.set(col.doc(c.id), c.toMap());
         ids.add(c.id);
-        maxTs = _maxTimestamp(maxTs, c.updatedAt);
       }
       await batch.commit();
     }
     await repo.markSynced(ids);
-    return maxTs;
   }
 
-  Future<String?> _pushTransactions(String uid) async {
+  Future<void> _pushTransactions(String uid) async {
     final repo = _TransactionSyncRepo(_db);
     final unsynced = await repo.getUnsynced();
-    if (unsynced.isEmpty) return null;
+    if (unsynced.isEmpty) return;
     print('[PUSH] transactions: ${unsynced.length} unsynced');
-    String? maxTs;
     final col = _firestore.collection('${_userPath(uid)}/transactions');
     final ids = <String>[];
     for (var i = 0; i < unsynced.length; i += _batchLimit) {
@@ -136,20 +106,17 @@ class FirestoreSync {
       for (final t in chunk) {
         batch.set(col.doc(t.id), t.toMap());
         ids.add(t.id);
-        maxTs = _maxTimestamp(maxTs, t.updatedAt);
       }
       await batch.commit();
     }
     await repo.markSynced(ids);
-    return maxTs;
   }
 
-  Future<String?> _pushReminders(String uid) async {
+  Future<void> _pushReminders(String uid) async {
     final repo = _ReminderSyncRepo(_db);
     final unsynced = await repo.getUnsynced();
-    if (unsynced.isEmpty) return null;
+    if (unsynced.isEmpty) return;
     print('[PUSH] reminders: ${unsynced.length} unsynced');
-    String? maxTs;
     final col = _firestore.collection('${_userPath(uid)}/reminders');
     final ids = <String>[];
     for (var i = 0; i < unsynced.length; i += _batchLimit) {
@@ -161,79 +128,13 @@ class FirestoreSync {
       for (final r in chunk) {
         batch.set(col.doc(r.id), r.toMap());
         ids.add(r.id);
-        maxTs = _maxTimestamp(maxTs, r.updatedAt);
       }
       await batch.commit();
     }
     await repo.markSynced(ids);
-    return maxTs;
-  }
-
-  // ======================== PULL ========================
-
-  Future<String?> _pullCustomers(String uid) async {
-    final repo = _CustomerSyncRepo(_db);
-    final lastSync = await _getLastSync(uid);
-    Query query = _firestore.collection('${_userPath(uid)}/customers');
-    if (lastSync != null) {
-      query = query.where('updated_at', isGreaterThan: lastSync);
-    }
-    final snap = await query.get();
-    final records = snap.docs
-        .map((d) => Customer.fromMap(d.data() as Map<String, dynamic>))
-        .toList();
-    print('[PULL] customers: ${records.length} fetched (lastSync=$lastSync)');
-    if (records.isEmpty) return null;
-    await repo.upsertFromCloud(records);
-    return records.map((r) => r.updatedAt).reduce((a, b) => a.compareTo(b) > 0 ? a : b);
-  }
-
-  Future<String?> _pullTransactions(String uid) async {
-    final repo = _TransactionSyncRepo(_db);
-    final lastSync = await _getLastSync(uid);
-    Query query = _firestore.collection('${_userPath(uid)}/transactions');
-    if (lastSync != null) {
-      query = query.where('updated_at', isGreaterThan: lastSync);
-    }
-    final snap = await query.get();
-    final records = snap.docs
-        .map((d) => model.Transaction.fromMap(d.data() as Map<String, dynamic>))
-        .toList();
-    print('[PULL] transactions: ${records.length} fetched (lastSync=$lastSync)');
-    if (records.isEmpty) return null;
-    await repo.upsertFromCloud(records);
-    return records.map((r) => r.updatedAt).reduce((a, b) => a.compareTo(b) > 0 ? a : b);
-  }
-
-  Future<String?> _pullReminders(String uid) async {
-    final repo = _ReminderSyncRepo(_db);
-    final lastSync = await _getLastSync(uid);
-    Query query = _firestore.collection('${_userPath(uid)}/reminders');
-    if (lastSync != null) {
-      query = query.where('updated_at', isGreaterThan: lastSync);
-    }
-    final snap = await query.get();
-    final records = snap.docs
-        .map((d) => DebtReminder.fromMap(d.data() as Map<String, dynamic>))
-        .toList();
-    print('[PULL] reminders: ${records.length} fetched (lastSync=$lastSync)');
-    if (records.isEmpty) return null;
-    await repo.upsertFromCloud(records);
-    return records.map((r) => r.updatedAt).reduce((a, b) => a.compareTo(b) > 0 ? a : b);
   }
 
   // ======================== META ========================
-
-  Future<String?> _getLastSync(String uid) async {
-    final doc = await _firestore.doc('${_userPath(uid)}/meta/lastSync').get();
-    return doc.data()?['timestamp'] as String?;
-  }
-
-  Future<void> _saveLastSync(String uid, String maxUpdatedAt) async {
-    await _firestore.doc('${_userPath(uid)}/meta/lastSync').set({
-      'timestamp': maxUpdatedAt,
-    });
-  }
 
   Future<int> getUnsyncedCount(String uid) async {
     final db = await _db.database;
