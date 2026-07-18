@@ -1025,7 +1025,7 @@ abstract class AppLocalizations {
   /// No description provided for @planTrial.
   ///
   /// In en, this message translates to:
-  /// **'Free Trial'**
+  /// **'Trial'**
   String get planTrial;
 
   /// No description provided for @planTrialDesc.
@@ -1037,7 +1037,7 @@ abstract class AppLocalizations {
   /// No description provided for @planWeekly.
   ///
   /// In en, this message translates to:
-  /// **'Weekly Plan'**
+  /// **'Weekly'**
   String get planWeekly;
 
   /// No description provided for @planWeeklyDesc.
@@ -1049,7 +1049,7 @@ abstract class AppLocalizations {
   /// No description provided for @planMonthly.
   ///
   /// In en, this message translates to:
-  /// **'Monthly Plan'**
+  /// **'Monthly'**
   String get planMonthly;
 
   /// No description provided for @planMonthlyDesc.
@@ -1118,11 +1118,59 @@ abstract class AppLocalizations {
   /// **'Subscribers'**
   String get subscribersDashboard;
 
+  /// No description provided for @totalSubscribers.
+  ///
+  /// In en, this message translates to:
+  /// **'Total'**
+  String get totalSubscribers;
+
+  /// No description provided for @activeSubscribers.
+  ///
+  /// In en, this message translates to:
+  /// **'Active'**
+  String get activeSubscribers;
+
+  /// No description provided for @expiringSubscribers.
+  ///
+  /// In en, this message translates to:
+  /// **'Expiring'**
+  String get expiringSubscribers;
+
+  /// No description provided for @expiredSubscribers.
+  ///
+  /// In en, this message translates to:
+  /// **'Expired'**
+  String get expiredSubscribers;
+
   /// No description provided for @noSubscribers.
   ///
   /// In en, this message translates to:
   /// **'No subscribers yet'**
   String get noSubscribers;
+
+  /// No description provided for @noSubscribersMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Subscribers will appear here after signing in'**
+  String get noSubscribersMessage;
+
+  /// No description provided for @daysAgo.
+  ///
+  /// In en, this message translates to:
+  /// **'{days}d ago'**
+  String daysAgo(Object days);
+
+  /// No description provided for @daysLeft.
+  ///
+  /// In en, this message translates to:
+  /// **'{days}d left'**
+  String daysLeft(Object days);
+
+  /// No description provided for @subToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Today'**
+  String get subToday;
 
   /// No description provided for @updateExpiry.
   ///
@@ -1148,11 +1196,29 @@ abstract class AppLocalizations {
   /// **'+1 Month'**
   String get extendMonth;
 
+  /// No description provided for @expiryUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'Expiry updated successfully'**
+  String get expiryUpdated;
+
+  /// No description provided for @expiresOn.
+  ///
+  /// In en, this message translates to:
+  /// **'Expires on'**
+  String get expiresOn;
+
   /// No description provided for @accessDenied.
   ///
   /// In en, this message translates to:
   /// **'Access Denied'**
   String get accessDenied;
+
+  /// No description provided for @subLoadError.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load subscribers'**
+  String get subLoadError;
 }
 
 class _AppLocalizationsDelegate

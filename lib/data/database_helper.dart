@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import '../utils/sync_id.dart';
@@ -5,6 +7,7 @@ import '../utils/sync_id.dart';
 class DatabaseHelper {
   static final DatabaseHelper instance = DatabaseHelper._init();
   static Database? _database;
+  String? _currentUid;
 
   DatabaseHelper._init();
 
@@ -12,16 +15,38 @@ class DatabaseHelper {
 
   Future<Database> get database async {
     if (_database != null) return _database!;
+    return _openDb(_currentUid ?? 'default');
+  }
+
+  /// Opens the database for [uid].
+  /// Each user gets their own file: debt_management_{uid}.db
+  Future<void> init(String uid) async {
+    if (_currentUid == uid && _database != null) return;
+    await close();
+    _currentUid = uid;
+    _database = await _openDb(uid);
+    await _migrateFromSharedDb(_database!);
+    await _cleanupOrphanRecords(_database!);
+  }
+
+  Future<Database> _openDb(String uid) async {
     final dbPath = await getDatabasesPath();
-    final path = join(dbPath, 'debt_management.db');
-    _database = await openDatabase(
+    final path = join(dbPath, 'debt_management_$uid.db');
+    return openDatabase(
       path,
-      version: 7,
+      version: 8,
       onCreate: _createDB,
       onUpgrade: _onUpgrade,
     );
-    await _cleanupOrphanRecords(_database!);
-    return _database!;
+  }
+
+  /// Closes the current database. Called on sign-out.
+  Future<void> close() async {
+    if (_database != null) {
+      await _database!.close();
+      _database = null;
+    }
+    _currentUid = null;
   }
 
   Future<void> _createDB(Database db, int version) async {
@@ -204,15 +229,51 @@ class DatabaseHelper {
     }
   }
 
-  Future<void> close() async {
-    final db = await database;
-    db.close();
-    _database = null;
-  }
-
   Future<void> _cleanupOrphanRecords(Database db) async {
     await db.delete('customers', where: 'id IS NULL');
     await db.delete('transactions', where: 'id IS NULL');
     await db.delete('debt_reminders', where: 'id IS NULL');
+  }
+
+  /// One-time migration: copies data from the old shared debt_management.db
+  /// to the current per-user database, then deletes the old file.
+  Future<void> _migrateFromSharedDb(Database targetDb) async {
+    final dbPath = await getDatabasesPath();
+    final sharedPath = join(dbPath, 'debt_management.db');
+    if (!await File(sharedPath).exists()) return;
+
+    Database? sharedDb;
+    try {
+      sharedDb = await openDatabase(sharedPath, version: 8);
+      final db = sharedDb;
+      final customers = await db.query('customers');
+      if (customers.isEmpty) return;
+
+      final txnCount = Sqflite.firstIntValue(
+        await db.rawQuery('SELECT COUNT(*) FROM transactions'),
+      );
+      if (txnCount == null || txnCount == 0) return;
+
+      await targetDb.transaction((txn) async {
+        for (final c in customers) {
+          await txn.insert('customers', c, conflictAlgorithm: ConflictAlgorithm.replace);
+        }
+        final transactions = await db.query('transactions');
+        for (final t in transactions) {
+          await txn.insert('transactions', t, conflictAlgorithm: ConflictAlgorithm.replace);
+        }
+        final reminders = await db.query('debt_reminders');
+        for (final r in reminders) {
+          await txn.insert('debt_reminders', r, conflictAlgorithm: ConflictAlgorithm.replace);
+        }
+      });
+    } catch (_) {
+      return;
+    } finally {
+      await sharedDb?.close();
+      try {
+        await File(sharedPath).delete();
+      } catch (_) {}
+    }
   }
 }

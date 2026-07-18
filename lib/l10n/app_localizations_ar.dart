@@ -475,19 +475,19 @@ class AppLocalizationsAr extends AppLocalizations {
   String get choosePlanSubtitle => 'اختر اشتراكاً للبدء';
 
   @override
-  String get planTrial => 'تجربة مجانية';
+  String get planTrial => 'تجربة';
 
   @override
   String get planTrialDesc => '7 أيام وصول كامل، بدون بطاقة ائتمان';
 
   @override
-  String get planWeekly => 'خطة أسبوعية';
+  String get planWeekly => 'أسبوعي';
 
   @override
   String get planWeeklyDesc => '7 أيام وصول، تتجدد أسبوعياً';
 
   @override
-  String get planMonthly => 'خطة شهرية';
+  String get planMonthly => 'شهري';
 
   @override
   String get planMonthlyDesc => '30 يوم وصول، تتجدد شهرياً';
@@ -523,7 +523,35 @@ class AppLocalizationsAr extends AppLocalizations {
   String get subscribersDashboard => 'المشتركون';
 
   @override
+  String get totalSubscribers => 'الإجمالي';
+
+  @override
+  String get activeSubscribers => 'نشط';
+
+  @override
+  String get expiringSubscribers => 'ينتهي قريباً';
+
+  @override
+  String get expiredSubscribers => 'منتهي';
+
+  @override
   String get noSubscribers => 'لا يوجد مشتركون بعد';
+
+  @override
+  String get noSubscribersMessage => 'سيظهر المشتركون هنا بعد تسجيل الدخول';
+
+  @override
+  String daysAgo(Object days) {
+    return 'منذ $days يوم';
+  }
+
+  @override
+  String daysLeft(Object days) {
+    return 'متبقي $days يوم';
+  }
+
+  @override
+  String get subToday => 'اليوم';
 
   @override
   String get updateExpiry => 'تحديث تاريخ الانتهاء';
@@ -538,5 +566,14 @@ class AppLocalizationsAr extends AppLocalizations {
   String get extendMonth => '+شهر';
 
   @override
+  String get expiryUpdated => 'تم تحديث تاريخ الانتهاء بنجاح';
+
+  @override
+  String get expiresOn => 'ينتهي في';
+
+  @override
   String get accessDenied => 'غير مصرح بالدخول';
+
+  @override
+  String get subLoadError => 'فشل تحميل المشتركين';
 }

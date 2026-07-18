@@ -27,7 +27,7 @@ class ActivateTrial {
   Future<Subscription> call(String uid, {String userName = '', String userEmail = ''}) async {
     final sub = Subscription(
       plan: SubscriptionPlan.trial,
-      expiresAt: DateTime.now().add(const Duration(minutes: 2)),
+      expiresAt: DateTime.now().add(const Duration(days: 7)),
       activatedAt: DateTime.now(),
       isActive: true,
     );

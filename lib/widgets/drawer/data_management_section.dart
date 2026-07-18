@@ -131,7 +131,7 @@ class DataManagementSection extends ConsumerWidget {
               const SizedBox(height: 12),
               OutlinedButton.icon(
                 onPressed: () async {
-                  if (MutationGuard.checkBlocked(context, ref)) return;
+                  //if (MutationGuard.checkBlocked(context, ref)) return;
                   final ok = await confirm(l10n.deleteLocalDatabase, l10n.confirmDeleteLocalDatabase);
                   if (ok == true) {
                     await SeedDatabase.clearDemoData();

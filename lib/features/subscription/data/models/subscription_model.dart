@@ -16,6 +16,7 @@
 /// ---------------------------------------------------------------------------
 library;
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:local_debt_management/features/subscription/domain/entities/subscription.dart';
 
 /// Data model extending domain entity with serialization logic.
@@ -52,20 +53,27 @@ class SubscriptionModel extends Subscription {
   factory SubscriptionModel.fromFirestore(Map<String, dynamic> data) {
     return SubscriptionModel(
       plan: _parsePlan(data['plan'] as String),
-      expiresAt: DateTime.parse(data['expiresAt'] as String),
-      activatedAt: DateTime.parse(data['activatedAt'] as String),
+      expiresAt: _parseFirestoreDate(data['expiresAt']),
+      activatedAt: _parseFirestoreDate(data['activatedAt']),
       isActive: data['is_active'] as bool? ?? true,
     );
   }
 
-  /// Serialize to Firestore-compatible map (camelCase, native booleans).
+  /// Serialize to Firestore-compatible map (camelCase, native Timestamps).
   Map<String, dynamic> toFirestore() {
     return {
       'plan': plan.name,
-      'expiresAt': expiresAt.toIso8601String(),
-      'activatedAt': activatedAt.toIso8601String(),
+      'expiresAt': Timestamp.fromDate(expiresAt),
+      'activatedAt': Timestamp.fromDate(activatedAt),
       'is_active': isActive,
     };
+  }
+
+  /// Handles both Timestamp (new format) and ISO string (legacy format).
+  static DateTime _parseFirestoreDate(dynamic value) {
+    if (value is Timestamp) return value.toDate();
+    if (value is String) return DateTime.parse(value);
+    return DateTime.now();
   }
 
   /// Safely parse plan string → enum, defaulting to trial if unknown.

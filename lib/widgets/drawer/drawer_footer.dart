@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:local_debt_management/l10n/app_localizations.dart';
-import 'package:local_debt_management/services/auth_service.dart';
+import 'package:local_debt_management/services/auth_service.dart'; 
 
 class DrawerFooter extends ConsumerWidget {
   const DrawerFooter({super.key, required this.onClose});
@@ -19,7 +19,8 @@ class DrawerFooter extends ConsumerWidget {
           padding: const EdgeInsets.symmetric(horizontal: 24),
           child: OutlinedButton.icon(
             onPressed: () async {
-              await ref.read(authServiceProvider).signOut();
+              await ref.read(authServiceProvider).signOut(ref);
+
               if (context.mounted) onClose();
             },
             icon: const Icon(Icons.logout),

@@ -26,7 +26,8 @@ final debtReminderRepositoryProvider = Provider<DebtReminderRepository>((ref) {
 });
 
 final _ownerIdProvider = Provider<String>((ref) {
-  return ref.watch(authServiceProvider).ownerId ?? '';
+  final user = ref.watch(authStateProvider).valueOrNull;
+  return user?.uid ?? '';
 });
 
 final customersProvider = FutureProvider<List<Customer>>((ref) async {

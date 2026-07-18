@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:local_debt_management/services/auth_service.dart';
 
 final isAdminProvider = FutureProvider<bool>((ref) async {
-  final uid = ref.watch(authServiceProvider).ownerId;
+  final uid = ref.watch(authStateProvider).valueOrNull?.uid;
   if (uid == null) return false;
   try {
     final doc = await FirebaseFirestore.instance.collection('users').doc(uid).get();

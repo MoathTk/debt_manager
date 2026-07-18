@@ -476,19 +476,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get choosePlanSubtitle => 'Select a subscription plan to get started';
 
   @override
-  String get planTrial => 'Free Trial';
+  String get planTrial => 'Trial';
 
   @override
   String get planTrialDesc => '7 days full access, no credit card required';
 
   @override
-  String get planWeekly => 'Weekly Plan';
+  String get planWeekly => 'Weekly';
 
   @override
   String get planWeeklyDesc => '7 days access, renewed weekly';
 
   @override
-  String get planMonthly => 'Monthly Plan';
+  String get planMonthly => 'Monthly';
 
   @override
   String get planMonthlyDesc => '30 days access, renewed monthly';
@@ -524,7 +524,36 @@ class AppLocalizationsEn extends AppLocalizations {
   String get subscribersDashboard => 'Subscribers';
 
   @override
+  String get totalSubscribers => 'Total';
+
+  @override
+  String get activeSubscribers => 'Active';
+
+  @override
+  String get expiringSubscribers => 'Expiring';
+
+  @override
+  String get expiredSubscribers => 'Expired';
+
+  @override
   String get noSubscribers => 'No subscribers yet';
+
+  @override
+  String get noSubscribersMessage =>
+      'Subscribers will appear here after signing in';
+
+  @override
+  String daysAgo(Object days) {
+    return '${days}d ago';
+  }
+
+  @override
+  String daysLeft(Object days) {
+    return '${days}d left';
+  }
+
+  @override
+  String get subToday => 'Today';
 
   @override
   String get updateExpiry => 'Update Expiry Date';
@@ -539,5 +568,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String get extendMonth => '+1 Month';
 
   @override
+  String get expiryUpdated => 'Expiry updated successfully';
+
+  @override
+  String get expiresOn => 'Expires on';
+
+  @override
   String get accessDenied => 'Access Denied';
+
+  @override
+  String get subLoadError => 'Failed to load subscribers';
 }

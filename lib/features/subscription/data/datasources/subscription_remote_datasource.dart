@@ -43,16 +43,17 @@ class SubscriptionRemoteDatasource {
 
       // Backfill: mirror to top-level collection for admin dashboard
       final adminDoc = await _firestore.collection('subscriptions').doc(uid).get();
+      final sub = SubscriptionModel.fromFirestore(data);
       if (!adminDoc.exists) {
         final user = FirebaseAuth.instance.currentUser;
         await _firestore.collection('subscriptions').doc(uid).set({
-          ...data,
+          ...sub.toFirestore(),
           'userName': user?.displayName ?? '',
           'userEmail': user?.email ?? '',
         }, SetOptions(merge: true));
       }
 
-      return SubscriptionModel.fromFirestore(data);
+      return sub;
     } on FirebaseException catch (e) {
       throw SubscriptionRemoteException(
         'Firestore read failed: ${e.message}',
