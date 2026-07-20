@@ -34,7 +34,7 @@ class ActivateTrial {
 
     // Save locally first — this MUST succeed for offline access
     try {
-      await repo.saveLocal(sub);
+      await repo.saveLocal(sub,uid);
     } on SubscriptionException {
       rethrow; // Local DB failure is critical — can't proceed
     }

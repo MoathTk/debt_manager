@@ -23,7 +23,7 @@ abstract class SubscriptionRepository {
   Future<Subscription?> getRemote(String uid);
 
   /// Write subscription to local SQLite cache (for offline use).
-  Future<void> saveLocal(Subscription sub);
+  Future<void> saveLocal(Subscription sub, String userId);
 
   /// Write subscription to Firestore (source of truth).
   Future<void> saveRemote(String uid, Subscription sub, {String userName, String userEmail});

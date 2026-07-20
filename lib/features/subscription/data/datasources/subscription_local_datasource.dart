@@ -49,6 +49,8 @@ class SubscriptionLocalDatasource {
         {'user_id': userId, ...sub.toMap()},
         conflictAlgorithm: ConflictAlgorithm.replace,
       );
+      print("result: " + result.toString()
+      );
       if (result == 0) {
         throw SubscriptionLocalException(
           'Insert returned 0 — row was not saved',

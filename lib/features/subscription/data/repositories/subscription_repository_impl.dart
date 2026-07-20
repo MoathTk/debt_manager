@@ -33,14 +33,14 @@ class SubscriptionRepositoryImpl implements SubscriptionRepository {
   /// Converts domain entity → data model, then saves to SQLite.
   /// Throws [SubscriptionLocalException] if write fails.
   @override
-  Future<void> saveLocal(Subscription sub) async {
+  Future<void> saveLocal(Subscription sub, String userId) async {
     final model = SubscriptionModel(
       plan: sub.plan,
       expiresAt: sub.expiresAt,
       activatedAt: sub.activatedAt,
       isActive: sub.isActive,
     );
-    await _local.save(model, '');
+    await _local.save(model, userId);
   }
 
   /// Converts domain entity → data model, then saves to Firestore.

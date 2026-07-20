@@ -15,8 +15,9 @@ import '../../data/models/subscription_model.dart';
 import '../../data/repositories/subscription_repository_impl.dart';
 import 'subscription_state.dart';
 
-final subscriptionRepositoryProvider =
-    Provider<SubscriptionRepositoryImpl>((_) {
+final subscriptionRepositoryProvider = Provider<SubscriptionRepositoryImpl>((
+  _,
+) {
   return SubscriptionRepositoryImpl(
     SubscriptionLocalDatasource(DatabaseHelper.instance),
     SubscriptionRemoteDatasource(FirebaseFirestore.instance),
@@ -32,12 +33,13 @@ class SubscriptionNotifier extends StateNotifier<SubscriptionState> {
   StreamSubscription<DocumentSnapshot>? _adminSub;
 
   SubscriptionNotifier(this._check, this._activateTrial, this._auth)
-      : super(const SubscriptionState()) {
+    : super(const SubscriptionState()) {
     _init();
   }
 
   void _init() async {
     await load();
+    if (!mounted) return;
     final uid = _auth.ownerId;
     if (uid != null) _listenToFirestore(uid);
   }
@@ -52,33 +54,27 @@ class SubscriptionNotifier extends StateNotifier<SubscriptionState> {
         .collection('subscription')
         .doc('status')
         .snapshots()
-        .listen(
-      (doc) {
-        if (!doc.exists || doc.data() == null) {
-          state = state.copyWith(isLoading: false, clearSubscription: true);
-          return;
-        }
-        final sub = SubscriptionModel.fromFirestore(doc.data()!);
-        state = state.copyWith(isLoading: false, subscription: sub);
-      },
-      onError: (e) => print('[SUB] User doc stream error: $e'),
-    );
+        .listen((doc) {
+          if (!doc.exists || doc.data() == null) {
+            state = state.copyWith(isLoading: false, clearSubscription: true);
+            return;
+          }
+          final sub = SubscriptionModel.fromFirestore(doc.data()!);
+          state = state.copyWith(isLoading: false, subscription: sub);
+        }, onError: (e) => print('[SUB] User doc stream error: $e'));
 
     _adminSub = _firestore
         .collection('subscriptions')
         .doc(uid)
         .snapshots()
-        .listen(
-      (doc) {
-        if (!doc.exists || doc.data() == null) {
-          state = state.copyWith(isLoading: false, clearSubscription: true);
-          return;
-        }
-        final sub = SubscriptionModel.fromFirestore(doc.data()!);
-        state = state.copyWith(isLoading: false, subscription: sub);
-      },
-      onError: (e) => print('[SUB] Admin doc stream error: $e'),
-    );
+        .listen((doc) {
+          if (!doc.exists || doc.data() == null) {
+            state = state.copyWith(isLoading: false, clearSubscription: true);
+            return;
+          }
+          final sub = SubscriptionModel.fromFirestore(doc.data()!);
+          state = state.copyWith(isLoading: false, subscription: sub);
+        }, onError: (e) => print('[SUB] Admin doc stream error: $e'));
   }
 
   @override
@@ -94,12 +90,14 @@ class SubscriptionNotifier extends StateNotifier<SubscriptionState> {
     state = state.copyWith(isLoading: true, error: null);
     try {
       final sub = await _check(uid);
+      if (!mounted) return;
       if (sub != null) {
         state = state.copyWith(isLoading: false, subscription: sub);
       } else {
         state = state.copyWith(isLoading: false, clearSubscription: true);
       }
     } catch (e) {
+      if (!mounted) return;
       state = state.copyWith(isLoading: false, error: e.toString());
     }
   }
@@ -115,8 +113,10 @@ class SubscriptionNotifier extends StateNotifier<SubscriptionState> {
         userName: user?.displayName ?? '',
         userEmail: user?.email ?? '',
       );
+      if (!mounted) return;
       state = state.copyWith(isLoading: false, subscription: sub);
     } catch (e) {
+      if (!mounted) return;
       state = state.copyWith(isLoading: false, error: e.toString());
     }
   }
@@ -128,9 +128,10 @@ class SubscriptionNotifier extends StateNotifier<SubscriptionState> {
 
 final subscriptionProvider =
     StateNotifierProvider<SubscriptionNotifier, SubscriptionState>((ref) {
-  final auth = ref.watch(authServiceProvider);
-  final repo = ref.watch(subscriptionRepositoryProvider);
-  final check = CheckSubscription(repo, ConnectivityService());
-  final activateTrial = ActivateTrial(repo);
-  return SubscriptionNotifier(check, activateTrial, auth);
-});
+      ref.watch(authStateProvider);
+      final auth = ref.watch(authServiceProvider);
+      final repo = ref.watch(subscriptionRepositoryProvider);
+      final check = CheckSubscription(repo, ConnectivityService());
+      final activateTrial = ActivateTrial(repo);
+      return SubscriptionNotifier(check, activateTrial, auth);
+    });

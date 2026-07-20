@@ -39,7 +39,8 @@ class CheckSubscription {
     if (await connectivity.checkConnection()) {
       final remote = await repo.getRemote(uid);
       if (remote != null) {
-        await repo.saveLocal(remote);
+        print("time: " + remote.expiresAt.toString());
+        await repo.saveLocal(remote,uid);
         print("found in remote!!");
         return remote;
       }
