@@ -75,6 +75,7 @@ class _State extends ConsumerState<SubscriptionCheckScreen>
     AppLocalizations l10n,
   ) {
     if (state.isLoading && state.subscription == null) {
+      
       return _LoadingView(
         key: const ValueKey('loading'),
         pulseCtrl: _pulseCtrl,

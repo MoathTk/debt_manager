@@ -102,4 +102,30 @@ class SubscriptionRemoteDatasource {
       );
     }
   }
+
+  /// Delete subscription from both user doc and admin mirror.
+  Future<void> delete(String uid) async {
+    try {
+      final batch = _firestore.batch();
+      batch.delete(
+        _firestore
+            .collection('users')
+            .doc(uid)
+            .collection('subscription')
+            .doc('status'),
+      );
+      batch.delete(_firestore.collection('subscriptions').doc(uid));
+      await batch.commit();
+    } on FirebaseException catch (e) {
+      throw SubscriptionRemoteException(
+        'Firestore delete failed: ${e.message}',
+        e,
+      );
+    } catch (e) {
+      throw SubscriptionRemoteException(
+        'Unexpected error deleting subscription',
+        e,
+      );
+    }
+  }
 }

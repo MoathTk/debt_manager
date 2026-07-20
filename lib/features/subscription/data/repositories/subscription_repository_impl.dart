@@ -59,4 +59,8 @@ class SubscriptionRepositoryImpl implements SubscriptionRepository {
   /// Throws [SubscriptionLocalException] if delete fails.
   @override
   Future<void> deleteLocal() => _local.delete();
+
+  /// Throws [SubscriptionRemoteException] if delete fails.
+  @override
+  Future<void> deleteRemote(String uid) => _remote.delete(uid);
 }

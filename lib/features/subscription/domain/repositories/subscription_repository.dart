@@ -30,4 +30,7 @@ abstract class SubscriptionRepository {
 
   /// Delete local cache (e.g., on sign-out or DB reset).
   Future<void> deleteLocal();
+
+  /// Delete remote subscription from Firestore (both user doc and admin mirror).
+  Future<void> deleteRemote(String uid);
 }

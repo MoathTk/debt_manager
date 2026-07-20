@@ -17,11 +17,12 @@ class SubscriptionState {
   SubscriptionState copyWith({
     bool? isLoading,
     Subscription? subscription,
+    bool clearSubscription = false,
     String? error,
   }) =>
       SubscriptionState(
         isLoading: isLoading ?? this.isLoading,
-        subscription: subscription ?? this.subscription,
+        subscription: clearSubscription ? null : (subscription ?? this.subscription),
         error: error ?? this.error,
       );
 }

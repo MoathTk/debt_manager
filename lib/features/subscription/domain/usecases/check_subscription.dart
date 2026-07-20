@@ -40,10 +40,17 @@ class CheckSubscription {
       final remote = await repo.getRemote(uid);
       if (remote != null) {
         await repo.saveLocal(remote);
+        print("found in remote!!");
         return remote;
       }
-      return null; // New user — no subscription doc in Firestore yet
+
+      print("not found in remote!!");
+      await repo.deleteLocal();
+      await repo.deleteRemote(uid);
+      return null; // Subscription was deleted — clean stale data
     }
+
+    print("getting local!!");
     final local = await repo.getLocal();
     if (local != null) return local;
     throw const RequiresInternetException();

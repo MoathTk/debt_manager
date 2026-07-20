@@ -62,18 +62,11 @@ class SubscriptionLocalDatasource {
   }
 
   /// Delete cached subscription.
-  /// Throws [SubscriptionLocalException] on database error.
+  /// No-op if no row exists (idempotent).
   Future<void> delete() async {
     try {
       final database = await _db.database;
-      final deleted = await database.delete('user_subscription');
-      if (deleted == 0) {
-        throw SubscriptionLocalException(
-          'Delete returned 0 — no rows removed (nothing to delete?)',
-        );
-      }
-    } on SubscriptionLocalException {
-      rethrow;
+      await database.delete('user_subscription');
     } catch (e) {
       throw SubscriptionLocalException('Failed to delete subscription', e);
     }

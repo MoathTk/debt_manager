@@ -36,8 +36,8 @@ class SubscriptionNotifier extends StateNotifier<SubscriptionState> {
     _init();
   }
 
-  void _init() {
-    load();
+  void _init() async {
+    await load();
     final uid = _auth.ownerId;
     if (uid != null) _listenToFirestore(uid);
   }
@@ -54,7 +54,10 @@ class SubscriptionNotifier extends StateNotifier<SubscriptionState> {
         .snapshots()
         .listen(
       (doc) {
-        if (!doc.exists || doc.data() == null) return;
+        if (!doc.exists || doc.data() == null) {
+          state = state.copyWith(isLoading: false, clearSubscription: true);
+          return;
+        }
         final sub = SubscriptionModel.fromFirestore(doc.data()!);
         state = state.copyWith(isLoading: false, subscription: sub);
       },
@@ -67,7 +70,10 @@ class SubscriptionNotifier extends StateNotifier<SubscriptionState> {
         .snapshots()
         .listen(
       (doc) {
-        if (!doc.exists || doc.data() == null) return;
+        if (!doc.exists || doc.data() == null) {
+          state = state.copyWith(isLoading: false, clearSubscription: true);
+          return;
+        }
         final sub = SubscriptionModel.fromFirestore(doc.data()!);
         state = state.copyWith(isLoading: false, subscription: sub);
       },
@@ -88,7 +94,11 @@ class SubscriptionNotifier extends StateNotifier<SubscriptionState> {
     state = state.copyWith(isLoading: true, error: null);
     try {
       final sub = await _check(uid);
-      state = state.copyWith(isLoading: false, subscription: sub);
+      if (sub != null) {
+        state = state.copyWith(isLoading: false, subscription: sub);
+      } else {
+        state = state.copyWith(isLoading: false, clearSubscription: true);
+      }
     } catch (e) {
       state = state.copyWith(isLoading: false, error: e.toString());
     }
