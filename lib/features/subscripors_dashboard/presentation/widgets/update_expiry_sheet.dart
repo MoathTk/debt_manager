@@ -20,7 +20,7 @@ class _UpdateExpirySheetState extends ConsumerState<UpdateExpirySheet> {
   @override
   void initState() {
     super.initState();
-    _newExpiry = widget.sub.isExpired ? DateTime.now().add(const Duration(days: 7)) : widget.sub.expiresAt;
+    _newExpiry = widget.sub.isExpired ? DateTime.now()  : widget.sub.expiresAt;
   }
 
   @override
