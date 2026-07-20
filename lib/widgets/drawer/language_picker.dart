@@ -57,7 +57,7 @@ class LanguagePicker extends ConsumerWidget {
             height: 48,
             child: SegmentedButton<String>(
               style: SegmentedButton.styleFrom(
-                side: BorderSide(color: cs.outlineVariant.withOpacity(0.5)),
+                side: BorderSide(color: cs.outlineVariant.withValues(alpha: .5)),
               ),
               segments: const [
                 ButtonSegment(

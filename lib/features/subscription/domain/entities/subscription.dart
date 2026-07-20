@@ -46,17 +46,13 @@ class Subscription {
   SubscriptionStatus get status {
     final now = DateTime.now();
     if (!isActive || expiresAt.isAfter(now) == false) {
-      print("ex: " + (now.difference(expiresAt).inMinutes > 1
-          ? SubscriptionStatus.blocked
-          : SubscriptionStatus.grace).toString());
+     
       return now.difference(expiresAt).inMinutes > 1
           ? SubscriptionStatus.blocked
           : SubscriptionStatus.grace;
     }
 
-     print("ex: " + (now.difference(expiresAt).inMinutes <= 1
-          ? SubscriptionStatus.blocked
-          : SubscriptionStatus.grace).toString());
+      
     return expiresAt.difference(now).inMinutes <= 1
         ? SubscriptionStatus.expiring
         : SubscriptionStatus.active;
