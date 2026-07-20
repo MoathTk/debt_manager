@@ -130,9 +130,9 @@ class ReminderCard extends ConsumerWidget {
                       ),
                     ),
                     if (!reminder.completed)
-                      ReminderActionBtn(
-                        icon: Icons.check_circle_outline_rounded,
-                        color: const Color(0xFF43A047),
+                      _MarkCompletedBtn(
+                        reminder: reminder,
+                        l10n: l10n,
                         onTap: () => _confirmToggle(context, ref, l10n),
                       ),
                     if (!reminder.completed) const SizedBox(width: 8),
@@ -249,6 +249,57 @@ class _AmountChip extends ConsumerWidget {
               color: cs.primary,
             ),
           ),
+        );
+      },
+    );
+  }
+}
+
+class _MarkCompletedBtn extends ConsumerWidget {
+  final DebtReminder reminder;
+  final AppLocalizations l10n;
+  final VoidCallback onTap;
+
+  const _MarkCompletedBtn({
+    required this.reminder,
+    required this.l10n,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    if (reminder.debtId == null) {
+      return ReminderActionBtn(
+        icon: Icons.check_circle_outline_rounded,
+        color: const Color(0xFF43A047),
+        onTap: onTap,
+      );
+    }
+    final repo = ref.read(transactionRepositoryProvider);
+    return FutureBuilder<model.Transaction?>(
+      future: repo.getById(reminder.debtId!),
+      builder: (ctx, txnSnap) {
+        final txn = txnSnap.data;
+        if (txn == null) {
+          return ReminderActionBtn(
+            icon: Icons.check_circle_outline_rounded,
+            color: const Color(0xFF43A047),
+            onTap: onTap,
+          );
+        }
+        return FutureBuilder<double>(
+          future: repo.getPaymentsForDebt(reminder.debtId!),
+          builder: (ctx2, paidSnap) {
+            final paid = paidSnap.data ?? 0;
+            final fullyPaid = (txn.amount - paid) <= 0;
+            return ReminderActionBtn(
+              icon: fullyPaid
+                  ? Icons.check_circle
+                  : Icons.check_circle_outline_rounded,
+              color: fullyPaid ? Colors.grey : const Color(0xFF43A047),
+              onTap: fullyPaid ? () {} : onTap,
+            );
+          },
         );
       },
     );

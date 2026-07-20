@@ -62,7 +62,7 @@ class Subscription {
         : SubscriptionStatus.active;
   }
 
-  int get daysRemaining => expiresAt.difference(DateTime.now()).inDays;
+  int get daysRemaining => expiresAt.difference(DateTime.now()).inMinutes;
   bool get isTrial => plan == SubscriptionPlan.trial;
 
   String get planLabel {

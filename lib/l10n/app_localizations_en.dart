@@ -587,4 +587,36 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get subLoadError => 'Failed to load subscribers';
+
+  @override
+  String get expireNow => 'Expire Now';
+
+  @override
+  String get confirmExpire => 'Expire Subscription?';
+
+  @override
+  String confirmExpireMsg(Object name) {
+    return 'This will immediately expire the subscription for $name.';
+  }
+
+  @override
+  String get cancelled => 'Cancelled';
+
+  @override
+  String get subscriptionExpired => 'Subscription expired';
+
+  @override
+  String get subscriptionDetails => 'Subscription Details';
+
+  @override
+  String get planName => 'Plan';
+
+  @override
+  String get expiresOnLabel => 'Expires on';
+
+  @override
+  String get timeRemainingLabel => 'Time remaining';
+
+  @override
+  String get expiredLabel => 'Expired';
 }

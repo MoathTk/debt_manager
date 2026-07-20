@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:local_debt_management/features/subscription/presentation/providers/subscription_provider.dart';
 import 'package:local_debt_management/l10n/app_localizations.dart';
 import '../../data/models/subscriber_model.dart';
+import '../providers/subscribers_provider.dart';
 import 'update_expiry_sheet.dart';
 
-class SubscriberTile extends StatelessWidget {
+class SubscriberTile extends ConsumerWidget {
   final SubscriberModel sub;
   const SubscriberTile({super.key, required this.sub});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final cs = Theme.of(context).colorScheme;
     final l10n = AppLocalizations.of(context)!;
     final color = sub.isExpired ? Colors.red : sub.daysRemaining <= 1 ? Colors.orange : Colors.green;
@@ -47,7 +50,7 @@ class SubscriberTile extends StatelessWidget {
             const SizedBox(height: 4),
             Text(days, style: TextStyle(fontSize: 11, color: cs.outline, fontWeight: FontWeight.w500)),
           ]),
-          const SizedBox(width: 8),
+          const SizedBox(width: 4),
           IconButton(
             icon: Icon(Icons.edit_calendar_rounded, size: 20, color: cs.primary),
             onPressed: () => showModalBottomSheet(
@@ -56,9 +59,39 @@ class SubscriberTile extends StatelessWidget {
               builder: (_) => UpdateExpirySheet(sub: sub),
             ),
           ),
+          IconButton(
+            icon: Icon(Icons.block_rounded, size: 20, color: Colors.red),
+            onPressed: sub.isExpired ? null : () => _confirmExpire(context, ref, l10n, name),
+          ),
         ]),
       ),
     );
+  }
+
+  Future<void> _confirmExpire(BuildContext context, WidgetRef ref, AppLocalizations l10n, String name) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        icon: const Icon(Icons.warning_amber_rounded, color: Colors.red, size: 32),
+        title: Text(l10n.confirmExpire),
+        content: Text(l10n.confirmExpireMsg(name)),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(l10n.cancel)),
+          FilledButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            style: FilledButton.styleFrom(backgroundColor: Colors.red),
+            child: Text(l10n.expireNow),
+          ),
+        ],
+      ),
+    );
+    if (confirmed == true && context.mounted) {
+      await ref.read(subscribersProvider.notifier).expireNow(sub.uid);
+      ref.read(subscriptionProvider.notifier).load();
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l10n.subscriptionExpired)));
+      }
+    }
   }
 
   String _planLabel(String plan, AppLocalizations l10n) => switch (plan) {

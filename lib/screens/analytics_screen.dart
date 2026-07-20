@@ -22,7 +22,18 @@ class _AnalyticsState extends ConsumerState<AnalyticsScreen> {
     final l10n = AppLocalizations.of(context)!;
     final statsAsync = ref.watch(dashboardStatsProvider);
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.analytics)),
+      appBar: AppBar(title: Text(l10n.analytics),backgroundColor: Colors.transparent,
+      elevation: 0,
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(1),
+          child: Container(
+            height: 2,
+            margin: const EdgeInsets.symmetric(horizontal: 16),
+            color: Theme.of(
+              context,
+            ).colorScheme.outlineVariant.withValues(alpha: 0.4),
+          ),
+        ),),
       body: statsAsync.when(
         data: (s) => _body(l10n, s),
         loading: () => const Center(child: CircularProgressIndicator()),

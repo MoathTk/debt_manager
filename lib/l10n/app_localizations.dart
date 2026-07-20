@@ -1237,6 +1237,66 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Failed to load subscribers'**
   String get subLoadError;
+
+  /// No description provided for @expireNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Expire Now'**
+  String get expireNow;
+
+  /// No description provided for @confirmExpire.
+  ///
+  /// In en, this message translates to:
+  /// **'Expire Subscription?'**
+  String get confirmExpire;
+
+  /// No description provided for @confirmExpireMsg.
+  ///
+  /// In en, this message translates to:
+  /// **'This will immediately expire the subscription for {name}.'**
+  String confirmExpireMsg(Object name);
+
+  /// No description provided for @cancelled.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancelled'**
+  String get cancelled;
+
+  /// No description provided for @subscriptionExpired.
+  ///
+  /// In en, this message translates to:
+  /// **'Subscription expired'**
+  String get subscriptionExpired;
+
+  /// No description provided for @subscriptionDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Subscription Details'**
+  String get subscriptionDetails;
+
+  /// No description provided for @planName.
+  ///
+  /// In en, this message translates to:
+  /// **'Plan'**
+  String get planName;
+
+  /// No description provided for @expiresOnLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Expires on'**
+  String get expiresOnLabel;
+
+  /// No description provided for @timeRemainingLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Time remaining'**
+  String get timeRemainingLabel;
+
+  /// No description provided for @expiredLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Expired'**
+  String get expiredLabel;
 }
 
 class _AppLocalizationsDelegate

@@ -26,16 +26,16 @@ class NumberFormatter {
     return '$trimmed $suffix';
   }
 
-  /// Card-friendly format: truncates numbers >= 10,000,000 (e.g. 11,800,000 -> 11,800,0...)
+  /// Card-friendly format: uses compact notation for numbers >= 1,000,000.
   static String formatForCard(double n) {
+    final abs = n.abs();
+    if (abs >= 1000000) {
+      return compact(n);
+    }
     final s = n % 1 == 0 ? n.toStringAsFixed(0) : n.toStringAsFixed(2);
-    final formatted = s.replaceAllMapped(
+    return s.replaceAllMapped(
       RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
       (Match m) => '${m[1]},',
     );
-    if (n >= 10000000) {
-      return '${formatted.substring(0, formatted.length - 2)}...';
-    }
-    return formatted;
   }
 }

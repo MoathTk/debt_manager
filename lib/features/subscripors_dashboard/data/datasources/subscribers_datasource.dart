@@ -42,6 +42,30 @@ class SubscribersDatasource {
       );
     }
   }
+//dangrous in the failure !!
+  Future<void> expireNow(String uid) async {
+    final ts = Timestamp.fromDate(DateTime.now());
+    final batch = _firestore.batch();
+
+    batch.update(_col.doc(uid), {'expiresAt': ts});
+
+    batch.update(
+      _firestore
+          .collection('users')
+          .doc(uid)
+          .collection('subscription')
+          .doc('status'),
+      {'expiresAt': ts},
+    );
+
+    try {
+      await batch.commit();
+    } on FirebaseException catch (e) {
+      throw Exception(
+        "Failed to expire subscription for $uid: ${e.message}",
+      );
+    }
+  }
 
   Stream<List<SubscriberModel>> watchAll() {
     return _col.snapshots().map(

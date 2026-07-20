@@ -5,12 +5,12 @@ import '../Providers/database_provider.dart';
 import '../Providers/mutations.dart';
 import '../widgets/stat_card.dart';
 import '../widgets/recent_transactions_list.dart';
-import '../features/subscription/presentation/widgets/subscription_banner.dart';
 import 'all_transactions_screen.dart';
 import 'analytics_screen.dart';
 
 class DashboardScreen extends ConsumerWidget {
-  const DashboardScreen({super.key});
+  final ValueChanged<int>? onNavigateToTab;
+  const DashboardScreen({super.key, this.onNavigateToTab});
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final statsAsync = ref.watch(dashboardStatsProvider);
@@ -35,7 +35,6 @@ class DashboardScreen extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const SubscriptionBanner(),
           const SizedBox(height: 8),
           GridView.count(
             crossAxisCount: 2,
@@ -51,6 +50,12 @@ class DashboardScreen extends ConsumerWidget {
                 numValue: s.totalDebts,
                 color: const Color(0xFFE53935),
                 compact: true,
+                onTap: () => Navigator.push(
+                  ctx,
+                  MaterialPageRoute(
+                    builder: (_) => const AllTransactionsScreen(initialType: 0),
+                  ),
+                ),
               ),
               StatCard(
                 icon: Icons.payments,
@@ -58,18 +63,26 @@ class DashboardScreen extends ConsumerWidget {
                 numValue: s.totalPayments,
                 color: const Color(0xFF43A047),
                 compact: true,
+                onTap: () => Navigator.push(
+                  ctx,
+                  MaterialPageRoute(
+                    builder: (_) => const AllTransactionsScreen(initialType: 1),
+                  ),
+                ),
               ),
               StatCard(
                 icon: Icons.people,
                 label: l10n.customers,
                 numValue: s.customerCount.toDouble(),
                 color: const Color(0xFF1E88E5),
+                onTap: () => onNavigateToTab?.call(1),
               ),
               StatCard(
                 icon: Icons.notifications_active,
                 label: l10n.pendingReminders,
                 numValue: s.pendingReminders.toDouble(),
                 color: const Color(0xFFF9A825),
+                onTap: () => onNavigateToTab?.call(2),
               ),
             ],
           ),

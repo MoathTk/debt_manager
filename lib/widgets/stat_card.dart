@@ -13,6 +13,7 @@ class StatCard extends StatelessWidget {
   final double numValue;
   final Color color;
   final bool compact;
+  final VoidCallback? onTap;
 
   const StatCard({
     super.key,
@@ -21,6 +22,7 @@ class StatCard extends StatelessWidget {
     required this.numValue,
     required this.color,
     this.compact = false,
+    this.onTap,
   });
 
   @override
@@ -30,55 +32,62 @@ class StatCard extends StatelessWidget {
       ? (double v) => NumberFormatter.compact(v,
           billion: l10n!.billion, million: l10n.million, thousand: l10n.thousand)
       : null;
-    return Container(
-      margin: EdgeInsets.all(3),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [color, color.withValues(alpha: 0.7)],
-        ),
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
         borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: color.withValues(alpha: 0.3),
-            blurRadius: 12,
-            offset: const Offset(0, 6),
+        child: Container(
+          margin: EdgeInsets.all(3),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [color, color.withValues(alpha: 0.7)],
+            ),
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                color: color.withValues(alpha: 0.3),
+                blurRadius: 12,
+                offset: const Offset(0, 6),
+              ),
+            ],
           ),
-        ],
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            _IconBadge(icon: icon),
-            const Spacer(),
-            FittedBox(
-              child: AnimatedCounter(
-                targetValue: numValue,
-                formatter: compactFn,
-                style: TextStyle(
-                  fontSize: compact ? 22 : 32,
-                  fontWeight: FontWeight.w800,
-                  color: Colors.white,
-                  height: 1.1,
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                _IconBadge(icon: icon),
+                const Spacer(),
+                FittedBox(
+                  child: AnimatedCounter(
+                    targetValue: numValue,
+                    formatter: compactFn,
+                    style: TextStyle(
+                      fontSize: compact ? 22 : 32,
+                      fontWeight: FontWeight.w800,
+                      color: Colors.white,
+                      height: 1.1,
+                    ),
+                  ),
                 ),
-              ),
+                const SizedBox(height: 4),
+                Text(
+                  label,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.white,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
             ),
-            const SizedBox(height: 4),
-            Text(
-              label,
-              style: const TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-                color: Colors.white,
-              ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ],
+          ),
         ),
       ),
     );

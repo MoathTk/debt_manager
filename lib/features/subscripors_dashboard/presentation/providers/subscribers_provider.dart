@@ -32,6 +32,11 @@ class SubscribersNotifier extends StateNotifier<AsyncValue<List<SubscriberModel>
     await _ds.updateExpiry(uid, newExpiry);
     await load();
   }
+
+  Future<void> expireNow(String uid) async {
+    await _ds.expireNow(uid);
+    await load();
+  }
 }
 
 final subscribersProvider = StateNotifierProvider<SubscribersNotifier,

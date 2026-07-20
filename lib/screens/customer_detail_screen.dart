@@ -21,7 +21,19 @@ class CustomerDetailScreen extends ConsumerWidget {
     final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Colors.transparent,
         title: Text(l10n.customerDetail),
+        elevation: 0,
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(1),
+          child: Container(
+            height: 2,
+            margin: const EdgeInsets.symmetric(horizontal: 16),
+            color: Theme.of(
+              context,
+            ).colorScheme.outlineVariant.withValues(alpha: 0.4),
+          ),
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.edit_rounded),

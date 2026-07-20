@@ -64,15 +64,19 @@ String _getOwnerId(ProviderContainer container) {
 // REMINDER MUTATIONS
 // ============================================================================
 
-Future<void> markReminderCompleted(ProviderContainer container, String id,String note) async {
+Future<void> markReminderCompleted(
+  ProviderContainer container,
+  String id,
+  String note,
+) async {
   final reminderRepo = container.read(debtReminderRepositoryProvider);
   final reminder = await reminderRepo.getById(id);
   if (reminder != null && reminder.debtId != null) {
     final txRepo = container.read(transactionRepositoryProvider);
     final debt = await txRepo.getById(reminder.debtId!);
     if (debt != null) {
-      final paid = await txRepo.getPaymentsForDebt(reminder.debtId!); 
-      final remaining = debt.amount - paid; 
+      final paid = await txRepo.getPaymentsForDebt(reminder.debtId!);
+      final remaining = debt.amount - paid;
       if (remaining > 0) {
         final now = DateTime.now().toIso8601String();
         await txRepo.insert(
@@ -111,7 +115,10 @@ Future<void> deleteReminder(ProviderContainer container, String id) async {
   container.read(syncProvider.notifier).schedulePush();
 }
 
-Future<void> deleteRemindersBatch(ProviderContainer container, List<String> ids) async {
+Future<void> deleteRemindersBatch(
+  ProviderContainer container,
+  List<String> ids,
+) async {
   final repo = container.read(debtReminderRepositoryProvider);
   await repo.deleteBatch(ids);
   _invalidateReminders(container);
@@ -166,7 +173,10 @@ Future<void> updateCustomer(
   container.read(syncProvider.notifier).schedulePush();
 }
 
-Future<void> deleteCustomer(ProviderContainer container, String customerId) async {
+Future<void> deleteCustomer(
+  ProviderContainer container,
+  String customerId,
+) async {
   final customerRepo = container.read(customerRepositoryProvider);
   final txRepo = container.read(transactionRepositoryProvider);
   final reminderRepo = container.read(debtReminderRepositoryProvider);
@@ -248,6 +258,9 @@ Future<void> recordPayment(
     ),
   );
   _invalidateTransactions(container, customerId);
+  if (debtId != null) {
+    await _autoCompleteRemindersIfSettled(container, debtId);
+  }
   container.read(syncProvider.notifier).schedulePush();
 }
 
@@ -283,6 +296,9 @@ Future<void> updateTransaction(
     ),
   );
   _invalidateTransactions(container, transaction.customerId);
+  if (transaction.isPayment && transaction.debtId != null) {
+    await _autoCompleteRemindersIfSettled(container, transaction.debtId!);
+  }
   container.read(syncProvider.notifier).schedulePush();
 }
 
@@ -308,14 +324,28 @@ Future<void> settleDebt(
       updatedAt: now,
     ),
   );
+  await _autoCompleteRemindersIfSettled(container, debtId);
+  _invalidateTransactions(container, customerId);
+  container.read(syncProvider.notifier).schedulePush();
+}
+
+Future<void> _autoCompleteRemindersIfSettled(
+  ProviderContainer container,
+  String debtId,
+) async {
+  final txRepo = container.read(transactionRepositoryProvider);
+  final debt = await txRepo.getById(debtId);
+  if (debt == null) return;
+  final paid = await txRepo.getPaymentsForDebt(debtId);
+  if ((debt.amount - paid) > 0) return;
   final reminderRepo = container.read(debtReminderRepositoryProvider);
   final reminders = await reminderRepo.getAll();
+  var changed = false;
   for (final r in reminders) {
     if (r.debtId == debtId && !r.completed) {
       await reminderRepo.markCompleted(r.id);
+      changed = true;
     }
   }
-  _invalidateTransactions(container, customerId);
-  _invalidateReminders(container);
-  container.read(syncProvider.notifier).schedulePush();
+  if (changed) _invalidateReminders(container);
 }

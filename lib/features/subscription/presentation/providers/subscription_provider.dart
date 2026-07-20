@@ -11,6 +11,7 @@ import '../../domain/usecases/check_subscription.dart';
 import '../../domain/usecases/activate_trial.dart';
 import '../../data/datasources/subscription_local_datasource.dart';
 import '../../data/datasources/subscription_remote_datasource.dart';
+import '../../data/models/subscription_model.dart';
 import '../../data/repositories/subscription_repository_impl.dart';
 import 'subscription_state.dart';
 
@@ -26,20 +27,58 @@ class SubscriptionNotifier extends StateNotifier<SubscriptionState> {
   final CheckSubscription _check;
   final ActivateTrial _activateTrial;
   final AuthService _auth;
-  Timer? _retryTimer;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  StreamSubscription<DocumentSnapshot>? _userSub;
+  StreamSubscription<DocumentSnapshot>? _adminSub;
 
   SubscriptionNotifier(this._check, this._activateTrial, this._auth)
       : super(const SubscriptionState()) {
+    _init();
+  }
+
+  void _init() {
     load();
-    _retryTimer = Timer.periodic(
-      const Duration(minutes: 5),
-      (_) => load(),
+    final uid = _auth.ownerId;
+    if (uid != null) _listenToFirestore(uid);
+  }
+
+  void _listenToFirestore(String uid) {
+    _userSub?.cancel();
+    _adminSub?.cancel();
+
+    _userSub = _firestore
+        .collection('users')
+        .doc(uid)
+        .collection('subscription')
+        .doc('status')
+        .snapshots()
+        .listen(
+      (doc) {
+        if (!doc.exists || doc.data() == null) return;
+        final sub = SubscriptionModel.fromFirestore(doc.data()!);
+        state = state.copyWith(isLoading: false, subscription: sub);
+      },
+      onError: (e) => print('[SUB] User doc stream error: $e'),
+    );
+
+    _adminSub = _firestore
+        .collection('subscriptions')
+        .doc(uid)
+        .snapshots()
+        .listen(
+      (doc) {
+        if (!doc.exists || doc.data() == null) return;
+        final sub = SubscriptionModel.fromFirestore(doc.data()!);
+        state = state.copyWith(isLoading: false, subscription: sub);
+      },
+      onError: (e) => print('[SUB] Admin doc stream error: $e'),
     );
   }
 
   @override
   void dispose() {
-    _retryTimer?.cancel();
+    _userSub?.cancel();
+    _adminSub?.cancel();
     super.dispose();
   }
 

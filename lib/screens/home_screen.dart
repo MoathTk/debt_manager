@@ -5,6 +5,7 @@ import 'package:local_debt_management/widgets/sync_status_indicator.dart';
 import '../l10n/app_localizations.dart';
 import '../Providers/database_provider.dart';
 import '../Providers/sync_provider.dart';
+import '../features/subscription/presentation/widgets/subscription_status_icon.dart';
 
 import 'dashboard_screen.dart';
 import 'customers_screen.dart';
@@ -25,12 +26,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   int _currentIndex = 0;
   final _scaffoldKey = GlobalKey<ScaffoldState>();
 
-  final _screens = const [
-    DashboardScreen(),
-    CustomersScreen(),
-    RemindersScreen(),
-  ];
-
   @override
   void initState() {
     super.initState();
@@ -46,17 +41,53 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final pendingCount = pendingAsync.whenOrNull(
       data: (list) {
         final today = DateTime.now();
-        final todayStr = '${today.year}-${today.month.toString().padLeft(2, '0')}-${today.day.toString().padLeft(2, '0')}';
-        return list.where((r) => r.isCompleted == 0 && r.reminderDate.compareTo(todayStr) < 0).length;
+        final todayStr =
+            '${today.year}-${today.month.toString().padLeft(2, '0')}-${today.day.toString().padLeft(2, '0')}';
+        return list
+            .where(
+              (r) =>
+                  r.isCompleted == 0 && r.reminderDate.compareTo(todayStr) < 0,
+            )
+            .length;
       },
     );
+
+    final screens = [
+      DashboardScreen(
+        onNavigateToTab: (i) => setState(() => _currentIndex = i),
+      ),
+      const CustomersScreen(),
+      const RemindersScreen(),
+    ];
 
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
-        title: Text(l10n.appTitle),
+        // leading: Padding(
+        //   padding: const EdgeInsets.only(right: 20),
+        //   child: Icon(
+        //     Icons.account_balance_wallet_rounded,
+        //     size: 40,
+        //     color: Theme.of(context).colorScheme.primary,
+        //   ),
+        // ),
+        title: Text(l10n.appTitle, style: TextStyle(fontSize: 14)),
+
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(1),
+          child: Container(
+            height: 2,
+            margin: const EdgeInsets.symmetric(horizontal: 16),
+            color: Theme.of(
+              context,
+            ).colorScheme.outlineVariant.withValues(alpha: 0.4),
+          ),
+        ),
         actions: [
           const SyncStatusIndicator(),
+          const SubscriptionStatusIcon(),
           IconButton(
             icon: const Icon(Icons.settings),
             onPressed: () => _scaffoldKey.currentState!.openEndDrawer(),
@@ -67,7 +98,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         l10n: l10n,
         onClose: () => _scaffoldKey.currentState?.closeEndDrawer(),
       ),
-      body: IndexedStack(index: _currentIndex, children: _screens),
+      body: IndexedStack(index: _currentIndex, children: screens),
       bottomNavigationBar: _ModernNavBar(
         currentIndex: _currentIndex,
         onTap: (i) => setState(() => _currentIndex = i),

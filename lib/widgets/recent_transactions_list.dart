@@ -3,6 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../l10n/app_localizations.dart';
 import '../Providers/database_provider.dart';
 import '../data/models/transaction.dart' as model;
+import 'add_debt_sheet.dart';
+import 'record_payment_sheet.dart';
+import 'records_list_sheet.dart';
 
 String _fmt(double n) {
   final s = n % 1 == 0 ? n.toStringAsFixed(0) : n.toStringAsFixed(2);
@@ -37,11 +40,15 @@ class RecentTransactionsList extends ConsumerWidget {
           ),
           child: Column(
             children: recent.asMap().entries.map((entry) {
+              final txn = entry.value;
               final isLast = entry.key == recent.length - 1;
               return _TransactionTile(
-                transaction: entry.value,
+                transaction: txn,
                 l10n: l10n,
                 showDivider: !isLast,
+                onTap: () => _showTransactionActions(
+                  context, ref, txn.customerId,
+                ),
               );
             }).toList(),
           ),
@@ -54,6 +61,67 @@ class RecentTransactionsList extends ConsumerWidget {
         ),
       ),
       error: (e, _) => Center(child: Text('Error: $e')),
+    );
+  }
+
+  void _showTransactionActions(
+    BuildContext context,
+    WidgetRef ref,
+    String customerId,
+  ) {
+    final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (_) => Padding(
+        padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: theme.colorScheme.outlineVariant,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            const SizedBox(height: 20),
+            _ActionOption(
+              icon: Icons.add_rounded,
+              label: l10n.debt,
+              color: theme.colorScheme.error,
+              onTap: () {
+                Navigator.pop(context);
+                showAddDebtSheet(context, ref, customerId);
+              },
+            ),
+            const SizedBox(height: 8),
+            _ActionOption(
+              icon: Icons.payments_rounded,
+              label: l10n.payment,
+              color: theme.colorScheme.primary,
+              onTap: () {
+                Navigator.pop(context);
+                showRecordPaymentSheet(context, ref, customerId);
+              },
+            ),
+            const SizedBox(height: 8),
+            _ActionOption(
+              icon: Icons.edit_rounded,
+              label: l10n.editRecords,
+              color: theme.colorScheme.tertiary,
+              onTap: () {
+                Navigator.pop(context);
+                showRecordsListSheet(context, ref, customerId);
+              },
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
@@ -93,11 +161,13 @@ class _TransactionTile extends StatelessWidget {
   final model.Transaction transaction;
   final AppLocalizations l10n;
   final bool showDivider;
+  final VoidCallback onTap;
 
   const _TransactionTile({
     required this.transaction,
     required this.l10n,
     required this.showDivider,
+    required this.onTap,
   });
 
   bool get _isDebt => transaction.isDebt;
@@ -107,6 +177,7 @@ class _TransactionTile extends StatelessWidget {
     return Column(
       children: [
         ListTile(
+          onTap: onTap,
           contentPadding: const EdgeInsets.symmetric(
             horizontal: 16,
             vertical: 2,
@@ -162,6 +233,34 @@ class _TransactionTile extends StatelessWidget {
             color: Theme.of(context).colorScheme.outlineVariant,
           ),
       ],
+    );
+  }
+}
+
+class _ActionOption extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final Color color;
+  final VoidCallback onTap;
+
+  const _ActionOption({
+    required this.icon,
+    required this.label,
+    required this.color,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      onTap: onTap,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      leading: CircleAvatar(
+        backgroundColor: color.withValues(alpha: 0.1),
+        child: Icon(icon, color: color, size: 22),
+      ),
+      title: Text(label, style: const TextStyle(fontWeight: FontWeight.w600)),
+      trailing: Icon(Icons.chevron_right_rounded, color: color),
     );
   }
 }

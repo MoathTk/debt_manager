@@ -91,20 +91,7 @@ class _BodyState extends ConsumerState<_ReminderDetailBody> {
             debtPaid: _debtPaid,
           ),
           const SizedBox(height: 20),
-          SizedBox(
-            width: double.infinity,
-            height: 52,
-            child: FilledButton(
-              onPressed: () => confirmToggle(context, r, l10n),
-              child: Text(
-                l10n.markCompleted,
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ),
-          ),
+          _MarkCompletedButton(reminder: r, debtPaid: _debtPaid, debtTxn: _debtTxn),
           const SizedBox(height: 10),
           SizedBox(
             width: double.infinity,
@@ -126,6 +113,48 @@ class _BodyState extends ConsumerState<_ReminderDetailBody> {
           ),
           const SizedBox(height: 8),
         ],
+      ),
+    );
+  }
+}
+
+class _MarkCompletedButton extends StatelessWidget {
+  final DebtReminder reminder;
+  final double debtPaid;
+  final model.Transaction? debtTxn;
+
+  const _MarkCompletedButton({
+    required this.reminder,
+    required this.debtPaid,
+    required this.debtTxn,
+  });
+
+  bool get _isCompleted => reminder.completed;
+  bool get _debtFullyPaid =>
+      debtTxn != null && (debtTxn!.amount - debtPaid) <= 0;
+  bool get _disabled => _isCompleted || _debtFullyPaid;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final cs = Theme.of(context).colorScheme;
+    final disabled = _disabled;
+    return SizedBox(
+      width: double.infinity,
+      height: 52,
+      child: FilledButton(
+        onPressed: disabled ? null : () => confirmToggle(context, reminder, l10n),
+        style: FilledButton.styleFrom(
+          backgroundColor: disabled ? cs.surfaceContainerHighest : null,
+          foregroundColor: disabled ? cs.onSurfaceVariant : null,
+        ),
+        child: Text(
+          _debtFullyPaid ? l10n.settled : l10n.markCompleted,
+          style: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
       ),
     );
   }

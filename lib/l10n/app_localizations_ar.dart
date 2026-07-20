@@ -585,4 +585,36 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get subLoadError => 'فشل تحميل المشتركين';
+
+  @override
+  String get expireNow => 'إنهاء الآن';
+
+  @override
+  String get confirmExpire => 'إنهاء الاشتراك؟';
+
+  @override
+  String confirmExpireMsg(Object name) {
+    return 'سيتم إنهاء اشتراك $name فوراً.';
+  }
+
+  @override
+  String get cancelled => 'تم الإلغاء';
+
+  @override
+  String get subscriptionExpired => 'تم إنهاء الاشتراك';
+
+  @override
+  String get subscriptionDetails => 'تفاصيل الاشتراك';
+
+  @override
+  String get planName => 'الخطة';
+
+  @override
+  String get expiresOnLabel => 'ينتهي في';
+
+  @override
+  String get timeRemainingLabel => 'الوقت المتبقي';
+
+  @override
+  String get expiredLabel => 'منتهي';
 }

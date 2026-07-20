@@ -191,5 +191,15 @@
   "expiryUpdated": "تم تحديث تاريخ الانتهاء بنجاح",
   "expiresOn": "ينتهي في",
   "accessDenied": "غير مصرح بالدخول",
-  "subLoadError": "فشل تحميل المشتركين"
+  "subLoadError": "فشل تحميل المشتركين",
+  "expireNow": "إنهاء الآن",
+  "confirmExpire": "إنهاء الاشتراك؟",
+  "confirmExpireMsg": "سيتم إنهاء اشتراك {name} فوراً.",
+  "cancelled": "تم الإلغاء",
+  "subscriptionExpired": "تم إنهاء الاشتراك",
+  "subscriptionDetails": "تفاصيل الاشتراك",
+  "planName": "الخطة",
+  "expiresOnLabel": "ينتهي في",
+  "timeRemainingLabel": "الوقت المتبقي",
+  "expiredLabel": "منتهي"
 }

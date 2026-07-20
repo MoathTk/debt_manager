@@ -90,10 +90,13 @@ class SyncNotifier extends StateNotifier<SyncState> {
         .collection('users/$uid/customers')
         .snapshots()
         .listen(
-      (snap) {
+      (snap) async {
         final records = snap.docs.map((d) => Customer.fromMap(d.data())).toList();
-        _firestoreSync.upsertCustomers(records);
+        await _firestoreSync.upsertCustomers(records);
         _ref.invalidate(customersProvider);
+        for (final c in records) {
+          _ref.invalidate(customerByIdProvider(c.id));
+        }
         _refreshUnsyncedCount();
       },
       onError: (e) => print('[WS] customers stream error: $e'),
@@ -105,10 +108,16 @@ class SyncNotifier extends StateNotifier<SyncState> {
         .collection('users/$uid/transactions')
         .snapshots()
         .listen(
-      (snap) {
+      (snap) async {
         final records = snap.docs.map((d) => model.Transaction.fromMap(d.data())).toList();
-        _firestoreSync.upsertTransactions(records);
+        await _firestoreSync.upsertTransactions(records);
         _ref.invalidate(transactionsProvider);
+        for (final t in records) {
+          _ref.invalidate(transactionsByCustomerProvider(t.customerId));
+          _ref.invalidate(customerBalanceProvider(t.customerId));
+          _ref.invalidate(debtsWithRemainingProvider(t.customerId));
+        }
+        _ref.invalidate(dashboardStatsProvider);
         _refreshUnsyncedCount();
       },
       onError: (e) => print('[WS] transactions stream error: $e'),
@@ -120,12 +129,13 @@ class SyncNotifier extends StateNotifier<SyncState> {
         .collection('users/$uid/reminders')
         .snapshots()
         .listen(
-      (snap) {
+      (snap) async {
         final records = snap.docs.map((d) => DebtReminder.fromMap(d.data())).toList();
-        _firestoreSync.upsertReminders(records);
+        await _firestoreSync.upsertReminders(records);
         _ref.invalidate(allRemindersProvider);
         _ref.invalidate(pendingRemindersProvider);
         _ref.invalidate(dueTodayProvider);
+        _ref.invalidate(dashboardStatsProvider);
         _refreshUnsyncedCount();
       },
       onError: (e) => print('[WS] reminders stream error: $e'),

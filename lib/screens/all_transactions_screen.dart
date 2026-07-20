@@ -10,7 +10,8 @@ import '../widgets/sort_bottom_sheet.dart';
 import '../widgets/all_transactions_tile.dart';
 
 class AllTransactionsScreen extends ConsumerStatefulWidget {
-  const AllTransactionsScreen({super.key});
+  final int initialType;
+  const AllTransactionsScreen({super.key, this.initialType = -1});
   @override
   ConsumerState<AllTransactionsScreen> createState() => _State();
 }
@@ -18,7 +19,7 @@ class AllTransactionsScreen extends ConsumerStatefulWidget {
 class _State extends ConsumerState<AllTransactionsScreen> {
   final _ctrl = TextEditingController();
   String _query = '';
-  int _type = -1;
+  late int _type = widget.initialType;
   SortMode _sort = SortMode.dateNewest;
   DateTimeRange? _range;
 
@@ -94,7 +95,17 @@ class _State extends ConsumerState<AllTransactionsScreen> {
     final txns = ref.watch(transactionsProvider);
     final custs = ref.watch(customersProvider);
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.allTransactions)),
+      appBar: AppBar(title: Text(l10n.allTransactions),backgroundColor: Colors.transparent,elevation: 0,
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(1),
+          child: Container(
+            height: 2,
+            margin: const EdgeInsets.symmetric(horizontal: 16),
+            color: Theme.of(
+              context,
+            ).colorScheme.outlineVariant.withValues(alpha: 0.4),
+          ),
+        ),),
       body: txns.when(
         data: (txns) {
           final f = _apply(txns, custs.valueOrNull ?? []);

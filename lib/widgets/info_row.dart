@@ -22,7 +22,7 @@ class InfoRow extends StatelessWidget {
             ),
           ),
           const Spacer(),
-          child,
+          Flexible(child: child),
         ],
       ),
     );

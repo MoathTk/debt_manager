@@ -192,5 +192,15 @@
   "expiryUpdated": "Expiry updated successfully",
   "expiresOn": "Expires on",
   "accessDenied": "Access Denied",
-  "subLoadError": "Failed to load subscribers"
+  "subLoadError": "Failed to load subscribers",
+  "expireNow": "Expire Now",
+  "confirmExpire": "Expire Subscription?",
+  "confirmExpireMsg": "This will immediately expire the subscription for {name}.",
+  "cancelled": "Cancelled",
+  "subscriptionExpired": "Subscription expired",
+  "subscriptionDetails": "Subscription Details",
+  "planName": "Plan",
+  "expiresOnLabel": "Expires on",
+  "timeRemainingLabel": "Time remaining",
+  "expiredLabel": "Expired"
 }
