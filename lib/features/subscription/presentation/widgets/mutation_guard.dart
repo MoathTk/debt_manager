@@ -8,6 +8,7 @@ import '../providers/subscription_provider.dart';
 class MutationGuard {
   static bool checkBlocked(BuildContext context, WidgetRef ref) {
     final state = ref.read(subscriptionProvider);
+    
     if (state.subscription?.status.name != 'blocked') return false;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(

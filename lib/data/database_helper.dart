@@ -18,6 +18,14 @@ class DatabaseHelper {
     return _openDb(_currentUid ?? 'default');
   }
 
+  static Future<void> deleteall(String uid) async {
+    await _database!.delete('customers');
+    await _database!.delete('transactions');
+    await _database!.delete('debt_reminders');
+    await _database!.delete('user_subscription');
+    print("deleted");
+  }
+
   /// Opens the database for [uid].
   /// Each user gets their own file: debt_management_{uid}.db
   Future<void> init(String uid) async {
@@ -122,9 +130,7 @@ class DatabaseHelper {
     ''');
   }
 
-  Future<void> _onUpgrade(
-    Database db, int oldVersion, int newVersion,
-  ) async {
+  Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
     if (oldVersion < 4) {
       final customers = await db.query('customers');
       final transactions = await db.query('transactions');
@@ -256,15 +262,27 @@ class DatabaseHelper {
 
       await targetDb.transaction((txn) async {
         for (final c in customers) {
-          await txn.insert('customers', c, conflictAlgorithm: ConflictAlgorithm.replace);
+          await txn.insert(
+            'customers',
+            c,
+            conflictAlgorithm: ConflictAlgorithm.replace,
+          );
         }
         final transactions = await db.query('transactions');
         for (final t in transactions) {
-          await txn.insert('transactions', t, conflictAlgorithm: ConflictAlgorithm.replace);
+          await txn.insert(
+            'transactions',
+            t,
+            conflictAlgorithm: ConflictAlgorithm.replace,
+          );
         }
         final reminders = await db.query('debt_reminders');
         for (final r in reminders) {
-          await txn.insert('debt_reminders', r, conflictAlgorithm: ConflictAlgorithm.replace);
+          await txn.insert(
+            'debt_reminders',
+            r,
+            conflictAlgorithm: ConflictAlgorithm.replace,
+          );
         }
       });
     } catch (_) {

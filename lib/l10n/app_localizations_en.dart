@@ -619,4 +619,14 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get expiredLabel => 'Expired';
+
+  @override
+  String get wipeAllData => 'Wipe All Data';
+
+  @override
+  String get confirmWipeAll =>
+      'This will permanently delete ALL data locally and from the cloud (customers, debts, payments, reminders, subscription). This action cannot be undone. Continue?';
+
+  @override
+  String get wipeAllSuccess => 'All data wiped successfully';
 }

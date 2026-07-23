@@ -154,6 +154,31 @@ class DataManagementSection extends ConsumerWidget {
                   foregroundColor: cs.error, side: BorderSide(color: cs.error.withValues(alpha: 0.5)),
                 ),
               ),
+              const SizedBox(height: 12),
+              OutlinedButton.icon(
+                onPressed: () async {
+                  final ok = await confirm(l10n.wipeAllData, l10n.confirmWipeAll);
+                  if (ok == true) {
+                    await SeedDatabase.clearDemoData();
+                    final uid = ref.read(authServiceProvider).ownerId;
+                    if (uid != null) {
+                      try { await FirestoreSync().deleteAllFirestoreData(uid); } catch (_) {}
+                    }
+                    invalidateAll();
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text(l10n.wipeAllSuccess), behavior: SnackBarBehavior.floating),
+                      );
+                    }
+                  }
+                },
+                icon: const Icon(Icons.delete_forever_outlined),
+                label: Center(child: Text(l10n.wipeAllData)),
+                style: OutlinedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 12), alignment: Alignment.centerLeft,
+                  foregroundColor: cs.error, side: BorderSide(color: cs.error),
+                ),
+              ),
             ],
           ),
         ),

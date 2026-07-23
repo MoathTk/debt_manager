@@ -617,4 +617,14 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get expiredLabel => 'منتهي';
+
+  @override
+  String get wipeAllData => 'مسح جميع البيانات';
+
+  @override
+  String get confirmWipeAll =>
+      'سيؤدي هذا إلى حذف جميع البيانات بشكل永久 من المحلي والسحابة (العملاء، الديون، الدفعات، التذكيرات، الاشتراك). لا يمكن التراجع عن هذا الإجراء. هل تريد المتابعة؟';
+
+  @override
+  String get wipeAllSuccess => 'تم مسح جميع البيانات بنجاح';
 }

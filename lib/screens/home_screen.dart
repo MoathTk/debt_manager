@@ -63,14 +63,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
-        // leading: Padding(
-        //   padding: const EdgeInsets.only(right: 20),
-        //   child: Icon(
-        //     Icons.account_balance_wallet_rounded,
-        //     size: 40,
-        //     color: Theme.of(context).colorScheme.primary,
-        //   ),
-        // ),
+        
         title: Text(l10n.appTitle, style: TextStyle(fontSize: 14)),
 
         backgroundColor: Colors.transparent,

@@ -148,6 +148,43 @@ class FirestoreSync {
     return count;
   }
 
+  /// Deletes ALL user data from Firestore: customers, transactions,
+  /// reminders, subscription, and meta. Also deletes the admin mirror.
+  Future<void> deleteAllFirestoreData(String uid) async {
+    final collections = [
+      '${_userPath(uid)}/customers',
+      '${_userPath(uid)}/transactions',
+      '${_userPath(uid)}/reminders',
+    ];
+    for (final colPath in collections) {
+      final snap = await _firestore.collection(colPath).get();
+      for (var i = 0; i < snap.docs.length; i += _batchLimit) {
+        final batch = _firestore.batch();
+        final chunk = snap.docs.sublist(
+          i,
+          (i + _batchLimit > snap.docs.length)
+              ? snap.docs.length
+              : i + _batchLimit,
+        );
+        for (final doc in chunk) {
+          batch.delete(doc.reference);
+        }
+        await batch.commit();
+      }
+    }
+    final batch = _firestore.batch();
+    batch.delete(
+      _firestore
+          .collection('users')
+          .doc(uid)
+          .collection('subscription')
+          .doc('status'),
+    );
+    batch.delete(_firestore.collection('subscriptions').doc(uid));
+    batch.delete(_firestore.doc('${_userPath(uid)}/meta/lastSync'));
+    await batch.commit();
+  }
+
   Future<void> deleteLastSyncMetadata(String uid) async {
     await _firestore.doc('${_userPath(uid)}/meta/lastSync').delete();
   }

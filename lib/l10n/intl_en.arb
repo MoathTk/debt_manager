@@ -202,5 +202,8 @@
   "planName": "Plan",
   "expiresOnLabel": "Expires on",
   "timeRemainingLabel": "Time remaining",
-  "expiredLabel": "Expired"
+  "expiredLabel": "Expired",
+  "wipeAllData": "Wipe All Data",
+  "confirmWipeAll": "This will permanently delete ALL data locally and from the cloud (customers, debts, payments, reminders, subscription). This action cannot be undone. Continue?",
+  "wipeAllSuccess": "All data wiped successfully"
 }

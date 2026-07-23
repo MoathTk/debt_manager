@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:local_debt_management/l10n/app_localizations.dart';
 import '../../domain/entities/subscription.dart';
@@ -14,7 +13,6 @@ class SubscriptionStatusDialog extends StatefulWidget {
 class _State extends State<SubscriptionStatusDialog>
     with SingleTickerProviderStateMixin {
   late final AnimationController _pulse;
-  late final Timer _dismiss;
   @override
   void initState() {
     super.initState();
@@ -22,15 +20,11 @@ class _State extends State<SubscriptionStatusDialog>
       vsync: this,
       duration: const Duration(milliseconds: 1500),
     )..repeat(reverse: true);
-    _dismiss = Timer(const Duration(seconds: 2), () {
-      if (mounted) Navigator.pop(context);
-    });
   }
 
   @override
   void dispose() {
     _pulse.dispose();
-    _dismiss.cancel();
     super.dispose();
   }
 

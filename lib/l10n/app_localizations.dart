@@ -1297,6 +1297,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Expired'**
   String get expiredLabel;
+
+  /// No description provided for @wipeAllData.
+  ///
+  /// In en, this message translates to:
+  /// **'Wipe All Data'**
+  String get wipeAllData;
+
+  /// No description provided for @confirmWipeAll.
+  ///
+  /// In en, this message translates to:
+  /// **'This will permanently delete ALL data locally and from the cloud (customers, debts, payments, reminders, subscription). This action cannot be undone. Continue?'**
+  String get confirmWipeAll;
+
+  /// No description provided for @wipeAllSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'All data wiped successfully'**
+  String get wipeAllSuccess;
 }
 
 class _AppLocalizationsDelegate

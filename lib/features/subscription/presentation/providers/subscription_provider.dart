@@ -30,7 +30,6 @@ class SubscriptionNotifier extends StateNotifier<SubscriptionState> {
   final AuthService _auth;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   StreamSubscription<DocumentSnapshot>? _userSub;
-  StreamSubscription<DocumentSnapshot>? _adminSub;
 
   SubscriptionNotifier(this._check, this._activateTrial, this._auth)
     : super(const SubscriptionState()) {
@@ -46,7 +45,6 @@ class SubscriptionNotifier extends StateNotifier<SubscriptionState> {
 
   void _listenToFirestore(String uid) {
     _userSub?.cancel();
-    _adminSub?.cancel();
 
     _userSub = _firestore
         .collection('users')
@@ -62,25 +60,11 @@ class SubscriptionNotifier extends StateNotifier<SubscriptionState> {
           final sub = SubscriptionModel.fromFirestore(doc.data()!);
           state = state.copyWith(isLoading: false, subscription: sub);
         }, onError: (e) => print('[SUB] User doc stream error: $e'));
-
-    _adminSub = _firestore
-        .collection('subscriptions')
-        .doc(uid)
-        .snapshots()
-        .listen((doc) {
-          if (!doc.exists || doc.data() == null) {
-            state = state.copyWith(isLoading: false, clearSubscription: true);
-            return;
-          }
-          final sub = SubscriptionModel.fromFirestore(doc.data()!);
-          state = state.copyWith(isLoading: false, subscription: sub);
-        }, onError: (e) => print('[SUB] Admin doc stream error: $e'));
   }
 
   @override
   void dispose() {
     _userSub?.cancel();
-    _adminSub?.cancel();
     super.dispose();
   }
 
