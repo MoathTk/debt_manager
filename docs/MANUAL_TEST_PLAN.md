@@ -97,26 +97,26 @@
 
 | # | Test | Steps | Expected Result |
 |---|------|-------|----------------|
-| 2.6.1 | Firebase change reflected | Admin changes expiry in Firebase Console for user doc | App updates subscription state within seconds (real-time) |
-| 2.6.2 | No dual-listener overwrite | Admin changes only user doc, NOT admin mirror | App shows new expiry (not overwritten by stale admin mirror). |
-| 2.6.3 | Subscription deleted remotely | Admin deletes user's subscription doc from Firestore | App shows plan picker (no subscription) |
-| 2.6.4 | Stale cache cleanup | Online + Firestore returns null | Local SQLite subscription deleted + admin mirror deleted. Plan picker shown. |
+| 2.6.1 | Firebase change reflected | Admin changes expiry in Firebase Console for user doc | App updates subscription state within seconds (real-time) | **PASS**
+| 2.6.2 | No dual-listener overwrite | Admin changes only user doc, NOT admin mirror | App shows new expiry (not overwritten by stale admin mirror). |  **PASS**
+* | 2.6.3 | Subscription deleted remotely | Admin deletes user's subscription doc from Firestore | App shows plan picker (no subscription) |
+| 2.6.4 | Stale cache cleanup | Online + Firestore returns null | Local SQLite subscription deleted + admin mirror deleted. Plan picker shown. | **PASS**
 
 ### 2.7 Subscription on Account Switch
 
 | # | Test | Steps | Expected Result |
 |---|------|-------|----------------|
-| 2.7.1 | Sign out, sign in | Account A (has subscription) -> sign out -> sign in Account B (no subscription) | Clean slate. Shows plan picker. No Account A data. |
-| 2.7.2 | Provider recreated | After switching accounts | `subscriptionProvider` watches `authStateProvider` stream, auto-recreates. New user's subscription loaded. |
-| 2.7.3 | Ghost update prevention | Rapidly switch between accounts | No state updates on disposed notifiers. `mounted` guard prevents stale writes. |
+| 2.7.1 | Sign out, sign in | Account A (has subscription) -> sign out -> sign in Account B (no subscription) | Clean slate. Shows plan picker. No Account A data. | **PASS**
+| 2.7.2 | Provider recreated | After switching accounts | `subscriptionProvider` watches `authStateProvider` stream, auto-recreates. New user's subscription loaded. |  **PASS**
+| 2.7.3 | Ghost update prevention | Rapidly switch between accounts | No state updates on disposed notifiers. `mounted` guard prevents stale writes. | **PASS**
 
 ### 2.8 Trial Activation
 
 | # | Test | Steps | Expected Result |
 |---|------|-------|----------------|
-| 2.8.1 | Trial saves locally first | Activate trial with network on | SQLite subscription row created BEFORE Firestore write |
-| 2.8.2 | Trial works offline | Turn off network, activate trial | Trial saved to SQLite. User can use app. Firestore write queued for later sync. |
-| 2.8.3 | Trial remote failure silent | Simulate Firestore write failure | Trial still works. User sees HomeScreen. Error logged but not shown. |
+| 2.8.1 | Trial saves locally first | Activate trial with network on | SQLite subscription row created BEFORE Firestore write | **PASS**
+| 2.8.2 | Trial works offline | Turn off network, activate trial | Trial saved to SQLite. User can use app. Firestore write queued for later sync. | **PASS**
+* |  2.8.3 | Trial remote failure silent | Simulate Firestore write failure | Trial still works. User sees HomeScreen. Error logged but not shown. |
 
 ---
 
@@ -126,31 +126,31 @@
 
 | # | Test | Steps | Expected Result |
 |---|------|-------|----------------|
-| 3.1.1 | Empty state | Fresh account, no data | All stats show 0. "No recent transactions" message. |
-| 3.1.2 | Stats grid (2x2) | Add some customers/debts | Total Debts, Total Payments, Customers, Pending Reminders cards show correct counts |
-| 3.1.3 | Collection rate | Add debts + payments | Rate = (payments/debts)x100, clamped 0-100% |
-| 3.1.4 | Pull-to-refresh | Pull down on dashboard | Data refreshes. Spin indicator visible briefly. |
+| 3.1.1 | Empty state | Fresh account, no data | All stats show 0. "No recent transactions" message. | **PASS**
+| 3.1.2 | Stats grid (2x2) | Add some customers/debts | Total Debts, Total Payments, Customers, Pending Reminders cards show correct counts | **PASS**
+| 3.1.3 | Collection rate | Add debts + payments | Rate = (payments/debts)x100, clamped 0-100% | **PASS**
+| 3.1.4 | Pull-to-refresh | Pull down on dashboard | Data refreshes. Spin indicator visible briefly. | **PASS**
 
 ### 3.2 Dashboard Navigation (Tappable Cards)
 
 | # | Test | Steps | Expected Result |
 |---|------|-------|----------------|
-| 3.2.1 | Tap Total Debts card | Tap red debts card | Navigates to `AllTransactionsScreen` with debt filter pre-selected |
-| 3.2.2 | Tap Total Payments card | Tap green payments card | Navigates to `AllTransactionsScreen` with payment filter pre-selected |
-| 3.2.3 | Tap Customers card | Tap blue customers card | Bottom nav switches to Tab 1 (Customers) |
-| 3.2.4 | Tap Pending card | Tap yellow pending card | Bottom nav switches to Tab 2 (Reminders) |
-| 3.2.5 | Tap Analytics card | Tap analytics/collection rate card | Navigates to `AnalyticsScreen` |
-| 3.2.6 | Tap Recent Transactions arrow | Tap forward arrow in recent section | Navigates to `AllTransactionsScreen` (unfiltered) |
+| 3.2.1 | Tap Total Debts card | Tap red debts card | Navigates to `AllTransactionsScreen` with debt filter pre-selected | **PASS**
+| 3.2.2 | Tap Total Payments card | Tap green payments card | Navigates to `AllTransactionsScreen` with payment filter pre-selected | **PASS**
+| 3.2.3 | Tap Customers card | Tap blue customers card | Bottom nav switches to Tab 1 (Customers) | **PASS**
+| 3.2.4 | Tap Pending card | Tap yellow pending card | Bottom nav switches to Tab 2 (Reminders) | **PASS**
+| 3.2.5 | Tap Analytics card | Tap analytics/collection rate card | Navigates to `AnalyticsScreen` | **PASS** 
+| 3.2.6 | Tap Recent Transactions arrow | Tap forward arrow in recent section | Navigates to `AllTransactionsScreen` (unfiltered) | **PASS**
 
 ### 3.3 Recent Transactions
 
 | # | Test | Steps | Expected Result |
 |---|------|-------|----------------|
-| 3.3.1 | Shows last transactions | Add 5+ transactions | Dashboard shows most recent transactions |
-| 3.3.2 | Tappable transaction opens action sheet | Tap a transaction in recent list | Bottom action sheet with 3 options: Debt, Payment, Edit Records (scoped to that customer) |
-| 3.3.3 | Action sheet option 1 - Debt | Tap "Debt" in action sheet | Add debt sheet opens for that customer |
-| 3.3.4 | Action sheet option 2 - Payment | Tap "Payment" in action sheet | Record payment sheet opens for that customer |
-| 3.3.5 | Action sheet option 3 - Edit | Tap "Edit Records" in action sheet | Navigates to customer detail screen |
+| 3.3.1 | Shows last transactions | Add 5+ transactions | Dashboard shows most recent transactions | **PASS**
+| 3.3.2 | Tappable transaction opens action sheet | Tap a transaction in recent list | Bottom action sheet with 3 options: Debt, Payment, Edit Records (scoped to that customer) | **PASS**
+| 3.3.3 | Action sheet option 1 - Debt | Tap "Debt" in action sheet | Add debt sheet opens for that customer | **PASS**
+| 3.3.4 | Action sheet option 2 - Payment | Tap "Payment" in action sheet | Record payment sheet opens for that customer | **PASS**
+| 3.3.5 | Action sheet option 3 - Edit | Tap "Edit Records" in action sheet | Navigates to customer detail screen | **PASS**
 
 ---
 
@@ -160,47 +160,47 @@
 
 | # | Test | Steps | Expected Result |
 |---|------|-------|----------------|
-| 4.1.1 | Open add sheet | Tap + FAB in Customers tab | `AddCustomerSheet` slides up |
-| 4.1.2 | Add with name only | Enter name, leave phone empty, save | Customer created. Phone is null. |
-| 4.1.3 | Add with name + phone | Enter name + phone, save | Customer created with both fields |
-| 4.1.4 | Empty name validation | Leave name empty, tap save | Validation error. Customer NOT created. |
-| 4.1.5 | Duplicate phone allowed | Add two customers with same phone | Both saved (no unique constraint on phone) |
-| 4.1.6 | Owner ID set | Add customer while signed in | `ownerId` field set to current user's UID |
-| 4.1.7 | UpdatedAt set | Add customer | `updatedAt` timestamp set automatically |
-| 4.1.8 | Sync triggered | Add customer | `schedulePush()` called. Unsynced count increases. |
+| 4.1.1 | Open add sheet | Tap + FAB in Customers tab | `AddCustomerSheet` slides up | **PASS**
+| 4.1.2 | Add with name only | Enter name, leave phone empty, save | Customer created. Phone is null. | **PASS**
+| 4.1.3 | Add with name + phone | Enter name + phone, save | Customer created with both fields | **PASS**
+| 4.1.4 | Empty name validation | Leave name empty, tap save | Validation error. Customer NOT created. | **PASS**
+| 4.1.5 | Duplicate phone allowed | Add two customers with same phone | Both saved (no unique constraint on phone) | **PASS**
+* | 4.1.6 | Owner ID set | Add customer while signed in | `ownerId` field set to current user's UID |
+| 4.1.7 | UpdatedAt set | Add customer | `updatedAt` timestamp set automatically | **PASS**
+| 4.1.8 | Sync triggered | Add customer | `schedulePush()` called. Unsynced count increases. | **PASS**
 
 ### 4.2 Customer List
 
 | # | Test | Steps | Expected Result |
 |---|------|-------|----------------|
-| 4.2.1 | List sorted by newest | Add 3 customers at different times | Most recently added shown first |
-| 4.2.2 | Search by name | Type in search bar | Filters customers by name (case-insensitive) |
-| 4.2.3 | Search by phone | Type phone number in search bar | Filters customers by phone |
-| 4.2.4 | Clear search | Tap X button in search bar | Search cleared. Full list shown. |
-| 4.2.5 | Empty state | No customers exist | "No customers yet" with `EmptyState` widget |
-| 4.2.6 | Search no results | Search for nonexistent name | "No results" message |
+| 4.2.1 | List sorted by newest | Add 3 customers at different times | Most recently added shown first | **PASS**
+| 4.2.2 | Search by name | Type in search bar | Filters customers by name (case-insensitive) |  **PASS**
+| 4.2.3 | Search by phone | Type phone number in search bar | Filters customers by phone |  **PASS**
+| 4.2.4 | Clear search | Tap X button in search bar | Search cleared. Full list shown. | **PASS**
+| 4.2.5 | Empty state | No customers exist | "No customers yet" with `EmptyState` widget | **PASS**
+| 4.2.6 | Search no results | Search for nonexistent name | "No results" message | **PASS**
 
 ### 4.3 Customer Detail
 
 | # | Test | Steps | Expected Result |
 |---|------|-------|----------------|
-| 4.3.1 | Open customer detail | Tap customer tile | Opens `CustomerDetailScreen` with customer info |
-| 4.3.2 | Balance card shows correct balance | Customer has 100 debt + 30 payment | Balance shows 70 |
-| 4.3.3 | Transaction list | Customer has transactions | All transactions listed chronologically |
-| 4.3.4 | Empty transaction list | New customer, no transactions | "No transactions for customer" message |
-| 4.3.5 | Customer not found | Navigate with invalid ID | "Customer not found" text shown |
+| 4.3.1 | Open customer detail | Tap customer tile | Opens `CustomerDetailScreen` with customer info |  **PASS**
+| 4.3.2 | Balance card shows correct balance | Customer has 100 debt + 30 payment | Balance shows 70 | **PASS**
+| 4.3.3 | Transaction list | Customer has transactions | All transactions listed chronologically |  **PASS**
+| 4.3.4 | Empty transaction list | New customer, no transactions | "No transactions for customer" message | **PASS**
+| 4.3.5 | Customer not found | Navigate with invalid ID | "Customer not found" text shown | **PASS**
 
 ### 4.4 Edit Customer
 
 | # | Test | Steps | Expected Result |
 |---|------|-------|----------------|
-| 4.4.1 | Open edit sheet | Tap edit icon in customer detail AppBar | `EditCustomerSheet` opens with pre-filled values |
-| 4.4.2 | Update name | Change name, save | Name updated. `updatedAt` refreshed. |
-| 4.4.3 | Update phone | Change phone, save | Phone updated |
-| 4.4.4 | Clear phone | Set phone to empty, save | Phone becomes null |
-| 4.4.5 | Blocked subscription | Subscription blocked, tap edit | SnackBar "read-only". Edit sheet NOT shown. |
+| 4.4.1 | Open edit sheet | Tap edit icon in customer detail AppBar | `EditCustomerSheet` opens with pre-filled values | **PASS**
+| 4.4.2 | Update name | Change name, save | Name updated. `updatedAt` refreshed. | **PASS**
+| 4.4.3 | Update phone | Change phone, save | Phone updated | **PASS**
+| 4.4.4 | Clear phone | Set phone to empty, save | Phone becomes null | **PASS**
+| 4.4.5 | Blocked subscription | Subscription blocked, tap edit | SnackBar "read-only". Edit sheet NOT shown. | **PASS**
 
-### 4.5 Delete Customer
+* ### 4.5 Delete Customer
 
 | # | Test | Steps | Expected Result |
 |---|------|-------|----------------|
@@ -216,67 +216,67 @@
 
 | # | Test | Steps | Expected Result |
 |---|------|-------|----------------|
-| 5.1.1 | Add debt from customer detail | Open customer detail, tap "Debt" in action bar | Add debt sheet opens |
-| 5.1.2 | Enter amount | Enter 500, save | Debt of 500 created. Balance increases by 500. |
-| 5.1.3 | Enter amount with note | Enter 500, note "Rent", save | Debt created with note |
-| 5.1.4 | Amount validation (zero) | Enter 0, save | Validation error |
-| 5.1.5 | Amount validation (negative) | Enter negative, save | Validation error |
-| 5.1.6 | Create linked reminder | Add debt with "Create reminder" checkbox | Debt + reminder created linked by `debtId` |
-| 5.1.7 | Owner ID set | Add debt while signed in | `ownerId` = current UID |
-| 5.1.8 | Format display | Debt of 1500 | Displayed as "1,500" (comma-formatted) |
+| 5.1.1 | Add debt from customer detail | Open customer detail, tap "Debt" in action bar | Add debt sheet opens | **PASS**
+| 5.1.2 | Enter amount | Enter 500, save | Debt of 500 created. Balance increases by 500. | **PASS**
+| 5.1.3 | Enter amount with note | Enter 500, note "Rent", save | Debt created with note | **PASS**
+| 5.1.4 | Amount validation (zero) | Enter 0, save | Validation error | **PASS**
+| 5.1.5 | Amount validation (negative) | Enter negative, save | Validation error | **PASS**
+| 5.1.6 | Create linked reminder | Add debt with "Create reminder" checkbox | Debt + reminder created linked by `debtId` | **PASS**
+| 5.1.7 | Owner ID set | Add debt while signed in | `ownerId` = current UID | **PASS**
+| 5.1.8 | Format display | Debt of 1500 | Displayed as "1,500" (comma-formatted) | **PASS**
 
 ### 5.2 Record Payment
 
 | # | Test | Steps | Expected Result |
 |---|------|-------|----------------|
 | 5.2.1 | Record payment | Open customer detail, tap "Payment", enter 200, save | Payment of 200 recorded. Balance decreases by 200. |
-| 5.2.2 | Balance badge update | Record payment, return to list | Balance badge on customer tile updates |
-| 5.2.3 | Partial payment | Customer has 500 debt, pay 200 | Debt remaining: 300. Balance: 300. |
-| 5.2.4 | Auto-complete reminder | Pay full amount of debt with linked reminder | Reminder auto-marked as completed |
-| 5.2.5 | Payment amount validation | Enter 0, save | Validation error |
+| 5.2.2 | Balance badge update | Record payment, return to list | Balance badge on customer tile updates | **PASS**
+| 5.2.3 | Partial payment | Customer has 500 debt, pay 200 | Debt remaining: 300. Balance: 300. | **PASS**
+| 5.2.4 | Auto-complete reminder | Pay full amount of debt with linked reminder | Reminder auto-marked as completed | **PASS**
+| 5.2.5 | Payment amount validation | Enter 0, save | Validation error | **PASS**
 
 ### 5.3 Settle Debt
 
 | # | Test | Steps | Expected Result |
 |---|------|-------|----------------|
-| 5.3.1 | Settle full debt | Customer has 500 debt, 0 payments, tap "Settle" | Payment of 500 auto-created. Balance: 0. |
-| 5.3.2 | Settle partial debt | Customer has 500 debt, 200 paid, tap "Settle" | Payment of 300 (remaining) auto-created. Balance: 0. |
-| 5.3.3 | Settle with reminders | Settle debt that has linked incomplete reminders | Reminders auto-completed |
-| 5.3.4 | Already settled | Customer with 0 balance, "Settle" action | No action / already settled indication |
+| 5.3.1 | Settle full debt | Customer has 500 debt, 0 payments, tap "Settle" | Payment of 500 auto-created. Balance: 0. | **PASS**
+| 5.3.2 | Settle partial debt | Customer has 500 debt, 200 paid, tap "Settle" | Payment of 300 (remaining) auto-created. Balance: 0. | **PASS**
+| 5.3.3 | Settle with reminders | Settle debt that has linked incomplete reminders | Reminders auto-completed | **PASS**
+| 5.3.4 | Already settled | Customer with 0 balance, "Settle" action | No action / already settled indication | **PASS**
 
 ### 5.4 Update Transaction
 
 | # | Test | Steps | Expected Result |
 |---|------|-------|----------------|
-| 5.4.1 | Edit debt amount | Edit debt from 500 to 750 | Amount updated. Balance recalculated. |
-| 5.4.2 | Edit payment amount | Edit payment from 200 to 300 | Amount updated. Balance recalculated. |
-| 5.4.3 | Edit note | Change transaction note | Note updated |
-| 5.4.4 | Re-check auto-complete | Edit payment to make total >= debt | Linked reminders auto-completed |
+| 5.4.1 | Edit debt amount | Edit debt from 500 to 750 | Amount updated. Balance recalculated. | **PASS**
+| 5.4.2 | Edit payment amount | Edit payment from 200 to 300 | Amount updated. Balance recalculated. | **PASS**
+| 5.4.3 | Edit note | Change transaction note | Note updated | **FAIL** (in reminders , it is not updated)
+* | 5.4.4 | Re-check auto-complete | Edit payment to make total >= debt | Linked reminders auto-completed |
 
 ### 5.5 Delete Transaction
 
 | # | Test | Steps | Expected Result |
 |---|------|-------|----------------|
-| 5.5.1 | Delete debt | Delete a debt transaction | Balance recalculated. Debt removed from list. |
-| 5.5.2 | Delete payment | Delete a payment | Balance increases (debt re-opens). Payment removed. |
-| 5.5.3 | Soft delete | Delete transaction | `is_deleted=1` in SQLite. `is_synced=0`. Sync will push deletion to Firestore. |
+| 5.5.1 | Delete debt | Delete a debt transaction | Balance recalculated. Debt removed from list. | **PASS**
+* | 5.5.2 | Delete payment | Delete a payment | Balance increases (debt re-opens). Payment removed. |
+| 5.5.3 | Soft delete | Delete transaction | `is_deleted=1` in SQLite. `is_synced=0`. Sync will push deletion to Firestore. | **PASS**
 
 ### 5.6 All Transactions Screen
 
 | # | Test | Steps | Expected Result |
 |---|------|-------|----------------|
-| 5.6.1 | Search by note | Search transaction note text | Filters correctly |
-| 5.6.2 | Search by amount | Search "500" | Shows transactions with 500 |
-| 5.6.3 | Filter by type - debts | Tap debt filter | Only debts shown |
-| 5.6.4 | Filter by type - payments | Tap payment filter | Only payments shown |
-| 5.6.5 | Filter by type - all | Tap all | Both types shown |
-| 5.6.6 | Sort by date newest | Select sort option | Most recent first |
-| 5.6.7 | Sort by amount highest | Select sort option | Highest amount first |
-| 5.6.8 | Date range filter | Pick date range | Only transactions in range shown |
-| 5.6.9 | Clear date filter | Tap clear | All transactions shown |
-| 5.6.10 | Empty - no data | No transactions at all | "No transactions yet" |
-| 5.6.11 | Empty - no results | Filters match nothing | "No results" |
-| 5.6.12 | Pre-filtered from dashboard | Tap "Total Debts" card on dashboard | Opens with debt filter pre-selected |
+| 5.6.1 | Search by note | Search transaction note text | Filters correctly | **PASS**
+| 5.6.2 | Search by amount | Search "500" | Shows transactions with 500 | **PASS**
+| 5.6.3 | Filter by type - debts | Tap debt filter | Only debts shown | **PASS**
+| 5.6.4 | Filter by type - payments | Tap payment filter | Only payments shown | **PASS**
+| 5.6.5 | Filter by type - all | Tap all | Both types shown | **PASS**
+| 5.6.6 | Sort by date newest | Select sort option | Most recent first | **PASS**
+| 5.6.7 | Sort by amount highest | Select sort option | Highest amount first | **PASS**
+| 5.6.8 | Date range filter | Pick date range | Only transactions in range shown | **PASS**
+| 5.6.9 | Clear date filter | Tap clear | All transactions shown | **PASS**
+| 5.6.10 | Empty - no data | No transactions at all | "No transactions yet" | **PASS**
+| 5.6.11 | Empty - no results | Filters match nothing | "No results" | **PASS** **PASS**
+| 5.6.12 | Pre-filtered from dashboard | Tap "Total Debts" card on dashboard | Opens with debt filter pre-selected | **PASS**
 
 ---
 
@@ -287,54 +287,54 @@
 | # | Test | Steps | Expected Result |
 |---|------|-------|----------------|
 | 6.1.1 | Create reminder (standalone) | Open Reminders tab, add reminder | Reminder created |
-| 6.1.2 | Create reminder linked to debt | Add debt with "Create reminder" checkbox | Reminder created with `debtId` linked |
-| 6.1.3 | Reminder card color - late | Reminder date is in the past, uncompleted | Red accent |
-| 6.1.4 | Reminder card color - today | Reminder date is today, uncompleted | Orange accent |
-| 6.1.5 | Reminder card color - future | Reminder date is in the future, uncompleted | Blue accent |
-| 6.1.6 | Reminder card color - completed | Completed reminder | Grey accent |
+| 6.1.2 | Create reminder linked to debt | Add debt with "Create reminder" checkbox | Reminder created with `debtId` linked | **PASS**
+| 6.1.3 | Reminder card color - late | Reminder date is in the past, uncompleted | Red accent | **PASS**
+| 6.1.4 | Reminder card color - today | Reminder date is today, uncompleted | Orange accent | **PASS**
+| 6.1.5 | Reminder card color - future | Reminder date is in the future, uncompleted | Blue accent | **PASS**
+| 6.1.6 | Reminder card color - completed | Completed reminder | Grey accent | **PASS**
 
 ### 6.2 Reminder Filters
 
 | # | Test | Steps | Expected Result |
 |---|------|-------|----------------|
-| 6.2.1 | Filter: All | Select "All" filter | All reminders shown |
-| 6.2.2 | Filter: Late | Select "Late" filter | Only overdue + uncompleted shown |
-| 6.2.3 | Filter: Pending | Select "Pending" filter | Only future + uncompleted shown |
-| 6.2.4 | Filter: Completed | Select "Completed" filter | Only completed shown |
-| 6.2.5 | Status counts | View filter bar | Counts shown for each category |
-| 6.2.6 | Search by customer name | Type customer name | Filters correctly |
-| 6.2.7 | Search by reminder text | Type reminder message | Filters correctly |
-| 6.2.8 | Sort options | Try all sort options | Date newest, oldest, amount highest/lowest, name A-Z |
+| 6.2.1 | Filter: All | Select "All" filter | All reminders shown | **PASS**
+| 6.2.2 | Filter: Late | Select "Late" filter | Only overdue + uncompleted shown | **PASS**
+| 6.2.3 | Filter: Pending | Select "Pending" filter | Only future + uncompleted shown | **PASS**
+| 6.2.4 | Filter: Completed | Select "Completed" filter | Only completed shown | **PASS**
+| 6.2.5 | Status counts | View filter bar | Counts shown for each category | **PASS**
+| 6.2.6 | Search by customer name | Type customer name | Filters correctly | **PASS**
+| 6.2.7 | Search by reminder text | Type reminder message | Filters correctly | **PASS**
+| 6.2.8 | Sort options | Try all sort options | Date newest, oldest, amount highest/lowest, name A-Z | **PASS**
 
 ### 6.3 Mark Reminder Completed
 
 | # | Test | Steps | Expected Result |
 |---|------|-------|----------------|
-| 6.3.1 | Mark completed from card | Tap "Mark Completed" on reminder card | Reminder marked as completed. Color turns grey. |
-| 6.3.2 | Mark completed from detail sheet | Open reminder detail, tap "Mark Completed" | Same result |
-| 6.3.3 | Completed triggers payment | Mark completed when debt has remaining balance | Payment auto-created for remaining debt amount |
-| 6.3.4 | Disabled when settled | Reminder linked to fully-paid debt | "Mark Completed" button is greyed out / disabled. Tapping does nothing. Shows "Settled" label. |
-| 6.3.5 | Disabled when already completed | Reminder already completed | Button disabled. No action on tap. |
+| 6.3.1 | Mark completed from card | Tap "Mark Completed" on reminder card | Reminder marked as completed. Color turns grey. | **PASS**
+| 6.3.2 | Mark completed from detail sheet | Open reminder detail, tap "Mark Completed" | Same result | **PASS**
+| 6.3.3 | Completed triggers payment | Mark completed when debt has remaining balance | Payment auto-created for remaining debt amount | **PASS**
+| 6.3.4 | Disabled when settled | Reminder linked to fully-paid debt | "Mark Completed" button is greyed out / disabled. Tapping does nothing. Shows "Settled" label. | **PASS**
+| 6.3.5 | Disabled when already completed | Reminder already completed | Button disabled. No action on tap. | **PASS**
 
 ### 6.4 Auto-Complete on Full Payment
 
 | # | Test | Steps | Expected Result |
 |---|------|-------|----------------|
-| 6.4.1 | Pay full debt, reminder auto-complete | Customer has 500 debt with reminder, record payment of 500 | Reminder auto-completed. No manual action needed. |
-| 6.4.2 | Settle, reminder auto-complete | Customer has 500 debt with reminder, settle | Reminder auto-completed |
-| 6.4.3 | Multiple reminders auto-complete | Debt has 3 linked reminders, pay full amount | All 3 reminders auto-completed |
-| 6.4.4 | Edit payment to settle, auto-complete | Edit payment so total payments = debt amount | Reminders auto-completed |
+| 6.4.1 | Pay full debt, reminder auto-complete | Customer has 500 debt with reminder, record payment of 500 | Reminder auto-completed. No manual action needed. | **PASS**
+| 6.4.2 | Settle, reminder auto-complete | Customer has 500 debt with reminder, settle | Reminder auto-completed | **PASS**
+* | 6.4.3 | Multiple reminders auto-complete | Debt has 3 linked reminders, pay full amount | All 3 reminders auto-completed |
+| 6.4.4 | Edit payment to settle, auto-complete | Edit payment so total payments = debt amount | Reminders auto-completed | **PASS**
 
 ### 6.5 Reminder Detail Sheet
 
 | # | Test | Steps | Expected Result |
 |---|------|-------|----------------|
-| 6.5.1 | Open detail sheet | Tap reminder card | Bottom sheet with full details |
-| 6.5.2 | Shows customer name | View sheet | Correct customer name displayed |
-| 6.5.3 | Shows amount | View sheet | Correct debt amount shown |
-| 6.5.4 | Shows reminder date | View sheet | Correct date displayed |
+| 6.5.1 | Open detail sheet | Tap reminder card | Bottom sheet with full details | **PASS**
+| 6.5.2 | Shows customer name | View sheet | Correct customer name displayed | **PASS**
+| 6.5.3 | Shows amount | View sheet | Correct debt amount shown | **PASS**
+| 6.5.4 | Shows reminder date | View sheet | Correct date displayed | **PASS**
 
-### 6.6 Reminders Tab Badge
+* ### 6.6 Reminders Tab Badge
 
 | # | Test | Steps | Expected Result |
 |---|------|-------|----------------|
@@ -348,14 +348,14 @@
 
 | # | Test | Steps | Expected Result |
 |---|------|-------|----------------|
-| 7.1.1 | Open from dashboard | Tap analytics card | `AnalyticsScreen` opens |
-| 7.1.2 | Collection progress ring | Has debts + payments | Ring shows correct collection rate percentage |
-| 7.1.3 | Period totals | View period section | Correct totals for current period |
-| 7.1.4 | Weekly view | Toggle to weekly | Shows weekly aggregated data |
-| 7.1.5 | Monthly view | Toggle to monthly | Shows monthly aggregated data |
-| 7.1.6 | Debt-to-payment ratio | View chart | Visual comparison of debts vs payments |
-| 7.1.7 | Top debtors chart | Have multiple debtors | Shows highest-debt customers |
-| 7.1.8 | Empty state | No data | Charts show 0 values, no errors |
+| 7.1.1 | Open from dashboard | Tap analytics card | `AnalyticsScreen` opens | **PASS**
+| 7.1.2 | Collection progress ring | Has debts + payments | Ring shows correct collection rate percentage | **PASS**
+| 7.1.3 | Period totals | View period section | Correct totals for current period | **PASS**
+| 7.1.4 | Weekly view | Toggle to weekly | Shows weekly aggregated data | **PASS**
+| 7.1.5 | Monthly view | Toggle to monthly | Shows monthly aggregated data | **PASS**
+| 7.1.6 | Debt-to-payment ratio | View chart | Visual comparison of debts vs payments | **PASS**
+| 7.1.7 | Top debtors chart | Have multiple debtors | Shows highest-debt customers | **PASS**
+| 7.1.8 | Empty state | No data | Charts show 0 values, no errors | **PASS**
 
 ---
 
@@ -365,30 +365,30 @@
 
 | # | Test | Steps | Expected Result |
 |---|------|-------|----------------|
-| 8.1.1 | Open drawer | Tap gear icon in AppBar | Drawer slides from right, 85% screen width |
-| 8.1.2 | User profile | View drawer header | Shows current user's name, email, avatar |
-| 8.1.3 | Close drawer | Tap outside drawer or swipe | Drawer closes smoothly |
-| 8.1.4 | Sync section visible | View drawer | Sync controls shown |
+| 8.1.1 | Open drawer | Tap gear icon in AppBar | Drawer slides from right, 85% screen width | **PASS**
+| 8.1.2 | User profile | View drawer header | Shows current user's name, email, avatar | **PASS**
+| 8.1.3 | Close drawer | Tap outside drawer or swipe | Drawer closes smoothly | **PASS** **PASS**
+| 8.1.4 | Sync section visible | View drawer | Sync controls shown | **PASS**
 
 ### 8.2 Language Switching
 
 | # | Test | Steps | Expected Result |
 |---|------|-------|----------------|
-| 8.2.1 | Switch to Arabic | Open drawer, select Arabic | Entire UI switches to Arabic (RTL layout) |
-| 8.2.2 | Switch to English | Open drawer, select English | UI switches to English (LTR layout) |
-| 8.2.3 | Arabic persistence | Switch to Arabic, close app, reopen | App remembers Arabic |
-| 8.2.4 | Arabic content | Switch to Arabic, navigate all screens | All text in Arabic. No English strings leaked. |
-| 8.2.5 | RTL layout correctness | Arabic mode, check all screens | Text aligns right. Layout is mirrored. Icons in correct positions. |
+| 8.2.1 | Switch to Arabic | Open drawer, select Arabic | Entire UI switches to Arabic (RTL layout) | **PASS**
+| 8.2.2 | Switch to English | Open drawer, select English | UI switches to English (LTR layout) | **PASS**
+| 8.2.3 | Arabic persistence | Switch to Arabic, close app, reopen | App remembers Arabic | **PASS**
+| 8.2.4 | Arabic content | Switch to Arabic, navigate all screens | All text in Arabic. No English strings leaked. | **PASS**
+| 8.2.5 | RTL layout correctness | Arabic mode, check all screens | Text aligns right. Layout is mirrored. Icons in correct positions. | **PASS**
 
 ### 8.3 Theme Switching
 
 | # | Test | Steps | Expected Result |
 |---|------|-------|----------------|
-| 8.3.1 | Switch to dark | Open drawer, select dark theme | App switches to dark theme |
-| 8.3.2 | Switch to light | Open drawer, select light theme | App switches to light theme |
-| 8.3.3 | Theme persistence | Switch to dark, close app, reopen | Dark theme persists |
-| 8.3.4 | Dark theme consistency | Dark mode, navigate all screens | All screens use dark theme. No light-theme elements. |
-| 8.3.5 | Light theme consistency | Light mode, navigate all screens | All screens use light theme. |
+| 8.3.1 | Switch to dark | Open drawer, select dark theme | App switches to dark theme | **PASS**
+| 8.3.2 | Switch to light | Open drawer, select light theme | App switches to light theme | **PASS**
+| 8.3.3 | Theme persistence | Switch to dark, close app, reopen | Dark theme persists | **FAIL**
+| 8.3.4 | Dark theme consistency | Dark mode, navigate all screens | All screens use dark theme. No light-theme elements. |   **PASS**
+| 8.3.5 | Light theme consistency | Light mode, navigate all screens | All screens use light theme. | **PASS**
 
 ---
 
@@ -398,46 +398,46 @@
 
 | # | Test | Steps | Expected Result |
 |---|------|-------|----------------|
-| 9.1.1 | Initial sync | Sign in with data in Firestore | Data pulled from Firestore to local SQLite. UI populated. |
-| 9.1.2 | Add data, push | Add customer while online | Customer synced to Firestore. `is_synced=1` after sync. |
-| 9.1.3 | Sync indicator | Observe sync icon in AppBar | Shows syncing animation during push/pull |
-| 9.1.4 | Unsynced count | Add data, check sync state | Unsynced count increases before sync, decreases after |
-| 9.1.5 | Manual sync | Tap sync button in drawer | Triggers `syncNow()`. Pushes all unsynced data. |
+| 9.1.1 | Initial sync | Sign in with data in Firestore | Data pulled from Firestore to local SQLite. UI populated. | **PASS**
+| 9.1.2 | Add data, push | Add customer while online | Customer synced to Firestore. `is_synced=1` after sync. | **PASS**
+| 9.1.3 | Sync indicator | Observe sync icon in AppBar | Shows syncing animation during push/pull | **PASS**
+| 9.1.4 | Unsynced count | Add data, check sync state | Unsynced count increases before sync, decreases after | **PASS**
+| 9.1.5 | Manual sync | Tap sync button in drawer | Triggers `syncNow()`. Pushes all unsynced data. | **PASS**
 
 ### 9.2 Real-Time Firestore Listeners
 
 | # | Test | Steps | Expected Result |
 |---|------|-------|----------------|
-| 9.2.1 | Customer added in Firestore | Have 2 devices. Add customer on Device A | Device B shows customer within seconds (via WebSocket listener) |
-| 9.2.2 | Transaction changed in Firestore | Device A adds transaction | Device B shows updated data |
-| 9.2.3 | Reminder changed in Firestore | Device A adds reminder | Device B shows updated reminder |
-| 9.2.4 | Provider invalidation on listener | Firestore data changes | All relevant Riverpod providers invalidated. UI updates. |
-| 9.2.5 | Family provider invalidation | Transaction added for customer X | `customerByIdProvider(X)`, `customerBalanceProvider(X)`, `debtsWithRemainingProvider(X)` all invalidated |
+| 9.2.1 | Customer added in Firestore | Have 2 devices. Add customer on Device A | Device B shows customer within seconds (via WebSocket listener) | **PASS**
+| 9.2.2 | Transaction changed in Firestore | Device A adds transaction | Device B shows updated data | **PASS**
+| 9.2.3 | Reminder changed in Firestore | Device A adds reminder | Device B shows updated reminder | **PASS**
+| 9.2.4 | Provider invalidation on listener | Firestore data changes | All relevant Riverpod providers invalidated. UI updates. | **PASS**
+| 9.2.5 | Family provider invalidation | Transaction added for customer X | `customerByIdProvider(X)`, `customerBalanceProvider(X)`, `debtsWithRemainingProvider(X)` all invalidated | **PASS**
 
 ### 9.3 Offline Mode
 
 | # | Test | Steps | Expected Result |
 |---|------|-------|----------------|
-| 9.3.1 | Offline, add customer | Turn off network, add customer | Customer saved to SQLite. `is_synced=0`. |
-| 9.3.2 | Offline, add debt | Turn off network, add debt | Debt saved locally. `is_synced=0`. |
-| 9.3.3 | Offline, record payment | Turn off network, record payment | Payment saved locally. `is_synced=0`. |
-| 9.3.4 | Offline, read data | Turn off network, navigate app | All existing local data readable. No errors. |
-| 9.3.5 | Offline indicator | Turn off network | Sync status shows `offline` |
+| 9.3.1 | Offline, add customer | Turn off network, add customer | Customer saved to SQLite. `is_synced=0`. | **PASS**
+| 9.3.2 | Offline, add debt | Turn off network, add debt | Debt saved locally. `is_synced=0`. | **PASS**
+| 9.3.3 | Offline, record payment | Turn off network, record payment | Payment saved locally. `is_synced=0`. | **PASS**
+| 9.3.4 | Offline, read data | Turn off network, navigate app | All existing local data readable. No errors. | **PASS**
+| 9.3.5 | Offline indicator | Turn off network | Sync status shows `offline` | **PASS**
 
 ### 9.4 Sync Recovery
 
 | # | Test | Steps | Expected Result |
 |---|------|-------|----------------|
-| 9.4.1 | Reconnect, auto-sync | Go offline, add data, reconnect | Auto-sync triggers. All unsynced data pushed to Firestore. `is_synced=1`. |
-| 9.4.2 | Retry on failure | Simulate network failure during sync | Status goes to `error`. Auto-retry with backoff (30s, 60s, 120s). |
-| 9.4.3 | Debounced push | Add multiple customers quickly | Push debounced (2s). Only one sync triggered. |
+| 9.4.1 | Reconnect, auto-sync | Go offline, add data, reconnect | Auto-sync triggers. All unsynced data pushed to Firestore. `is_synced=1`. | **PASS**
+| 9.4.2 | Retry on failure | Simulate network failure during sync | Status goes to `error`. Auto-retry with backoff (30s, 60s, 120s). | **PASS**
+| 9.4.3 | Debounced push | Add multiple customers quickly | Push debounced (2s). Only one sync triggered. | **PASS**
 
 ### 9.5 Owner Scoping
 
 | # | Test | Steps | Expected Result |
 |---|------|-------|----------------|
-| 9.5.1 | Data isolation | Account A adds customer, sign out, sign in as Account B | Account B does NOT see Account A's customers |
-| 9.5.2 | Firestore scoping | Check Firestore structure | Data under `users/{uid}/customers/`, `users/{uid}/transactions/`, `users/{uid}/reminders/` |
+| 9.5.1 | Data isolation | Account A adds customer, sign out, sign in as Account B | Account B does NOT see Account A's customers | **PASS**
+| 9.5.2 | Firestore scoping | Check Firestore structure | Data under `users/{uid}/customers/`, `users/{uid}/transactions/`, `users/{uid}/reminders/` | **PASS**
 
 ---
 
@@ -447,49 +447,49 @@
 
 | # | Test | Steps | Expected Result |
 |---|------|-------|----------------|
-| 10.1.1 | Admin sees admin section | Sign in as admin user, open drawer | "ADMIN" section visible in drawer |
-| 10.1.2 | Non-admin cannot see section | Sign in as regular user, open drawer | "ADMIN" section NOT visible |
-| 10.1.3 | Non-admin direct access | Non-admin navigates to subscribers dashboard URL | "Access Denied" view with lock icon |
-| 10.1.4 | Admin role from Firestore | Check Firestore `users/{uid}` doc | `role: "admin"` field present |
+| 10.1.1 | Admin sees admin section | Sign in as admin user, open drawer | "ADMIN" section visible in drawer | **PASS**
+| 10.1.2 | Non-admin cannot see section | Sign in as regular user, open drawer | "ADMIN" section NOT visible | **PASS**
+| 10.1.3 | Non-admin direct access | Non-admin navigates to subscribers dashboard URL | "Access Denied" view with lock icon | **PASS**
+| 10.1.4 | Admin role from Firestore | Check Firestore `users/{uid}` doc | `role: "admin"` field present | **PASS**
 
 ### 10.2 Subscribers List
 
 | # | Test | Steps | Expected Result |
 |---|------|-------|----------------|
-| 10.2.1 | List displays subscribers | Open subscribers dashboard | All subscribers listed, sorted by expiry date (soonest first) |
-| 10.2.2 | Stats row | View top of screen | Shows Total, Active, Expiring, Expired counts |
-| 10.2.3 | Refresh | Tap refresh button in AppBar | Stream reloads |
-| 10.2.4 | Empty state | No subscribers exist | "No subscribers" message |
-| 10.2.5 | Subscriber status badge | View subscriber tile | Correct status badge (active=green, expiring=orange, expired=red) |
-| 10.2.6 | Plan label | View subscriber tile | Shows plan name (Trial/Weekly/Monthly) |
+| 10.2.1 | List displays subscribers | Open subscribers dashboard | All subscribers listed, sorted by expiry date (soonest first) | **PASS**
+| 10.2.2 | Stats row | View top of screen | Shows Total, Active, Expiring, Expired counts | **PASS**
+| 10.2.3 | Refresh | Tap refresh button in AppBar | Stream reloads | **PASS**
+| 10.2.4 | Empty state | No subscribers exist | "No subscribers" message | **PASS**
+| 10.2.5 | Subscriber status badge | View subscriber tile | Correct status badge (active=green, expiring=orange, expired=red) | **PASS**
+| 10.2.6 | Plan label | View subscriber tile | Shows plan name (Trial/Weekly/Monthly) | **PASS**
 
 ### 10.3 Update Expiry Sheet
 
 | # | Test | Steps | Expected Result |
 |---|------|-------|----------------|
-| 10.3.1 | Open update sheet | Tap edit on subscriber tile | Bottom sheet with date picker + quick buttons |
-| 10.3.2 | Date picker | Tap calendar row, select date | Date updates in field |
-| 10.3.3 | Quick button +15 min | Tap "+15 min" | Expiry extended by 15 minutes from now/current |
-| 10.3.4 | Quick button +1 week | Tap "+1 week" | Expiry extended by 7 days |
-| 10.3.5 | Quick button +1 month | Tap "+1 month" | Expiry extended by 30 days |
-| 10.3.6 | Save | Select new date, save | Both Firestore docs updated (user doc + admin mirror). SnackBar "Expiry updated". |
-| 10.3.7 | Cancel | Tap outside or back | No changes saved |
-| 10.3.8 | Expired subscriber base | Subscriber is expired, open sheet | Quick buttons extend from `DateTime.now()` (not from old expiry) |
+| 10.3.1 | Open update sheet | Tap edit on subscriber tile | Bottom sheet with date picker + quick buttons | **PASS**
+| 10.3.2 | Date picker | Tap calendar row, select date | Date updates in field | **PASS**
+| 10.3.3 | Quick button +15 min | Tap "+15 min" | Expiry extended by 15 minutes from now/current | **PASS**
+| 10.3.4 | Quick button +1 week | Tap "+1 week" | Expiry extended by 7 days | **PASS**
+| 10.3.5 | Quick button +1 month | Tap "+1 month" | Expiry extended by 30 days | **PASS**
+| 10.3.6 | Save | Select new date, save | Both Firestore docs updated (user doc + admin mirror). SnackBar "Expiry updated". | **PASS**
+| 10.3.7 | Cancel | Tap outside or back | No changes saved | **PASS**
+| 10.3.8 | Expired subscriber base | Subscriber is expired, open sheet | Quick buttons extend from `DateTime.now()` (not from old expiry) | **PASS**
 
 ### 10.4 Expire Now
 
 | # | Test | Steps | Expected Result |
 |---|------|-------|----------------|
-| 10.4.1 | Expire now button | Tap red block icon on subscriber tile | Confirmation dialog |
-| 10.4.2 | Confirm expire | Confirm in dialog | Expiry set to now. Both docs updated. Subscriber status goes to expired. |
-| 10.4.3 | Cancel expire | Cancel in dialog | No changes |
+| 10.4.1 | Expire now button | Tap red block icon on subscriber tile | Confirmation dialog | **PASS**
+| 10.4.2 | Confirm expire | Confirm in dialog | Expiry set to now. Both docs updated. Subscriber status goes to expired. | **PASS**
+| 10.4.3 | Cancel expire | Cancel in dialog | No changes | **PASS**
 
 ### 10.5 Subscription Mirror Consistency
 
 | # | Test | Steps | Expected Result |
 |---|------|-------|----------------|
-| 10.5.1 | Admin changes, user sees it | Admin updates expiry, check user's app | User's app shows new expiry (via real-time listener) |
-| 10.5.2 | Both docs updated | Admin updates via subscribers dashboard | Both `users/{uid}/subscription/status` AND `subscriptions/{uid}` updated via batch write |
+| 10.5.1 | Admin changes, user sees it | Admin updates expiry, check user's app | User's app shows new expiry (via real-time listener) | **PASS**
+| 10.5.2 | Both docs updated | Admin updates via subscribers dashboard | Both `users/{uid}/subscription/status` AND `subscriptions/{uid}` updated via batch write | **PASS**
 
 ---
 
@@ -497,14 +497,14 @@
 
 | # | Test | Steps | Expected Result |
 |---|------|-------|----------------|
-| 11.1 | All EN strings | English mode, navigate all screens | Every string in English. No Arabic text. |
-| 11.2 | All AR strings | Arabic mode, navigate all screens | Every string in Arabic. No English text. |
-| 11.3 | Subscription strings EN | English, subscription screens | All subscription strings localized |
-| 11.4 | Subscription strings AR | Arabic, subscription screens | All subscription strings localized |
-| 11.5 | Status dialog strings | Open status icon popup in both langs | All 6 status dialog strings localized (EN+AR) |
-| 11.6 | Error messages | Trigger errors in both langs | Error messages localized |
-| 11.7 | Number formatting | Arabic mode, view amounts | Thousands separators correct for locale |
-| 11.8 | Date formatting | Both modes, view dates | Dates displayed in correct format |
+| 11.1 | All EN strings | English mode, navigate all screens | Every string in English. No Arabic text. | **PASS**
+| 11.2 | All AR strings | Arabic mode, navigate all screens | Every string in Arabic. No English text. | **PASS**
+| 11.3 | Subscription strings EN | English, subscription screens | All subscription strings localized | **PASS**
+| 11.4 | Subscription strings AR | Arabic, subscription screens | All subscription strings localized | **PASS**
+| 11.5 | Status dialog strings | Open status icon popup in both langs | All 6 status dialog strings localized (EN+AR) | **PASS**
+| 11.6 | Error messages | Trigger errors in both langs | Error messages localized | **PASS**
+| 11.7 | Number formatting | Arabic mode, view amounts | Thousands separators correct for locale | **PASS**
+| 11.8 | Date formatting | Both modes, view dates | Dates displayed in correct format | **PASS**
 
 ---
 
@@ -514,28 +514,28 @@
 
 | # | Test | Steps | Expected Result |
 |---|------|-------|----------------|
-| 12.1.1 | Balance calculation | Customer has multiple debts and payments | Balance = sum(debts) - sum(payments) for non-deleted records |
-| 12.1.2 | Balance excludes soft-deleted | Delete a payment, check balance | Balance recalculated without deleted payment |
-| 12.1.3 | Dashboard stats consistency | Add/delete data, check dashboard | Stats match actual data |
-| 12.1.4 | Debt remaining calculation | Debt of 500, payment of 200 | `remaining` = 300. Displayed correctly in customer detail. |
+| 12.1.1 | Balance calculation | Customer has multiple debts and payments | Balance = sum(debts) - sum(payments) for non-deleted records | **PASS**
+| 12.1.2 | Balance excludes soft-deleted | Delete a payment, check balance | Balance recalculated without deleted payment | **PASS**
+| 12.1.3 | Dashboard stats consistency | Add/delete data, check dashboard | Stats match actual data | **PASS**
+| 12.1.4 | Debt remaining calculation | Debt of 500, payment of 200 | `remaining` = 300. Displayed correctly in customer detail. | **PASS**
 
 ### 12.2 UI Edge Cases
 
 | # | Test | Steps | Expected Result |
 |---|------|-------|----------------|
-| 12.2.1 | InfoRow overflow | Long customer name in info row | `Flexible` prevents overflow. Text truncated with ellipsis. |
-| 12.2.2 | Balance badge large number | Balance of 1,998,000,000,250 | Shows compact format: "1998 billion" (EN) / "1998 مليار" (AR) |
-| 12.2.3 | Balance badge small number | Balance of 500 | Shows "500" (no truncation) |
-| 12.2.4 | Add Customer FAB | View customers screen with data | Circle FAB with `Icons.add` |
-| 12.2.5 | Subscription dialog double-pop | Open status icon, tap barrier to dismiss | Dialog closes. Screen does NOT go black. |
+| 12.2.1 | InfoRow overflow | Long customer name in info row | `Flexible` prevents overflow. Text truncated with ellipsis. | **PASS**
+| 12.2.2 | Balance badge large number | Balance of 1,998,000,000,250 | Shows compact format: "1998 billion" (EN) / "1998 مليار" (AR) | **PASS**
+| 12.2.3 | Balance badge small number | Balance of 500 | Shows "500" (no truncation) | **PASS**
+| 12.2.4 | Add Customer FAB | View customers screen with data | Circle FAB with `Icons.add` | **PASS**
+| 12.2.5 | Subscription dialog double-pop | Open status icon, tap barrier to dismiss | Dialog closes. Screen does NOT go black. | **PASS**
 
 ### 12.3 App Lifecycle
 
 | # | Test | Steps | Expected Result |
 |---|------|-------|----------------|
-| 12.3.1 | Background to foreground | Open app, switch to another app, return | App resumes. Data still present. Sync resumes. |
-| 12.3.2 | Kill and reopen | Kill app, reopen | Data persists (SQLite). Auth state persists. Subscription check runs. |
-| 12.3.3 | Low memory | Open app with large dataset | App doesn't crash. No data loss. |
+| 12.3.1 | Background to foreground | Open app, switch to another app, return | App resumes. Data still present. Sync resumes. | **PASS**
+| 12.3.2 | Kill and reopen | Kill app, reopen | Data persists (SQLite). Auth state persists. Subscription check runs. | **PASS**
+* | 12.3.3 | Low memory | Open app with large dataset | App doesn't crash. No data loss. |
 
 ---
 
@@ -543,10 +543,10 @@
 
 | # | Test | Steps | Expected Result |
 |---|------|-------|----------------|
-| 13.1 | Line chart (analytics) | Add data over time, view analytics | Line chart renders with data points |
-| 13.2 | Bar chart | View debt-to-payment ratio | Bar chart renders correctly |
-| 13.3 | Pie/donut chart | View collection distribution | Pie/donut chart renders |
-| 13.4 | Empty charts | No data | Charts show empty state, no errors |
+| 13.1 | Line chart (analytics) | Add data over time, view analytics | Line chart renders with data points | **PASS**
+| 13.2 | Bar chart | View debt-to-payment ratio | Bar chart renders correctly | **PASS**
+| 13.3 | Pie/donut chart | View collection distribution | Pie/donut chart renders | **PASS**
+| 13.4 | Empty charts | No data | Charts show empty state, no errors | **PASS**
 
 ---
 
@@ -568,3 +568,5 @@
 | 12 | Edge Cases | 8 |
 | 13 | Charts & Visuals | 4 |
 | **Total** | | **~185** |
+
+
