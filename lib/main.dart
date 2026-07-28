@@ -10,10 +10,12 @@ import 'Providers/sync_provider.dart';
 import 'features/subscription/presentation/screens/subscription_check_screen.dart';
 import 'screens/login_screen.dart';
 import 'services/auth_service.dart';
+import 'services/clock_integrity_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+  await ClockIntegrityService.init();
   runApp(const ProviderScope(child: DebtManagementApp()));
 }
 

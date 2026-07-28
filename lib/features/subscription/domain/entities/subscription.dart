@@ -40,19 +40,31 @@ class Subscription {
     required this.isActive,
   });
 
+  Subscription copyWith({
+    SubscriptionPlan? plan,
+    DateTime? expiresAt,
+    DateTime? activatedAt,
+    bool? isActive,
+  }) {
+    return Subscription(
+      plan: plan ?? this.plan,
+      expiresAt: expiresAt ?? this.expiresAt,
+      activatedAt: activatedAt ?? this.activatedAt,
+      isActive: isActive ?? this.isActive,
+    );
+  }
+
   /// Business rule: determine current status based on expiry time.
   /// This logic lives in the entity because it depends ONLY on
   /// the entity's own fields — no external services needed.
   SubscriptionStatus get status {
     final now = DateTime.now();
+    if (now.isBefore(activatedAt)) return SubscriptionStatus.blocked;
     if (!isActive || expiresAt.isAfter(now) == false) {
-     
       return now.difference(expiresAt).inMinutes > 1
           ? SubscriptionStatus.blocked
           : SubscriptionStatus.grace;
     }
-
-      
     return expiresAt.difference(now).inMinutes <= 1
         ? SubscriptionStatus.expiring
         : SubscriptionStatus.active;

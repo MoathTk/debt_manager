@@ -22,6 +22,7 @@
 /// ---------------------------------------------------------------------------
 library;
 
+import 'package:local_debt_management/services/clock_integrity_service.dart';
 import 'package:local_debt_management/services/connectivity_service.dart';
 import '../entities/subscription.dart';
 import '../exceptions/subscription_exception.dart';
@@ -39,21 +40,23 @@ class CheckSubscription {
     if (await connectivity.checkConnection()) {
       final remote = await repo.getRemote(uid);
       if (remote != null) {
-        print("time: " + remote.expiresAt.toString());
-        await repo.saveLocal(remote,uid);
-        print("found in remote!!");
+        await repo.saveLocal(remote, uid);
+        await ClockIntegrityService.markTrustedTime();
         return remote;
       }
 
-      print("not found in remote!!");
       await repo.deleteLocal();
       await repo.deleteRemote(uid);
-      return null; // Subscription was deleted — clean stale data
+      await ClockIntegrityService.clear();
+      return null;
     }
 
-    print("getting local!!");
     final local = await repo.getLocal();
-    if (local != null) return local;
-    throw const RequiresInternetException();
+    if (local == null) throw const RequiresInternetException();
+
+    if (!await ClockIntegrityService.isClockIntact()) {
+      return local.copyWith(isActive: false);
+    }
+    return local;
   }
 }

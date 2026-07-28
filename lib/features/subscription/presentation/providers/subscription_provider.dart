@@ -5,6 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:local_debt_management/data/database_helper.dart';
 import 'package:local_debt_management/services/auth_service.dart';
+import 'package:local_debt_management/services/clock_integrity_service.dart';
 import 'package:local_debt_management/services/connectivity_service.dart';
 import '../../domain/entities/subscription.dart';
 import '../../domain/usecases/check_subscription.dart';
@@ -52,12 +53,14 @@ class SubscriptionNotifier extends StateNotifier<SubscriptionState> {
         .collection('subscription')
         .doc('status')
         .snapshots()
-        .listen((doc) {
+        .listen((doc) async {
           if (!doc.exists || doc.data() == null) {
             state = state.copyWith(isLoading: false, clearSubscription: true);
             return;
           }
           final sub = SubscriptionModel.fromFirestore(doc.data()!);
+          await ClockIntegrityService.markTrustedTime();
+          if (!mounted) return;
           state = state.copyWith(isLoading: false, subscription: sub);
         }, onError: (e) => print('[SUB] User doc stream error: $e'));
   }
@@ -106,6 +109,7 @@ class SubscriptionNotifier extends StateNotifier<SubscriptionState> {
   }
 
   bool get isBlocked {
+    if (!ClockIntegrityService.isClockIntactSync()) return true;
     return state.subscription?.status == SubscriptionStatus.blocked;
   }
 }
