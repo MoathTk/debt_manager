@@ -23,7 +23,7 @@ class UpdateDialogActions extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.fromLTRB(24, 8, 24, 16),
       child: switch (state) {
-        UpdateContentState.downloading => const SizedBox.shrink(),
+        UpdateContentState.downloading || UpdateContentState.installing => const SizedBox.shrink(),
         UpdateContentState.success => FilledButton(
             onPressed: () => Navigator.of(context).pop(),
             child: Text(l10n.updateDone),

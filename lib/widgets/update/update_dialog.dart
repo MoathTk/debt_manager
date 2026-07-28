@@ -53,6 +53,9 @@ class _UpdateDialogState extends State<UpdateDialog>
         onProgress: (p) {
           if (mounted) setState(() => _progress = p);
         },
+        onInstalling: () {
+          if (mounted) setState(() => _contentState = UpdateContentState.installing);
+        },
       );
       if (!mounted) return;
       setState(() {

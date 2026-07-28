@@ -133,19 +133,22 @@ class UpdateService {
   static Future<DownloadResult> downloadAndInstall(
     String apkUrl, {
     void Function(double)? onProgress,
+    void Function()? onInstalling,
   }) async {
     try {
       final ota = OtaUpdate();
-      await for (final event in ota.execute(
+      final stream = ota.execute(
         apkUrl,
         androidProviderAuthority: 'com.example.local_debt_management.fileProvider',
         usePackageInstaller: true,
-      )) {
+      ).timeout(const Duration(minutes: 5));
+      await for (final event in stream) {
         if (event.status == OtaStatus.DOWNLOADING && event.value != null) {
           final progress = double.tryParse(event.value!) ?? 0;
           onProgress?.call((progress / 100).clamp(0.0, 1.0));
-        } else if (event.status == OtaStatus.INSTALLING ||
-            event.status == OtaStatus.INSTALLATION_DONE) {
+        } else if (event.status == OtaStatus.INSTALLING) {
+          onInstalling?.call();
+        } else if (event.status == OtaStatus.INSTALLATION_DONE) {
           return DownloadResult.success;
         } else if (event.status == OtaStatus.INSTALLATION_ERROR ||
             event.status == OtaStatus.DOWNLOAD_ERROR ||
@@ -154,7 +157,7 @@ class UpdateService {
           return DownloadResult.failed;
         }
       }
-      return DownloadResult.success;
+      return DownloadResult.failed;
     } catch (_) {
       return DownloadResult.failed;
     }

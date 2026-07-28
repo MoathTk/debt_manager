@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:local_debt_management/l10n/app_localizations.dart';
 
-enum UpdateContentState { idle, downloading, error, success }
+enum UpdateContentState { idle, downloading, installing, error, success }
 
 class UpdateDialogContent extends StatelessWidget {
   final UpdateContentState state;
@@ -31,6 +31,7 @@ class UpdateDialogContent extends StatelessWidget {
               releaseNotes: releaseNotes,
             ),
           UpdateContentState.downloading => _ProgressView(progress: progress ?? 0.0),
+          UpdateContentState.installing => const _InstallingView(),
           UpdateContentState.error => _ErrorView(onRetry: onRetry),
           UpdateContentState.success => _SuccessView(),
         },
@@ -171,6 +172,33 @@ class _ProgressView extends StatelessWidget {
         ),
         const SizedBox(height: 4),
         Text(l10n.downloading, style: tt.bodySmall?.copyWith(color: cs.onSurfaceVariant)),
+      ],
+    );
+  }
+}
+
+class _InstallingView extends StatelessWidget {
+  const _InstallingView();
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final cs = Theme.of(context).colorScheme;
+    final tt = Theme.of(context).textTheme;
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        SizedBox(
+          width: 44,
+          height: 44,
+          child: CircularProgressIndicator(strokeWidth: 3, color: cs.primary),
+        ),
+        const SizedBox(height: 16),
+        Semantics(
+          label: l10n.updateInstalling,
+          child: Text(l10n.updateInstalling, style: tt.bodyMedium, textAlign: TextAlign.center),
+        ),
       ],
     );
   }
