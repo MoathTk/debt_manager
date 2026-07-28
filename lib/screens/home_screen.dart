@@ -40,12 +40,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Future<void> _checkForUpdate() async {
     try {
       final info = await UpdateService.checkForUpdate();
-      //if (!mounted || info == null) return;
-    //  final dismissed = await UpdateService.wasRecentlyDismissed();
-     // if (!mounted) return;
-      //if (dismissed && !info.forceUpdate) return;
-      //if (!mounted) return;
-      showDialog(context: context, builder: (_) => UpdateDialog(info: UpdateInfo(latestVersion: "2.0.0", currentVersion: "1.0.0", apkUrls: {"arm64-v8a": "https://example.com/app-release.apk"}, deviceAbi: "arm64-v8a", forceUpdate: false, releaseNotes: "only for test right now!!")));
+      if (!mounted || info == null) return;
+      final dismissed = await UpdateService.wasRecentlyDismissed();
+      if (!mounted) return;
+      if (dismissed && !info.forceUpdate) return;
+      if (!mounted) return;
+      showDialog(
+        context: context,
+        builder: (_) => UpdateDialog(info: info),
+      );
     } catch (_) {}
   }
 
@@ -78,7 +81,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
-        
         title: Text(l10n.appTitle, style: TextStyle(fontSize: 14)),
 
         backgroundColor: Colors.transparent,
