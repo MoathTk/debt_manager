@@ -139,6 +139,7 @@ class UpdateService {
       await for (final event in ota.execute(
         apkUrl,
         androidProviderAuthority: 'com.example.local_debt_management.fileProvider',
+        usePackageInstaller: true,
       )) {
         if (event.status == OtaStatus.DOWNLOADING && event.value != null) {
           final progress = double.tryParse(event.value!) ?? 0;
