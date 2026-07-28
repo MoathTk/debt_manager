@@ -34,7 +34,7 @@ class ThemeNotifier extends StateNotifier<ThemeMode> {
 ThemeData get lightTheme {
   final colorScheme = ColorScheme.fromSeed(
     //const Color.fromARGB(255, 57, 68, 134)
-    seedColor:  Colors.red,
+    seedColor:  const Color.fromARGB(255, 57, 68, 134),
     brightness: Brightness.light,
   );
 
