@@ -64,7 +64,7 @@ class _CustomersScreenState extends ConsumerState<CustomersScreen> {
           if (MutationGuard.checkBlocked(context, ref)) return;
           showAddCustomerSheet(context, ref);
         },
-        child: const Icon(Icons.add, size: 80),
+        child: const Icon(Icons.add, size: 30),
       ),
     );
   }
