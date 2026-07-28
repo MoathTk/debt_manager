@@ -81,11 +81,40 @@ class _BodyState extends ConsumerState<_EditDebtBody> {
     if (mounted) Navigator.pop(context);
   }
 
+  void _confirmDelete() {
+    final l10n = AppLocalizations.of(context)!;
+    final cs = Theme.of(context).colorScheme;
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: Text(l10n.deleteDebt),
+        content: Text(l10n.confirmDeleteDebt),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(l10n.cancel),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              _delete();
+            },
+            child: Text(
+              l10n.yes,
+              style: TextStyle(color: cs.error),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Future<void> _delete() async {
     setState(() => _saving = true);
     final reminderRepo = ref.read(debtReminderRepositoryProvider);
     await reminderRepo.deleteByDebtId(widget.debt.id);
     final repo = ref.read(transactionRepositoryProvider);
+    await repo.deletePaymentsByDebtId(widget.debt.id);
     await repo.delete(widget.debt.id);
     ref.read(syncProvider.notifier).schedulePush();
     _invalidate(ref);
@@ -161,7 +190,7 @@ class _BodyState extends ConsumerState<_EditDebtBody> {
             width: double.infinity,
             height: 52,
             child: OutlinedButton(
-              onPressed: _saving ? null : _delete,
+              onPressed: _saving ? null : _confirmDelete,
               style: OutlinedButton.styleFrom(
                 foregroundColor: theme.colorScheme.error,
                 side: BorderSide(color: theme.colorScheme.error),

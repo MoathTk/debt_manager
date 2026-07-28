@@ -27,6 +27,16 @@ class TransactionRepository {
     );
   }
 
+  Future<void> deletePaymentsByDebtId(String debtId) async {
+    final db = await _dbHelper.database;
+    final now = DateTime.now().toIso8601String();
+    await db.update(
+      'transactions',
+      {'is_deleted': 1, 'is_synced': 0, 'updated_at': now},
+      where: 'debt_id = ? AND type = 1', whereArgs: [debtId],
+    );
+  }
+
   Future<void> deleteByCustomerId(String customerId) async {
     final db = await _dbHelper.database;
     final now = DateTime.now().toIso8601String();

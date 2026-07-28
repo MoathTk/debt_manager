@@ -174,6 +174,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get deleteDebt => 'حذف الدين';
 
   @override
+  String get confirmDeleteDebt =>
+      'هل أنت متأكد من حذف هذا الدين؟ سيتم أيضًا حذف جميع الدفعات المرتبطة به.';
+
+  @override
   String get allTransactions => 'جميع المعاملات';
 
   @override
@@ -627,4 +631,58 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get wipeAllSuccess => 'تم مسح جميع البيانات بنجاح';
+
+  @override
+  String get checkForUpdates => 'التحقق من التحديثات';
+
+  @override
+  String get updateAvailable => 'تحديث متاح';
+
+  @override
+  String get newVersionAvailable => 'إصدار جديد من التطبيق متاح';
+
+  @override
+  String get currentVersion => 'الإصدار الحالي';
+
+  @override
+  String get latestVersion => 'أحدث إصدار';
+
+  @override
+  String get updateNow => 'تحديث الآن';
+
+  @override
+  String get updateLater => 'لاحقًا';
+
+  @override
+  String get downloading => 'جاري التحميل...';
+
+  @override
+  String get downloadComplete => 'اكتمل التحميل';
+
+  @override
+  String get tapToInstall => 'اضغط لتثبيت التحديث';
+
+  @override
+  String get updateFailed => 'فشل التحديث. يرجى المحاولة مرة أخرى.';
+
+  @override
+  String get upToDate => 'أنت تستخدم أحدث إصدار!';
+
+  @override
+  String get releaseNotes => 'ما الجديد';
+
+  @override
+  String get forceUpdateRequired => 'هذا التحديث مطلوب للمتابعة';
+
+  @override
+  String get updateRetry => 'إعادة المحاولة';
+
+  @override
+  String get updateDone => 'تم';
+
+  @override
+  String get updateInstalling => 'جاري التحضير للتثبيت...';
+
+  @override
+  String get updateChecking => 'جاري التحقق من التحديثات...';
 }

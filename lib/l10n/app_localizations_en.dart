@@ -175,6 +175,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get deleteDebt => 'Delete Debt';
 
   @override
+  String get confirmDeleteDebt =>
+      'Are you sure you want to delete this debt? This will also delete all payments made against it.';
+
+  @override
   String get allTransactions => 'All Transactions';
 
   @override
@@ -629,4 +633,58 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get wipeAllSuccess => 'All data wiped successfully';
+
+  @override
+  String get checkForUpdates => 'Check for Updates';
+
+  @override
+  String get updateAvailable => 'Update Available';
+
+  @override
+  String get newVersionAvailable => 'A new version of the app is available';
+
+  @override
+  String get currentVersion => 'Current version';
+
+  @override
+  String get latestVersion => 'Latest version';
+
+  @override
+  String get updateNow => 'Update Now';
+
+  @override
+  String get updateLater => 'Later';
+
+  @override
+  String get downloading => 'Downloading...';
+
+  @override
+  String get downloadComplete => 'Download complete';
+
+  @override
+  String get tapToInstall => 'Tap to install the update';
+
+  @override
+  String get updateFailed => 'Update failed. Please try again.';
+
+  @override
+  String get upToDate => 'You\'re up to date!';
+
+  @override
+  String get releaseNotes => 'What\'s new';
+
+  @override
+  String get forceUpdateRequired => 'This update is required to continue';
+
+  @override
+  String get updateRetry => 'Retry';
+
+  @override
+  String get updateDone => 'Done';
+
+  @override
+  String get updateInstalling => 'Preparing to install...';
+
+  @override
+  String get updateChecking => 'Checking for updates...';
 }

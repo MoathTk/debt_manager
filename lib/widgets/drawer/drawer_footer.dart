@@ -1,14 +1,33 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:local_debt_management/l10n/app_localizations.dart';
-import 'package:local_debt_management/services/auth_service.dart'; 
+import 'package:local_debt_management/services/auth_service.dart';
 
-class DrawerFooter extends ConsumerWidget {
+class DrawerFooter extends ConsumerStatefulWidget {
   const DrawerFooter({super.key, required this.onClose});
   final VoidCallback onClose;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<DrawerFooter> createState() => _DrawerFooterState();
+}
+
+class _DrawerFooterState extends ConsumerState<DrawerFooter> {
+  String _version = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadVersion();
+  }
+
+  Future<void> _loadVersion() async {
+    final info = await PackageInfo.fromPlatform();
+    if (mounted) setState(() => _version = info.version);
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final cs = Theme.of(context).colorScheme;
     final tt = Theme.of(context).textTheme;
@@ -20,8 +39,7 @@ class DrawerFooter extends ConsumerWidget {
           child: OutlinedButton.icon(
             onPressed: () async {
               await ref.read(authServiceProvider).signOut(ref);
-
-              if (context.mounted) onClose();
+              if (context.mounted) widget.onClose();
             },
             icon: const Icon(Icons.logout),
             label: Center(child: Text(l10n.signOut)),
@@ -38,7 +56,7 @@ class DrawerFooter extends ConsumerWidget {
           padding: const EdgeInsets.all(24.0),
           child: Center(
             child: Text(
-              'v1.0.0',
+              'v$_version',
               style: tt.bodySmall?.copyWith(color: cs.outline),
             ),
           ),

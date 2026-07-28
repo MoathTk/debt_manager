@@ -428,6 +428,12 @@ abstract class AppLocalizations {
   /// **'Delete Debt'**
   String get deleteDebt;
 
+  /// No description provided for @confirmDeleteDebt.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete this debt? This will also delete all payments made against it.'**
+  String get confirmDeleteDebt;
+
   /// No description provided for @allTransactions.
   ///
   /// In en, this message translates to:
@@ -1315,6 +1321,114 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'All data wiped successfully'**
   String get wipeAllSuccess;
+
+  /// No description provided for @checkForUpdates.
+  ///
+  /// In en, this message translates to:
+  /// **'Check for Updates'**
+  String get checkForUpdates;
+
+  /// No description provided for @updateAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Update Available'**
+  String get updateAvailable;
+
+  /// No description provided for @newVersionAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'A new version of the app is available'**
+  String get newVersionAvailable;
+
+  /// No description provided for @currentVersion.
+  ///
+  /// In en, this message translates to:
+  /// **'Current version'**
+  String get currentVersion;
+
+  /// No description provided for @latestVersion.
+  ///
+  /// In en, this message translates to:
+  /// **'Latest version'**
+  String get latestVersion;
+
+  /// No description provided for @updateNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Update Now'**
+  String get updateNow;
+
+  /// No description provided for @updateLater.
+  ///
+  /// In en, this message translates to:
+  /// **'Later'**
+  String get updateLater;
+
+  /// No description provided for @downloading.
+  ///
+  /// In en, this message translates to:
+  /// **'Downloading...'**
+  String get downloading;
+
+  /// No description provided for @downloadComplete.
+  ///
+  /// In en, this message translates to:
+  /// **'Download complete'**
+  String get downloadComplete;
+
+  /// No description provided for @tapToInstall.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to install the update'**
+  String get tapToInstall;
+
+  /// No description provided for @updateFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Update failed. Please try again.'**
+  String get updateFailed;
+
+  /// No description provided for @upToDate.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'re up to date!'**
+  String get upToDate;
+
+  /// No description provided for @releaseNotes.
+  ///
+  /// In en, this message translates to:
+  /// **'What\'s new'**
+  String get releaseNotes;
+
+  /// No description provided for @forceUpdateRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'This update is required to continue'**
+  String get forceUpdateRequired;
+
+  /// No description provided for @updateRetry.
+  ///
+  /// In en, this message translates to:
+  /// **'Retry'**
+  String get updateRetry;
+
+  /// No description provided for @updateDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Done'**
+  String get updateDone;
+
+  /// No description provided for @updateInstalling.
+  ///
+  /// In en, this message translates to:
+  /// **'Preparing to install...'**
+  String get updateInstalling;
+
+  /// No description provided for @updateChecking.
+  ///
+  /// In en, this message translates to:
+  /// **'Checking for updates...'**
+  String get updateChecking;
 }
 
 class _AppLocalizationsDelegate

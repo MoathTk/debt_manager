@@ -6,6 +6,8 @@ import '../l10n/app_localizations.dart';
 import '../Providers/database_provider.dart';
 import '../Providers/sync_provider.dart';
 import '../features/subscription/presentation/widgets/subscription_status_icon.dart';
+import '../services/update_service.dart';
+import '../widgets/update/update_dialog.dart';
 
 import 'dashboard_screen.dart';
 import 'customers_screen.dart';
@@ -23,7 +25,7 @@ class HomeScreen extends ConsumerStatefulWidget {
 }
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
-  int _currentIndex = 0;
+  int _currentIndex = 1;
   final _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
@@ -31,7 +33,20 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(syncProvider.notifier).syncNow();
+      _checkForUpdate();
     });
+  }
+
+  Future<void> _checkForUpdate() async {
+    try {
+      final info = await UpdateService.checkForUpdate();
+      //if (!mounted || info == null) return;
+    //  final dismissed = await UpdateService.wasRecentlyDismissed();
+     // if (!mounted) return;
+      //if (dismissed && !info.forceUpdate) return;
+      //if (!mounted) return;
+      showDialog(context: context, builder: (_) => UpdateDialog(info: UpdateInfo(latestVersion: "2.0.0", currentVersion: "1.0.0", apkUrls: {"arm64-v8a": "https://example.com/app-release.apk"}, deviceAbi: "arm64-v8a", forceUpdate: false, releaseNotes: "only for test right now!!")));
+    } catch (_) {}
   }
 
   @override
