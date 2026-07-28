@@ -136,7 +136,10 @@ class UpdateService {
   }) async {
     try {
       final ota = OtaUpdate();
-      await for (final event in ota.execute(apkUrl)) {
+      await for (final event in ota.execute(
+        apkUrl,
+        androidProviderAuthority: 'com.example.local_debt_management.fileProvider',
+      )) {
         if (event.status == OtaStatus.DOWNLOADING && event.value != null) {
           final progress = double.tryParse(event.value!) ?? 0;
           onProgress?.call((progress / 100).clamp(0.0, 1.0));
