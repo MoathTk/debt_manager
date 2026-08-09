@@ -1,3 +1,4 @@
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:firebase_auth_mocks/firebase_auth_mocks.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -12,7 +13,48 @@ class _FakeGoogleSignIn implements GoogleSignIn {
   dynamic noSuchMethod(Invocation invocation) => null;
 }
 
+/// In-memory fake for the flutter_secure_storage platform channel.
+/// The plugin talks to Android Keystore / iOS Keychain via a method channel,
+/// which does not exist in the test environment. This mock stores values in a
+/// plain map so ClockIntegrityService.clear()/init() can run during tests.
+final Map<String, String> _secureStorage = {};
+
+void _mockSecureStorageChannel() {
+  const channel = MethodChannel('plugins.it_nomads.com/flutter_secure_storage');
+  TestWidgetsFlutterBinding.ensureInitialized();
+  TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+      .setMockMethodCallHandler(channel, (call) async {
+    switch (call.method) {
+      case 'read':
+        return _secureStorage[call.arguments['key']];
+      case 'write':
+        _secureStorage[call.arguments['key']] = call.arguments['value'];
+        return true;
+      case 'delete':
+        _secureStorage.remove(call.arguments['key']);
+        return true;
+      case 'deleteAll':
+        _secureStorage.clear();
+        return true;
+      case 'containsKey':
+        return _secureStorage.containsKey(call.arguments['key']);
+      case 'readAll':
+        return Map<String, String>.from(_secureStorage);
+      default:
+        return null;
+    }
+  });
+}
+
 void main() {
+  setUp(() {
+    // signOut() calls ClockIntegrityService.clear(), which now reads/writes
+    // flutter_secure_storage (Android Keystore / iOS Keychain). Provide an
+    // in-memory mock so the platform channel isn't invoked in tests.
+    _secureStorage.clear();
+    _mockSecureStorageChannel();
+  });
+
   group('AuthService', () {
     group('ownerId', () {
       test('returns null when not logged in', () {

@@ -7,7 +7,7 @@ import 'package:local_debt_management/data/database_helper.dart';
 import 'package:local_debt_management/services/auth_service.dart';
 import 'package:local_debt_management/services/clock_integrity_service.dart';
 import 'package:local_debt_management/services/connectivity_service.dart';
-import '../../domain/entities/subscription.dart';
+import 'package:local_debt_management/services/trusted_time.dart';
 import '../../domain/usecases/check_subscription.dart';
 import '../../domain/usecases/activate_trial.dart';
 import '../../data/datasources/subscription_local_datasource.dart';
@@ -59,7 +59,25 @@ class SubscriptionNotifier extends StateNotifier<SubscriptionState> {
             return;
           }
           final sub = SubscriptionModel.fromFirestore(doc.data()!);
-          await ClockIntegrityService.markTrustedTime();
+          // Fetch a trusted current time from the best available ONLINE source
+          // (NTP → Firestore server timestamp → HTTPS Date header). We never
+          // depend on the device clock here — see trusted_time.dart.
+          final trustedNow = await fetchTrustedTime();
+          if (trustedNow != null) {
+            await ClockIntegrityService.markTrustedTime(
+              trustedNow: trustedNow,
+              expiresAt: sub.expiresAt,
+            );
+          } else if (!await ClockIntegrityService.hasAnchor()) {
+            // Every online source failed AND no previous anchor exists
+            // (fresh install / first activation). Last resort: device time.
+            await ClockIntegrityService.markTrustedTime(
+              trustedNow: DateTime.now(),
+              expiresAt: sub.expiresAt,
+            );
+          }
+          // If all sources failed but an old anchor exists, keep the old
+          // anchor — never overwrite a good (real-time) anchor with device time.
           if (!mounted) return;
           state = state.copyWith(isLoading: false, subscription: sub);
         }, onError: (e) => print('[SUB] User doc stream error: $e'));
@@ -108,10 +126,6 @@ class SubscriptionNotifier extends StateNotifier<SubscriptionState> {
     }
   }
 
-  bool get isBlocked {
-    if (!ClockIntegrityService.isClockIntactSync()) return true;
-    return state.subscription?.status == SubscriptionStatus.blocked;
-  }
 }
 
 final subscriptionProvider =

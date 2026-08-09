@@ -1,6 +1,7 @@
 /// Subscription feature — Presentation layer: state class
 library;
 
+import 'package:local_debt_management/services/clock_integrity_service.dart';
 import '../../domain/entities/subscription.dart';
 
 class SubscriptionState {
@@ -13,6 +14,11 @@ class SubscriptionState {
     this.subscription,
     this.error,
   });
+
+  bool get isBlocked {
+    if (!ClockIntegrityService.isClockIntactSync()) return true;
+    return subscription?.status == SubscriptionStatus.blocked;
+  }
 
   SubscriptionState copyWith({
     bool? isLoading,

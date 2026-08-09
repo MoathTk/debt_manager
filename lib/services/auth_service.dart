@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:local_debt_management/Providers/database_provider.dart';
 import 'package:local_debt_management/Providers/sync_provider.dart';
 import 'package:local_debt_management/features/subscription/presentation/providers/subscription_provider.dart';
+import 'package:local_debt_management/services/clock_integrity_service.dart';
 import '../data/database_helper.dart';
 
 final authServiceProvider = Provider<AuthService>((ref) => AuthService());
@@ -38,6 +39,7 @@ class AuthService {
 
   Future<void> signOut([WidgetRef? ref]) async {
     await DatabaseHelper.instance.close();
+    await ClockIntegrityService.clear();
     if (ref != null) {
       ref.invalidate(customersProvider);
       ref.invalidate(transactionsProvider);

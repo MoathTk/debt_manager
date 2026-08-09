@@ -4,7 +4,6 @@ import '../l10n/app_localizations.dart';
 import '../Providers/database_provider.dart';
 import '../Providers/mutations.dart';
 import '../data/models/debt_reminder.dart';
-import '../features/subscription/domain/entities/subscription.dart';
 import '../features/subscription/presentation/providers/subscription_provider.dart';
 
 void confirmToggle(
@@ -13,9 +12,8 @@ void confirmToggle(
   AppLocalizations l10n,
 ) {
   final container = ProviderScope.containerOf(ctx);
-  final subStatus = container.read(subscriptionProvider).subscription?.status;
-  final isBlocked = subStatus == SubscriptionStatus.blocked;
-  if (isBlocked) {
+  final state = container.read(subscriptionProvider);
+  if (state.isBlocked) {
     ScaffoldMessenger.of(ctx).showSnackBar(
       SnackBar(content: Text(l10n.subExpiredReadonly), behavior: SnackBarBehavior.floating),
     );
@@ -50,9 +48,8 @@ void confirmToggle(
 
 void confirmDelete(BuildContext ctx, DebtReminder r, AppLocalizations l10n) {
   final container = ProviderScope.containerOf(ctx);
-  final subStatus = container.read(subscriptionProvider).subscription?.status;
-  final isBlocked = subStatus == SubscriptionStatus.blocked;
-  if (isBlocked) {
+  final state = container.read(subscriptionProvider);
+  if (state.isBlocked) {
     ScaffoldMessenger.of(ctx).showSnackBar(
       SnackBar(content: Text(l10n.subExpiredReadonly), behavior: SnackBarBehavior.floating),
     );

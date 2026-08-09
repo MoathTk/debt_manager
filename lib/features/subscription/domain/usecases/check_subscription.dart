@@ -24,6 +24,7 @@ library;
 
 import 'package:local_debt_management/services/clock_integrity_service.dart';
 import 'package:local_debt_management/services/connectivity_service.dart';
+import 'package:local_debt_management/services/trusted_time.dart';
 import '../entities/subscription.dart';
 import '../exceptions/subscription_exception.dart';
 import '../repositories/subscription_repository.dart';
@@ -41,7 +42,31 @@ class CheckSubscription {
       final remote = await repo.getRemote(uid);
       if (remote != null) {
         await repo.saveLocal(remote, uid);
-        await ClockIntegrityService.markTrustedTime();
+        // Fetch a trusted current time from the best available ONLINE source
+        // (NTP → Firestore server timestamp → HTTPS Date header). We never
+        // depend on the device clock here — see trusted_time.dart.
+        final trustedNow = await fetchTrustedTime();
+        if (trustedNow != null) {
+          // Store the anchor + boot counter + server expiry
+          await ClockIntegrityService.markTrustedTime(
+            trustedNow: trustedNow,
+            expiresAt: remote.expiresAt,
+          );
+        } else if (!await ClockIntegrityService.hasAnchor()) {
+          // Every online time source failed AND no previous anchor exists
+          // (fresh install / first activation). Last resort: device time.
+          await ClockIntegrityService.markTrustedTime(
+            trustedNow: DateTime.now(),
+            expiresAt: remote.expiresAt,
+          );
+        }
+        // If all sources failed but an old anchor exists, we keep the old
+        // anchor — never overwrite a good (real-time) anchor with device time.
+        // Direct comparison: trusted time vs server timestamp — 100% accurate
+        final now = trustedNow ?? DateTime.now();
+        if (now.isAfter(remote.expiresAt)) {
+          return remote.copyWith(isActive: false);
+        }
         return remote;
       }
 
