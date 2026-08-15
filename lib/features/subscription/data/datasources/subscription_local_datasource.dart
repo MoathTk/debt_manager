@@ -44,13 +44,11 @@ class SubscriptionLocalDatasource {
   Future<void> save(SubscriptionModel sub, String userId) async {
     try {
       final database = await _db.database;
-      final result = await database.insert(
-        'user_subscription',
-        {'user_id': userId, ...sub.toMap()},
-        conflictAlgorithm: ConflictAlgorithm.replace,
-      );
-      print("result: " + result.toString()
-      );
+      final result = await database.insert('user_subscription', {
+        'user_id': userId,
+        ...sub.toMap(),
+      }, conflictAlgorithm: ConflictAlgorithm.replace);
+      print("result: $result");
       if (result == 0) {
         throw SubscriptionLocalException(
           'Insert returned 0 — row was not saved',

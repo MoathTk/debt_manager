@@ -33,11 +33,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         });
       }
     } catch (e) {
-      if (mounted)
+      if (mounted) {
         setState(() {
           _loading = false;
           _error = e.toString();
         });
+      }
     }
   }
 
