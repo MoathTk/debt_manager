@@ -55,17 +55,20 @@ class Subscription {
   }
 
   /// Business rule: determine current status based on expiry time.
-  /// This logic lives in the entity because it depends ONLY on
-  /// the entity's own fields — no external services needed.
-  SubscriptionStatus get status {
-    final now = DateTime.now();
-    if (now.isBefore(activatedAt)) return SubscriptionStatus.blocked;
-    if (!isActive || expiresAt.isAfter(now) == false) {
-      return now.difference(expiresAt).inMinutes > 1
+  ///
+  /// [now] — the current time to compare against. When null (default),
+  /// falls back to [DateTime.now]. Callers with access to trusted time
+  /// (from [ClockIntegrityService.trustedNow]) should pass it so the
+  /// result is not fooled by a manipulated device clock.
+  SubscriptionStatus status([DateTime? now]) {
+    final effectiveNow = now ?? DateTime.now();
+    if (effectiveNow.isBefore(activatedAt)) return SubscriptionStatus.blocked;
+    if (!isActive || expiresAt.isAfter(effectiveNow) == false) {
+      return effectiveNow.difference(expiresAt).inMinutes > 1
           ? SubscriptionStatus.blocked
           : SubscriptionStatus.grace;
     }
-    return expiresAt.difference(now).inMinutes <= 1
+    return expiresAt.difference(effectiveNow).inMinutes <= 1
         ? SubscriptionStatus.expiring
         : SubscriptionStatus.active;
   }

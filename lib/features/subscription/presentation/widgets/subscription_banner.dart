@@ -15,7 +15,7 @@ class SubscriptionBanner extends ConsumerWidget {
     final sub = state.subscription;
     if (sub == null) return const SizedBox.shrink();
 
-    final status = state.isBlocked ? SubscriptionStatus.blocked : sub.status;
+    final status = state.isBlocked ? SubscriptionStatus.blocked : sub.status();
     final l10n = AppLocalizations.of(context)!;
     final (color, icon) = _style(status);
     final label = _label(status, l10n);

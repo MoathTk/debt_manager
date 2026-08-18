@@ -17,7 +17,7 @@ class SubscriptionState {
 
   bool get isBlocked {
     if (!ClockIntegrityService.isClockIntactSync()) return true;
-    return subscription?.status == SubscriptionStatus.blocked;
+    return subscription?.status(ClockIntegrityService.trustedNow) == SubscriptionStatus.blocked;
   }
 
   SubscriptionState copyWith({

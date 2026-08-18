@@ -8,6 +8,7 @@ import 'package:local_debt_management/services/auth_service.dart';
 import 'package:local_debt_management/services/clock_integrity_service.dart';
 import 'package:local_debt_management/services/connectivity_service.dart';
 import 'package:local_debt_management/services/trusted_time.dart';
+import '../../domain/entities/subscription.dart';
 import '../../domain/usecases/check_subscription.dart';
 import '../../domain/usecases/activate_trial.dart';
 import '../../data/datasources/subscription_local_datasource.dart';
@@ -59,15 +60,24 @@ class SubscriptionNotifier extends StateNotifier<SubscriptionState> {
             return;
           }
           final sub = SubscriptionModel.fromFirestore(doc.data()!);
-          // Fetch a trusted current time from the best available ONLINE source
-          // (NTP → Firestore server timestamp → HTTPS Date header). We never
-          // depend on the device clock here — see trusted_time.dart.
+
+          // Cross-check: fetch fresh trusted time from the best available
+          // ONLINE source (NTP → Firestore server timestamp → HTTPS Date header).
+          // We never depend on the device clock here — see trusted_time.dart.
           final trustedNow = await fetchTrustedTime();
+          // Track whether we need to override isActive due to expiry.
+          bool expiredByTrustedTime = false;
           if (trustedNow != null) {
+            // Store the anchor so isClockIntactSync() stays accurate.
             await ClockIntegrityService.markTrustedTime(
               trustedNow: trustedNow,
               expiresAt: sub.expiresAt,
             );
+            // If subscription is expired in trusted time, override isActive.
+            // This prevents the listener from showing an expired sub as active.
+            if (trustedNow.isAfter(sub.expiresAt)) {
+              expiredByTrustedTime = true;
+            }
           } else if (!await ClockIntegrityService.hasAnchor()) {
             // Every online source failed AND no previous anchor exists
             // (fresh install / first activation). Last resort: device time.
@@ -78,8 +88,15 @@ class SubscriptionNotifier extends StateNotifier<SubscriptionState> {
           }
           // If all sources failed but an old anchor exists, keep the old
           // anchor — never overwrite a good (real-time) anchor with device time.
+
           if (!mounted) return;
-          state = state.copyWith(isLoading: false, subscription: sub);
+          final entity = Subscription(
+            plan: sub.plan,
+            expiresAt: sub.expiresAt,
+            activatedAt: sub.activatedAt,
+            isActive: expiredByTrustedTime ? false : sub.isActive,
+          );
+          state = state.copyWith(isLoading: false, subscription: entity);
         }, onError: (e) => print('[SUB] User doc stream error: $e'));
   }
 

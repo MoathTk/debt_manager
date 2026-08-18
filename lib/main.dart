@@ -14,9 +14,14 @@ import 'services/clock_integrity_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
-  await ClockIntegrityService.init();
+  try {
+    await Firebase.initializeApp().timeout(const Duration(seconds: 10));
+  } catch (e) {
+    // ignore: avoid_print
+    print('[Main] Firebase init failed: $e');
+  }
   runApp(const ProviderScope(child: DebtManagementApp()));
+  ClockIntegrityService.init();
 }
 
 class DebtManagementApp extends ConsumerWidget {

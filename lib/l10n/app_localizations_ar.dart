@@ -685,4 +685,20 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get updateChecking => 'جاري التحقق من التحديثات...';
+
+  @override
+  String get blockedTitle => 'تم حظر الوصول';
+
+  @override
+  String get blockedClockRollback =>
+      'تاريخ/وقت جهازك غير صحيح. يرجى ضبط ساعة الجهاز على التاريخ والوقت الصحيح، ثم الاتصال بالنترنت والضغط على تحديث.';
+
+  @override
+  String get blockedDataSafe => 'بياناتك آمنة ومحفوظة بشكل آمن.';
+
+  @override
+  String get blockedRequiresInternet => 'يتطلب اتصال بالنترنت للتحقق';
+
+  @override
+  String get blockedRefresh => 'تحديث والتحقق';
 }

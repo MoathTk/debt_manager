@@ -87,7 +87,7 @@ class _State extends State<SubscriptionStatusDialog>
   }
 }
 
-Color dotColor(Subscription sub) => switch (sub.status) {
+Color dotColor(Subscription sub) => switch (sub.status()) {
   SubscriptionStatus.active => Colors.green,
   SubscriptionStatus.expiring => Colors.orange,
   SubscriptionStatus.grace => Colors.red,

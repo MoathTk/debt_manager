@@ -4,8 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:local_debt_management/l10n/app_localizations.dart';
 import 'package:local_debt_management/screens/home_screen.dart';
+import 'package:local_debt_management/services/clock_integrity_service.dart';
 import '../providers/subscription_provider.dart';
 import '../providers/subscription_state.dart';
+import 'clock_tamper_screen.dart';
 import 'subscription_plan_picker_screen.dart';
 
 class SubscriptionCheckScreen extends ConsumerStatefulWidget {
@@ -86,9 +88,19 @@ class _State extends ConsumerState<SubscriptionCheckScreen>
     if (state.error != null && state.subscription == null) {
       return _ErrorView(key: const ValueKey('error'), l10n: l10n, ref: ref);
     }
+    // No subscription record exists (new user, no trial yet)
     if (state.subscription == null) {
       return const SubscriptionPlanPickerScreen(key: ValueKey('picker'));
     }
+    // Subscription exists but user is blocked
+    if (state.isBlocked) {
+      // Clock rollback → warning screen (no data access)
+      if (ClockIntegrityService.blockReason == 'clock_rollback') {
+        return const ClockTamperScreen(key: ValueKey('clock_tamper'));
+      }
+      // Subscription expired → HomeScreen handles restrictions
+    }
+    // Subscription is valid — full access
     return const HomeScreen(key: ValueKey('home'));
   }
 }

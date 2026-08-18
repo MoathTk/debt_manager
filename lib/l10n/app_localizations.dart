@@ -1429,6 +1429,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Checking for updates...'**
   String get updateChecking;
+
+  /// No description provided for @blockedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Access Blocked'**
+  String get blockedTitle;
+
+  /// No description provided for @blockedClockRollback.
+  ///
+  /// In en, this message translates to:
+  /// **'Your device date/time is incorrect. Please set your clock to the correct date and time, then connect to the internet and tap refresh.'**
+  String get blockedClockRollback;
+
+  /// No description provided for @blockedDataSafe.
+  ///
+  /// In en, this message translates to:
+  /// **'Your data is safe and stored securely.'**
+  String get blockedDataSafe;
+
+  /// No description provided for @blockedRequiresInternet.
+  ///
+  /// In en, this message translates to:
+  /// **'Internet connection required to verify'**
+  String get blockedRequiresInternet;
+
+  /// No description provided for @blockedRefresh.
+  ///
+  /// In en, this message translates to:
+  /// **'Refresh & Verify'**
+  String get blockedRefresh;
 }
 
 class _AppLocalizationsDelegate

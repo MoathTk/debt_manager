@@ -79,7 +79,9 @@ class CheckSubscription {
     final local = await repo.getLocal();
     if (local == null) throw const RequiresInternetException();
 
-    if (!await ClockIntegrityService.isClockIntact()) {
+    // Offline path: check if the clock was rolled back.
+    // isClockIntactSync() compares DateTime.now() against the stored NTP anchor.
+    if (!ClockIntegrityService.isClockIntactSync()) {
       return local.copyWith(isActive: false);
     }
     return local;

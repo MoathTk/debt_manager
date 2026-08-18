@@ -687,4 +687,21 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get updateChecking => 'Checking for updates...';
+
+  @override
+  String get blockedTitle => 'Access Blocked';
+
+  @override
+  String get blockedClockRollback =>
+      'Your device date/time is incorrect. Please set your clock to the correct date and time, then connect to the internet and tap refresh.';
+
+  @override
+  String get blockedDataSafe => 'Your data is safe and stored securely.';
+
+  @override
+  String get blockedRequiresInternet =>
+      'Internet connection required to verify';
+
+  @override
+  String get blockedRefresh => 'Refresh & Verify';
 }
