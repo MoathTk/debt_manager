@@ -19,8 +19,9 @@ service cloud.firestore {
     }
 
     match /users/{uid}/{document=**} {
-      allow read, write: if request.auth != null && request.auth.uid == uid;
-    }
+  allow read, write: if request.auth != null &&
+    (request.auth.uid == uid || isAdmin());
+}
 
     // Includes {document=**} in case you add subcollections later
     match /subscriptions/{uid}/{document=**} {
