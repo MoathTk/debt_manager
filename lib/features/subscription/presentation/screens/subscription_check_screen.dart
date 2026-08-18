@@ -30,12 +30,14 @@ class _State extends ConsumerState<SubscriptionCheckScreen>
       vsync: this,
       duration: const Duration(milliseconds: 2000),
     )..repeat(reverse: true);
-    _scaleAnim = Tween(begin: 1.0, end: 1.08).animate(
-      CurvedAnimation(parent: _pulseCtrl, curve: Curves.easeInOut),
-    );
-    _glowAnim = Tween(begin: 0.2, end: 0.5).animate(
-      CurvedAnimation(parent: _pulseCtrl, curve: Curves.easeInOut),
-    );
+    _scaleAnim = Tween(
+      begin: 1.0,
+      end: 1.08,
+    ).animate(CurvedAnimation(parent: _pulseCtrl, curve: Curves.easeInOut));
+    _glowAnim = Tween(
+      begin: 0.2,
+      end: 0.5,
+    ).animate(CurvedAnimation(parent: _pulseCtrl, curve: Curves.easeInOut));
   }
 
   @override
@@ -77,7 +79,6 @@ class _State extends ConsumerState<SubscriptionCheckScreen>
     AppLocalizations l10n,
   ) {
     if (state.isLoading && state.subscription == null) {
-      
       return _LoadingView(
         key: const ValueKey('loading'),
         pulseCtrl: _pulseCtrl,
@@ -93,7 +94,7 @@ class _State extends ConsumerState<SubscriptionCheckScreen>
       return const SubscriptionPlanPickerScreen(key: ValueKey('picker'));
     }
     // Subscription exists but user is blocked
-    if (state.isBlocked) {
+    if (!ClockIntegrityService.isClockIntactSync()) {
       // Clock rollback → warning screen (no data access)
       if (ClockIntegrityService.blockReason == 'clock_rollback') {
         return const ClockTamperScreen(key: ValueKey('clock_tamper'));
@@ -130,10 +131,7 @@ class _LoadingView extends StatelessWidget {
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [
-              cs.primary.withValues(alpha: 0.08),
-              cs.surface,
-            ],
+            colors: [cs.primary.withValues(alpha: 0.08), cs.surface],
           ),
         ),
         child: SafeArea(
@@ -214,10 +212,7 @@ class _ErrorView extends StatelessWidget {
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [
-              cs.primary.withValues(alpha: 0.08),
-              cs.surface,
-            ],
+            colors: [cs.primary.withValues(alpha: 0.08), cs.surface],
           ),
         ),
         child: SafeArea(

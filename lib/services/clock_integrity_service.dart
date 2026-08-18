@@ -48,7 +48,7 @@ class ClockIntegrityService {
   // ── In-memory anchor cache ───────────────────────────────────────────
   // The sync integrity check reads ONLY these. All async methods
   // (init, markTrustedTime, clear) keep them in sync with secure storage.
-  static int? _ntpMs;    // last trusted time in milliseconds since epoch
+  static int? _ntpMs; // last trusted time in milliseconds since epoch
   static int? _expiryMs; // subscription expiry in milliseconds since epoch
 
   /// Initialize: load persisted anchor from secure storage into memory.
@@ -127,7 +127,7 @@ class ClockIntegrityService {
     // DateTime.now() is a few hundred ms behind the NTP response.
     // A 5-second window absorbs this while still catching meaningful
     // clock rollbacks (hours/days).
-    const toleranceMs = 5000;
+    const toleranceMs = 15000;
     if (nowMs < ntpMs - toleranceMs) return false;
 
     // ── Check 2: Subscription expiry ───────────────────────────────────
