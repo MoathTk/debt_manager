@@ -59,6 +59,7 @@ dev_dependencies:
   firebase_auth_mocks: ^0.15.2
   google_sign_in_mocks: ^0.3.0
   sqflite_common_ffi: ^2.3.4
+  flutter_launcher_icons: ^0.14.3
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -97,3 +98,10 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/icon/logo.png"
+  adaptive_icon_background: "#1A5276"
+  adaptive_icon_foreground: "assets/icon/logo.png"
