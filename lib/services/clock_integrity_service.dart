@@ -162,9 +162,12 @@ class ClockIntegrityService {
     final ntpMs = _ntpMs;
     if (ntpMs == null) return null;
     final nowMs = DateTime.now().millisecondsSinceEpoch;
-    if (nowMs < ntpMs) return 'clock_rollback';
     final expiryMs = _expiryMs;
+    // Check expired FIRST — subscription expiry takes priority
     if (expiryMs != null && nowMs > expiryMs + 60000) return 'expired';
+    // Clock rollback — use same 15s tolerance as isClockIntactSync()
+    const toleranceMs = 15000;
+    if (nowMs < ntpMs - toleranceMs) return 'clock_rollback';
     return null;
   }
 

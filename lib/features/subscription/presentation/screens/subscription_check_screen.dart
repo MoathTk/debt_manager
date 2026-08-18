@@ -95,6 +95,9 @@ class _State extends ConsumerState<SubscriptionCheckScreen>
     }
     // Subscription exists but user is blocked
     if (!ClockIntegrityService.isClockIntactSync()) {
+      if (ClockIntegrityService.blockReason == 'expired') {
+        return const HomeScreen(key: ValueKey('home'));
+      }
       // Clock rollback → warning screen (no data access)
       if (ClockIntegrityService.blockReason == 'clock_rollback') {
         return const ClockTamperScreen(key: ValueKey('clock_tamper'));
@@ -122,6 +125,7 @@ class _LoadingView extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final cs = theme.colorScheme;
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       body: Container(
@@ -170,7 +174,7 @@ class _LoadingView extends StatelessWidget {
               ),
               const SizedBox(height: 24),
               Text(
-                'Debt Management',
+                l10n.appTitle,
                 style: theme.textTheme.headlineSmall?.copyWith(
                   fontWeight: FontWeight.bold,
                   color: cs.onSurface,
