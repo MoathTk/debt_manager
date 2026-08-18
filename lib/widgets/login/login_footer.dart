@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import '../../l10n/app_localizations.dart';
 
@@ -30,7 +32,7 @@ class LoginFooter extends StatelessWidget {
         ),
         const SizedBox(height: 8),
         Text(
-          'v1.0.0',
+          '2.0.0',
           style: theme.textTheme.labelSmall?.copyWith(
             color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
           ),
