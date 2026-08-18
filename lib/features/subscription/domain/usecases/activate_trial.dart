@@ -24,17 +24,21 @@ class ActivateTrial {
 
   ActivateTrial(this.repo);
 
-  Future<Subscription> call(String uid, {String userName = '', String userEmail = ''}) async {
+  Future<Subscription> call(
+    String uid, {
+    String userName = '',
+    String userEmail = '',
+  }) async {
     final sub = Subscription(
       plan: SubscriptionPlan.trial,
-      expiresAt: DateTime.now().add(const Duration(minutes: 5)),
+      expiresAt: DateTime.now().add(const Duration(days: 14)),
       activatedAt: DateTime.now(),
       isActive: true,
     );
 
     // Save locally first — this MUST succeed for offline access
     try {
-      await repo.saveLocal(sub,uid);
+      await repo.saveLocal(sub, uid);
     } on SubscriptionException {
       rethrow; // Local DB failure is critical — can't proceed
     }

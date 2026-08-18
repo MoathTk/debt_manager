@@ -1037,7 +1037,7 @@ abstract class AppLocalizations {
   /// No description provided for @planTrialDesc.
   ///
   /// In en, this message translates to:
-  /// **'7 days full access, no credit card required'**
+  /// **'14 days full access, no credit card required'**
   String get planTrialDesc;
 
   /// No description provided for @planWeekly.

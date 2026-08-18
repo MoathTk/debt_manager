@@ -483,7 +483,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get planTrial => 'Trial';
 
   @override
-  String get planTrialDesc => '7 days full access, no credit card required';
+  String get planTrialDesc => '14 days full access, no credit card required';
 
   @override
   String get planWeekly => 'Weekly';

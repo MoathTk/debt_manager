@@ -482,7 +482,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get planTrial => 'تجربة';
 
   @override
-  String get planTrialDesc => '7 أيام وصول كامل، بدون بطاقة ائتمان';
+  String get planTrialDesc => '14 أيام وصول كامل، بدون بطاقة ائتمان';
 
   @override
   String get planWeekly => 'أسبوعي';
