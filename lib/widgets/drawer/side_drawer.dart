@@ -12,11 +12,7 @@ import 'drawer_footer.dart';
 import '../update/update_check_tile.dart';
 
 class SettingsDrawer extends ConsumerWidget {
-  const SettingsDrawer({
-    super.key,
-    required this.l10n,
-    required this.onClose,
-  });
+  const SettingsDrawer({super.key, required this.l10n, required this.onClose});
   final AppLocalizations l10n;
   final VoidCallback onClose;
 
@@ -39,7 +35,10 @@ class SettingsDrawer extends ConsumerWidget {
             const Divider(indent: 24, endIndent: 24),
             Expanded(
               child: ListView(
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 16,
+                ),
                 children: [
                   SyncSection(onClose: onClose),
                   const SizedBox(height: 24),
@@ -70,7 +69,7 @@ class SettingsDrawer extends ConsumerWidget {
                   const SizedBox(height: 32),
                   if (isAdmin) const AdminSection(),
                   if (isAdmin) const SizedBox(height: 32),
-                  const DataManagementSection(),
+                  // const DataManagementSection(),
                   const SizedBox(height: 16),
                   const UpdateCheckTile(),
                 ],
