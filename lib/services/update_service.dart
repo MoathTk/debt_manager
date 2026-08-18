@@ -67,7 +67,7 @@ class UpdateService {
   static const _dismissedAtKey = 'update_dismissed_at';
   static const _dismissWindow = Duration(hours: 24);
   static const versionUrl =
-    'https://raw.githubusercontent.com/MoathTk/debt_manager/main/version.json';
+      'https://raw.githubusercontent.com/MoathTk/debt_manager/main/version.json';
 
   static Future<UpdateInfo?> checkForUpdate() async {
     final response = await http
@@ -114,7 +114,10 @@ class UpdateService {
 
   static List<int> _parseVersion(String v) {
     final parts = v.split('.');
-    return List.generate(3, (i) => int.tryParse(parts.elementAtOrNull(i) ?? '0') ?? 0);
+    return List.generate(
+      3,
+      (i) => int.tryParse(parts.elementAtOrNull(i) ?? '0') ?? 0,
+    );
   }
 
   static Future<bool> wasRecentlyDismissed() async {
@@ -137,11 +140,14 @@ class UpdateService {
   }) async {
     try {
       final ota = OtaUpdate();
-      final stream = ota.execute(
-        apkUrl,
-        androidProviderAuthority: 'com.example.local_debt_management.fileProvider',
-        usePackageInstaller: true,
-      ).timeout(const Duration(minutes: 5));
+      final stream = ota
+          .execute(
+            apkUrl,
+            androidProviderAuthority:
+                'com.example.local_debt_management.fileProvider',
+            usePackageInstaller: false,
+          )
+          .timeout(const Duration(minutes: 5));
       await for (final event in stream) {
         if (event.status == OtaStatus.DOWNLOADING && event.value != null) {
           final progress = double.tryParse(event.value!) ?? 0;
