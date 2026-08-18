@@ -691,13 +691,13 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get blockedClockRollback =>
-      'تاريخ/وقت جهازك غير صحيح. يرجى ضبط ساعة الجهاز على التاريخ والوقت الصحيح، ثم الاتصال بالنترنت والضغط على تحديث.';
+      'تاريخ/وقت جهازك غير صحيح. يرجى ضبط ساعة الجهاز على التاريخ والوقت الصحيح، ثم الاتصال الإنترنت والضغط على تحديث.';
 
   @override
   String get blockedDataSafe => 'بياناتك آمنة ومحفوظة بشكل آمن.';
 
   @override
-  String get blockedRequiresInternet => 'يتطلب اتصال بالنترنت للتحقق';
+  String get blockedRequiresInternet => 'يتطلب اتصال الإنترنت للتحقق';
 
   @override
   String get blockedRefresh => 'تحديث والتحقق';

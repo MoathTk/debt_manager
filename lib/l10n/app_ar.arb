@@ -225,9 +225,9 @@
   "updateInstalling": "جاري التحضير للتثبيت...",
   "updateChecking": "جاري التحقق من التحديثات...",
   "blockedTitle": "تم حظر الوصول",
-  "blockedClockRollback": "تاريخ/وقت جهازك غير صحيح. يرجى ضبط ساعة الجهاز على التاريخ والوقت الصحيح، ثم الاتصال بالنترنت والضغط على تحديث.",
+  "blockedClockRollback": "تاريخ/وقت جهازك غير صحيح. يرجى ضبط ساعة الجهاز على التاريخ والوقت الصحيح، ثم الاتصال الإنترنت والضغط على تحديث.",
   "blockedDataSafe": "بياناتك آمنة ومحفوظة بشكل آمن.",
-  "blockedRequiresInternet": "يتطلب اتصال بالنترنت للتحقق",
+  "blockedRequiresInternet": "يتطلب اتصال الإنترنت للتحقق",
   "blockedRefresh": "تحديث والتحقق",
   "timeDaysHours": "{days}ي {hours}س",
   "timeHoursMinutes": "{hours}س {minutes}د"
