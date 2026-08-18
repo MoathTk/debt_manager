@@ -701,4 +701,14 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get blockedRefresh => 'تحديث والتحقق';
+
+  @override
+  String timeDaysHours(Object days, Object hours) {
+    return '$daysي $hoursس';
+  }
+
+  @override
+  String timeHoursMinutes(Object hours, Object minutes) {
+    return '$hoursس $minutesد';
+  }
 }

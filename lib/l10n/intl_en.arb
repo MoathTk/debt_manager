@@ -229,5 +229,7 @@
   "blockedClockRollback": "Your device date/time is incorrect. Please set your clock to the correct date and time, then connect to the internet and tap refresh.",
   "blockedDataSafe": "Your data is safe and stored securely.",
   "blockedRequiresInternet": "Internet connection required to verify",
-  "blockedRefresh": "Refresh & Verify"
+  "blockedRefresh": "Refresh & Verify",
+  "timeDaysHours": "{days}d {hours}h",
+  "timeHoursMinutes": "{hours}h {minutes}m"
 }

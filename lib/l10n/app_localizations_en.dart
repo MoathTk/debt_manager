@@ -704,4 +704,14 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get blockedRefresh => 'Refresh & Verify';
+
+  @override
+  String timeDaysHours(Object days, Object hours) {
+    return '${days}d ${hours}h';
+  }
+
+  @override
+  String timeHoursMinutes(Object hours, Object minutes) {
+    return '${hours}h ${minutes}m';
+  }
 }

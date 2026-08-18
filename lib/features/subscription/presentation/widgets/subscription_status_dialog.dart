@@ -39,8 +39,8 @@ class _State extends State<SubscriptionStatusDialog>
     final timeStr = expired
         ? l10n.expiredLabel
         : diff.inDays > 0
-        ? '${diff.inDays}d ${diff.inHours % 24}h'
-        : '${diff.inHours}h ${diff.inMinutes % 60}m';
+        ? l10n.timeDaysHours(diff.inDays, diff.inHours % 24)
+        : l10n.timeHoursMinutes(diff.inHours, diff.inMinutes % 60);
     final expiry =
         '${sub.expiresAt.day}/${sub.expiresAt.month}/${sub.expiresAt.year}';
     return AlertDialog(
@@ -56,13 +56,13 @@ class _State extends State<SubscriptionStatusDialog>
             child: Column(
               children: [
                 Text(
-                  sub.planLabel,
+                  _planLabel(sub.plan, l10n),
                   style: Theme.of(
                     context,
                   ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800),
                 ),
                 const SizedBox(height: 16),
-                _InfoRow(l10n.planName, sub.planLabel, cs),
+                _InfoRow(l10n.planName, _planLabel(sub.plan, l10n), cs),
                 _InfoRow(l10n.expiresOnLabel, expiry, cs),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -93,6 +93,12 @@ Color dotColor(Subscription sub) => switch (sub.status()) {
   SubscriptionStatus.grace => Colors.red,
   SubscriptionStatus.blocked => Colors.red.shade900,
   SubscriptionStatus.noData => Colors.blue,
+};
+
+String _planLabel(SubscriptionPlan plan, AppLocalizations l10n) => switch (plan) {
+  SubscriptionPlan.trial => l10n.planTrial,
+  SubscriptionPlan.weekly => l10n.planWeekly,
+  SubscriptionPlan.monthly => l10n.planMonthly,
 };
 
 class _InfoRow extends StatelessWidget {

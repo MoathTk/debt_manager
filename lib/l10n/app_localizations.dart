@@ -1459,6 +1459,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Refresh & Verify'**
   String get blockedRefresh;
+
+  /// No description provided for @timeDaysHours.
+  ///
+  /// In en, this message translates to:
+  /// **'{days}d {hours}h'**
+  String timeDaysHours(Object days, Object hours);
+
+  /// No description provided for @timeHoursMinutes.
+  ///
+  /// In en, this message translates to:
+  /// **'{hours}h {minutes}m'**
+  String timeHoursMinutes(Object hours, Object minutes);
 }
 
 class _AppLocalizationsDelegate

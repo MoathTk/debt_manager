@@ -228,5 +228,7 @@
   "blockedClockRollback": "تاريخ/وقت جهازك غير صحيح. يرجى ضبط ساعة الجهاز على التاريخ والوقت الصحيح، ثم الاتصال بالنترنت والضغط على تحديث.",
   "blockedDataSafe": "بياناتك آمنة ومحفوظة بشكل آمن.",
   "blockedRequiresInternet": "يتطلب اتصال بالنترنت للتحقق",
-  "blockedRefresh": "تحديث والتحقق"
+  "blockedRefresh": "تحديث والتحقق",
+  "timeDaysHours": "{days}ي {hours}س",
+  "timeHoursMinutes": "{hours}س {minutes}د"
 }
