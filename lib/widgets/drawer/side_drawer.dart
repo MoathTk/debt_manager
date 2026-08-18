@@ -6,7 +6,6 @@ import 'user_profile_header.dart';
 import 'sync_section.dart';
 import 'language_picker.dart';
 import 'theme_picker.dart';
-import 'data_management_section.dart';
 import 'admin_section.dart';
 import 'drawer_footer.dart';
 import '../update/update_check_tile.dart';
@@ -69,7 +68,6 @@ class SettingsDrawer extends ConsumerWidget {
                   const SizedBox(height: 32),
                   if (isAdmin) const AdminSection(),
                   if (isAdmin) const SizedBox(height: 32),
-                  // const DataManagementSection(),
                   const SizedBox(height: 16),
                   const UpdateCheckTile(),
                 ],
