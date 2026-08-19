@@ -29,7 +29,10 @@ Future<DateTime?> fetchTrustedTime() async {
   // Source 1 — NTP: the best precision (milliseconds). Preferred, but uses
   // UDP port 123 which some carriers/public Wi-Fi/firewalls block.
   try {
-    return await NTP.now();
+    return await NTP.now(
+      lookUpAddress: 'time.google.com',
+      timeout: const Duration(seconds: 3),
+    );
   } catch (_) {}
 
   // Source 2 — Firestore server timestamp: ask the server for ITS clock.
