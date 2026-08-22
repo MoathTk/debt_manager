@@ -711,4 +711,25 @@ class AppLocalizationsAr extends AppLocalizations {
   String timeHoursMinutes(Object hours, Object minutes) {
     return '$hoursس $minutesد';
   }
+
+  @override
+  String get voiceInput => 'إدخال صوتي';
+
+  @override
+  String get listening => 'جاري الاستماع...';
+
+  @override
+  String get parsingVoice => 'الذكاء الاصطناعي يحلل...';
+
+  @override
+  String get transcriptLabel => 'النص المسجل';
+
+  @override
+  String get voiceInputError => 'فشل الإدخال الصوتي. حاول مجدداً.';
+
+  @override
+  String get requiresInternet => 'الإدخال الصوتي يتطلب اتصال بالإنترنت';
+
+  @override
+  String get speakNow => 'تحدث الآن...';
 }

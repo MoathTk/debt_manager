@@ -1471,6 +1471,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{hours}h {minutes}m'**
   String timeHoursMinutes(Object hours, Object minutes);
+
+  /// No description provided for @voiceInput.
+  ///
+  /// In en, this message translates to:
+  /// **'Voice Input'**
+  String get voiceInput;
+
+  /// No description provided for @listening.
+  ///
+  /// In en, this message translates to:
+  /// **'Listening...'**
+  String get listening;
+
+  /// No description provided for @parsingVoice.
+  ///
+  /// In en, this message translates to:
+  /// **'AI is parsing...'**
+  String get parsingVoice;
+
+  /// No description provided for @transcriptLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Transcript'**
+  String get transcriptLabel;
+
+  /// No description provided for @voiceInputError.
+  ///
+  /// In en, this message translates to:
+  /// **'Voice input failed. Try again.'**
+  String get voiceInputError;
+
+  /// No description provided for @requiresInternet.
+  ///
+  /// In en, this message translates to:
+  /// **'Voice input requires internet connection'**
+  String get requiresInternet;
+
+  /// No description provided for @speakNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Speak now...'**
+  String get speakNow;
 }
 
 class _AppLocalizationsDelegate

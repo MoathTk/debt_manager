@@ -231,5 +231,12 @@
   "blockedRequiresInternet": "Internet connection required to verify",
   "blockedRefresh": "Refresh & Verify",
   "timeDaysHours": "{days}d {hours}h",
-  "timeHoursMinutes": "{hours}h {minutes}m"
+  "timeHoursMinutes": "{hours}h {minutes}m",
+  "voiceInput": "Voice Input",
+  "listening": "Listening...",
+  "parsingVoice": "AI is parsing...",
+  "transcriptLabel": "Transcript",
+  "voiceInputError": "Voice input failed. Try again.",
+  "requiresInternet": "Voice input requires internet connection",
+  "speakNow": "Speak now..."
 }

@@ -714,4 +714,25 @@ class AppLocalizationsEn extends AppLocalizations {
   String timeHoursMinutes(Object hours, Object minutes) {
     return '${hours}h ${minutes}m';
   }
+
+  @override
+  String get voiceInput => 'Voice Input';
+
+  @override
+  String get listening => 'Listening...';
+
+  @override
+  String get parsingVoice => 'AI is parsing...';
+
+  @override
+  String get transcriptLabel => 'Transcript';
+
+  @override
+  String get voiceInputError => 'Voice input failed. Try again.';
+
+  @override
+  String get requiresInternet => 'Voice input requires internet connection';
+
+  @override
+  String get speakNow => 'Speak now...';
 }

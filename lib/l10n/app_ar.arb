@@ -230,5 +230,12 @@
   "blockedRequiresInternet": "يتطلب اتصال الإنترنت للتحقق",
   "blockedRefresh": "تحديث والتحقق",
   "timeDaysHours": "{days}ي {hours}س",
-  "timeHoursMinutes": "{hours}س {minutes}د"
+  "timeHoursMinutes": "{hours}س {minutes}د",
+  "voiceInput": "إدخال صوتي",
+  "listening": "جاري الاستماع...",
+  "parsingVoice": "الذكاء الاصطناعي يحلل...",
+  "transcriptLabel": "النص المسجل",
+  "voiceInputError": "فشل الإدخال الصوتي. حاول مجدداً.",
+  "requiresInternet": "الإدخال الصوتي يتطلب اتصال بالإنترنت",
+  "speakNow": "تحدث الآن..."
 }
