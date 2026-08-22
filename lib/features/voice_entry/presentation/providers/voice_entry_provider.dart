@@ -27,7 +27,7 @@ final voiceEntryProvider =
       final parseTranscript = ParseVoiceTranscript(
         VoiceEntryRepositoryImpl(
           AiParsingDatasource(
-            apiKey: 'AQ.Ab8RN6L2TGNLWNuvEZxCPuu6DA7KVxKVIe94xIOdFAVIOPs-lQ',
+            apiKey: const String.fromEnvironment('GEMINI_API_KEY'),
           ),
         ),
       );
