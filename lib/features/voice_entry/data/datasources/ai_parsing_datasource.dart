@@ -19,10 +19,48 @@ class AiParsingDatasource {
   final String apiKey;
   final http.Client _client;
 
-  static const _model = 'gpt-4o-mini';
+  static const _parseModel = 'gpt-4o-mini';
+  static const _transcribeModel = 'gpt-transcribe';
 
   AiParsingDatasource({required this.apiKey, http.Client? client})
     : _client = client ?? http.Client();
+
+  Future<String> transcribeAudio(String filePath) async {
+    try {
+      final url = Uri.parse('https://api.openai.com/v1/audio/transcriptions');
+      final request = http.MultipartRequest('POST', url)
+        ..headers['Authorization'] = 'Bearer $apiKey'
+        ..fields['model'] = _transcribeModel
+        ..fields['language'] = 'ar'
+        ..fields['prompt'] =
+            'Arabic speech, Iraqi dialect. Retail shop items and amounts in IQD.';
+      request.files.add(
+        await http.MultipartFile.fromPath('file', filePath),
+      );
+
+      final streamed = await _client.send(request).timeout(
+        const Duration(seconds: 30),
+      );
+      final response = await http.Response.fromStream(streamed);
+
+      if (response.statusCode != 200) {
+        throw AiParsingException(
+          'Transcription failed (${response.statusCode}): ${response.body}',
+        );
+      }
+
+      final data = jsonDecode(response.body);
+      final text = data['text'] as String?;
+      if (text == null || text.trim().isEmpty) {
+        throw const AiParsingException('Empty transcription result');
+      }
+      return text.trim();
+    } on AiParsingException {
+      rethrow;
+    } catch (e) {
+      throw AiParsingException('Failed to transcribe audio', e);
+    }
+  }
 
   Future<VoiceParsedDebt> parse(String transcript) async {
     final today = DateTime.now().toIso8601String().substring(0, 10);
@@ -68,7 +106,7 @@ class AiParsingDatasource {
   }
 
   Map<String, dynamic> _buildBody(String prompt) => {
-    'model': _model,
+    'model': _parseModel,
     'messages': [
       {
         'role': 'system',

@@ -764,4 +764,32 @@ class AppLocalizationsAr extends AppLocalizations {
   String itemsSummary(Object count, Object total) {
     return '$count عناصر • $total';
   }
+
+  @override
+  String get apiKeyNotConfigured =>
+      'مفتاح API غير مكون. قم بالتشغيل باستخدام: --dart-define-from-file=dart_define_config.env';
+
+  @override
+  String get noInternet =>
+      'لا يوجد اتصال بالإنترنت. تحقق من اتصالك وحاول مرة أخرى.';
+
+  @override
+  String listeningDuration(Object duration) {
+    return 'جاري الاستماع $duration';
+  }
+
+  @override
+  String get serverError => 'خطأ في الخادم. يرجى المحاولة لاحقاً.';
+
+  @override
+  String get retry => 'إعادة المحاولة';
+
+  @override
+  String get transcript => 'النص';
+
+  @override
+  String get reRecord => 'إعادة التسجيل';
+
+  @override
+  String get remove => 'إزالة';
 }

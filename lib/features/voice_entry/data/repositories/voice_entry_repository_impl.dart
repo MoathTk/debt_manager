@@ -19,6 +19,11 @@ class VoiceEntryRepositoryImpl implements VoiceEntryRepository {
   VoiceEntryRepositoryImpl(this._aiDatasource);
 
   @override
+  Future<String> transcribeAudio(String filePath) async {
+    return _aiDatasource.transcribeAudio(filePath);
+  }
+
+  @override
   Future<VoiceParsedDebt> parseTranscript(String transcript) async {
     if (transcript.trim().isEmpty) {
       throw const AiParsingException('Empty transcript');

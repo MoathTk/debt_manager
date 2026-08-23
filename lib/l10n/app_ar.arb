@@ -247,5 +247,13 @@
   "parse": "تحليل",
   "noSpeechDetected": "لم يتم اكتشاف كلام. يرجى المحاولة مرة أخرى.",
   "parsedItemsReady": "تمت معالجة الإدخال الصوتي بنجاح!",
-  "itemsSummary": "{count} عناصر • {total}"
+  "itemsSummary": "{count} عناصر • {total}",
+  "apiKeyNotConfigured": "مفتاح API غير مكون. قم بالتشغيل باستخدام: --dart-define-from-file=dart_define_config.env",
+  "noInternet": "لا يوجد اتصال بالإنترنت. تحقق من اتصالك وحاول مرة أخرى.",
+  "listeningDuration": "جاري الاستماع {duration}",
+  "serverError": "خطأ في الخادم. يرجى المحاولة لاحقاً.",
+  "retry": "إعادة المحاولة",
+  "transcript": "النص",
+  "reRecord": "إعادة التسجيل",
+  "remove": "إزالة"
 }

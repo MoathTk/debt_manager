@@ -16,13 +16,15 @@ library;
 import '../entities/voice_parsed_debt.dart';
 
 abstract class VoiceEntryRepository {
+  /// Transcribe an audio file to text using OpenAI's transcription API.
+  ///
+  /// Takes a file path to an audio file (.m4a) and returns the
+  /// transcribed text. Supports Arabic (Iraqi dialect).
+  Future<String> transcribeAudio(String filePath);
+
   /// Parse a voice transcript into structured debt data.
   ///
-  /// Takes a raw transcript string (from speech-to-text) and returns
-  /// a [VoiceParsedDebt] containing extracted items, total amount,
-  /// and optional due date.
-  ///
-  /// Throws [AiParsingException] if the AI API call fails.
-  /// Throws [NoInternetForVoiceException] if offline.
+  /// Takes a raw transcript string and returns a [VoiceParsedDebt]
+  /// containing extracted items, total amount, and optional due date.
   Future<VoiceParsedDebt> parseTranscript(String transcript);
 }

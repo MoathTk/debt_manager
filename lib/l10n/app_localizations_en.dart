@@ -767,4 +767,32 @@ class AppLocalizationsEn extends AppLocalizations {
   String itemsSummary(Object count, Object total) {
     return '$count items • $total';
   }
+
+  @override
+  String get apiKeyNotConfigured =>
+      'API key not configured. Run with --dart-define-from-file=dart_define_config.env';
+
+  @override
+  String get noInternet =>
+      'No internet connection. Check your connection and try again.';
+
+  @override
+  String listeningDuration(Object duration) {
+    return 'Listening $duration';
+  }
+
+  @override
+  String get serverError => 'Server error. Please try again later.';
+
+  @override
+  String get retry => 'Retry';
+
+  @override
+  String get transcript => 'Transcript';
+
+  @override
+  String get reRecord => 'Re-record';
+
+  @override
+  String get remove => 'Remove';
 }

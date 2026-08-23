@@ -5,11 +5,10 @@ import '../../Providers/mutations.dart';
 import '../../features/subscription/presentation/widgets/mutation_guard.dart';
 import '../../features/voice_entry/presentation/providers/voice_entry_provider.dart';
 import '../../features/voice_entry/domain/entities/voice_parsed_debt.dart';
-import '../../features/voice_entry/presentation/widgets/editable_transcript.dart';
 import '../../features/voice_entry/presentation/widgets/parsed_items_review.dart';
 import 'handle.dart';
 import 'header.dart';
-import 'live_transcript.dart';
+import 'recording_indicator.dart';
 import 'processing_indicator.dart';
 import 'error_banner.dart';
 import 'field.dart';
@@ -95,20 +94,10 @@ class _BodyState extends ConsumerState<_AddDebtBody> {
               AddDebtHeader(l10n: l10n, voiceState: voiceState),
               if (voiceState.isRecording) ...[
                 const SizedBox(height: 12),
-                LiveTranscript(l10n: l10n, transcript: voiceState.transcript),
-              ],
-              if (voiceState.isEditing && voiceState.transcript != null) ...[
-                const SizedBox(height: 12),
-                EditableTranscript(
-                  transcript: voiceState.transcript!,
-                  onParse: (edited) {
-                    ref
-                        .read(voiceEntryProvider.notifier)
-                        .confirmTranscript(edited);
-                  },
-                  onCancel: () {
-                    ref.read(voiceEntryProvider.notifier).reset();
-                  },
+                RecordingIndicator(
+                  l10n: l10n,
+                  soundLevel: voiceState.soundLevel,
+                  recordingStarted: voiceState.recordingStarted,
                 ),
               ],
               if (voiceState.isProcessing) ...[
@@ -118,7 +107,8 @@ class _BodyState extends ConsumerState<_AddDebtBody> {
               if (voiceState.isError && voiceState.error != null) ...[
                 const SizedBox(height: 12),
                 ErrorBanner(
-                  message: voiceState.error!,
+                  l10n: l10n,
+                  error: voiceState.error!,
                   onRetry: voiceState.transcript != null
                       ? () =>
                             ref.read(voiceEntryProvider.notifier).retryParsing()
@@ -129,6 +119,7 @@ class _BodyState extends ConsumerState<_AddDebtBody> {
                 const SizedBox(height: 12),
                 ParsedItemsReview(
                   parsedDebt: voiceState.parsedDebt!,
+                  transcript: voiceState.transcript,
                   onChanged: (updated) {
                     ref
                         .read(voiceEntryProvider.notifier)
@@ -139,6 +130,9 @@ class _BodyState extends ConsumerState<_AddDebtBody> {
                   },
                   onRetry: () {
                     ref.read(voiceEntryProvider.notifier).retryParsing();
+                  },
+                  onReRecord: () {
+                    ref.read(voiceEntryProvider.notifier).reRecord();
                   },
                 ),
               ],

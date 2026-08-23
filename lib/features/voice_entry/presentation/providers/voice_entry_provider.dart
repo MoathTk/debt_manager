@@ -1,159 +1,186 @@
 /// VOICE ENTRY FEATURE — PRESENTATION LAYER: PROVIDER
 ///
-/// Manages the voice recording → transcription → AI parsing flow.
-/// Uses speech_to_text for on-device speech recognition and
-/// ParseVoiceTranscript use case for AI parsing.
+/// Manages the record → transcribe → parse flow.
+/// Uses record package for audio capture and OpenAI for transcription + parsing.
 /// ---------------------------------------------------------------------------
 library;
 
+import 'dart:async';
+import 'dart:io';
+import 'dart:math';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:speech_to_text/speech_to_text.dart' as stt;
+import 'package:record/record.dart';
 import 'package:local_debt_management/services/connectivity_service.dart';
 import '../../domain/exceptions/voice_entry_exception.dart';
+import '../../domain/usecases/transcribe_audio.dart';
 import '../../domain/usecases/parse_voice_transcript.dart';
 import '../../data/datasources/ai_parsing_datasource.dart';
 import '../../data/repositories/voice_entry_repository_impl.dart';
 import 'voice_entry_state.dart';
 import '../../domain/entities/voice_parsed_debt.dart';
 
-/// Provider for the voice entry notifier.
-///
-/// Uses a compile-time environment variable for the API key.
-/// Pass --dart-define-from-file=dart_define_config.env at build time.
-/// The provider is autoDispose since voice entry is session-based.
 final voiceEntryProvider =
     StateNotifierProvider.autoDispose<VoiceEntryNotifier, VoiceEntryState>((
       ref,
     ) {
-      final parseTranscript = ParseVoiceTranscript(
-        VoiceEntryRepositoryImpl(
-          AiParsingDatasource(
-            apiKey: const String.fromEnvironment('OPENAI_API_KEY'),
-          ),
-        ),
+      final datasource = AiParsingDatasource(
+        apiKey: const String.fromEnvironment('OPENAI_API_KEY'),
       );
-      return VoiceEntryNotifier(parseTranscript);
+      final repo = VoiceEntryRepositoryImpl(datasource);
+      return VoiceEntryNotifier(
+        TranscribeAudio(repo),
+        ParseVoiceTranscript(repo),
+      );
     });
 
 class VoiceEntryNotifier extends StateNotifier<VoiceEntryState> {
+  final TranscribeAudio _transcribeAudio;
   final ParseVoiceTranscript _parseTranscript;
-  final stt.SpeechToText _speech = stt.SpeechToText();
-  bool _speechInitialized = false;
-  bool _processing = false;
-  String _localeId = 'ar-IQ';
-  String _committedTranscript = '';
+  final AudioRecorder _recorder = AudioRecorder();
+  StreamSubscription<Amplitude>? _ampSub;
 
-  VoiceEntryNotifier(this._parseTranscript) : super(const VoiceEntryState());
-
-  Future<void> _initSpeech() async {
-    if (_speechInitialized) return;
-    final available = await _speech.initialize(
-      onError: (error) {
-        if (mounted && !state.isRecording) {
-          state = state.copyWith(
-            status: VoiceEntryStatus.error,
-            error: error.errorMsg,
-          );
-        }
-      },
-    );
-    if (!available) {
-      throw const SpeechRecognitionException(
-        'Speech recognition not available on this device',
-      );
-    }
-    _speechInitialized = true;
-  }
-
-  void _onSpeechResult(dynamic result) {
-    if (!mounted || !state.isRecording) return;
-    final words = result.recognizedWords as String? ?? '';
-    if (words.isEmpty) return;
-    final isFinal = result.finalResult as bool? ?? false;
-    final current = state.transcript ?? '';
-
-    if (current.isEmpty) {
-      // First result
-      state = state.copyWith(transcript: words);
-    } else if (words.startsWith(current)) {
-      // Engine extended the current text (same session)
-      state = state.copyWith(transcript: words);
-    } else if (current.startsWith(words)) {
-      // Engine corrected itself — ignore shorter result
-      return;
-    } else {
-      // New session — engine restarted with fresh words
-      _committedTranscript = current;
-      state = state.copyWith(transcript: '$_committedTranscript $words');
-    }
-
-    if (isFinal) {
-      _committedTranscript = state.transcript ?? '';
-    }
-  }
-
-  static const _arabicLocalePriority = [
-    'ar-IQ',
-    'ar-SA',
-    'ar-AE',
-    'ar-EG',
-    'ar-MA',
-    'ar-TN',
-    'ar',
-  ];
-
-  Future<String> _detectArabicLocale() async {
-    try {
-      final locales = await _speech.locales();
-      for (final preferred in _arabicLocalePriority) {
-        if (locales.any((l) => l.localeId == preferred)) {
-          return preferred;
-        }
-      }
-      if (locales.any((l) => l.localeId.startsWith('ar'))) {
-        return 'ar';
-      }
-    } catch (_) {}
-    return 'ar-IQ';
-  }
+  VoiceEntryNotifier(this._transcribeAudio, this._parseTranscript)
+    : super(const VoiceEntryState());
 
   Future<void> startRecording() async {
     const apiKey = String.fromEnvironment('OPENAI_API_KEY');
     if (apiKey.isEmpty) {
       state = state.copyWith(
         status: VoiceEntryStatus.error,
-        error:
-            'API key not configured. Run with:\n--dart-define-from-file=dart_define_config.env',
+        error: 'api_key_not_configured',
       );
       return;
     }
+
     try {
-      await _initSpeech();
-      _processing = false;
-      _committedTranscript = '';
-
-      _localeId = await _detectArabicLocale();
-
+      if (!await _recorder.hasPermission()) {
+        state = state.copyWith(
+          status: VoiceEntryStatus.error,
+          error: 'no_speech_detected',
+        );
+        return;
+      }
+    } catch (e) {
       state = state.copyWith(
-        status: VoiceEntryStatus.recording,
-        clearError: true,
-        clearParsedDebt: true,
-        clearTranscript: true,
+        status: VoiceEntryStatus.error,
+        error: 'no_speech_detected',
       );
+      return;
+    }
 
-      await _speech.listen(
-        onResult: _onSpeechResult,
-        listenOptions: stt.SpeechListenOptions(
-          listenMode: stt.ListenMode.deviceDefault,
-          cancelOnError: true,
-          partialResults: true,
-          localeId: _localeId,
-          pauseFor: const Duration(minutes: 5),
-          listenFor: const Duration(minutes: 5),
+    final tempDir = Directory.systemTemp;
+    final path =
+        '${tempDir.path}/recording_${DateTime.now().millisecondsSinceEpoch}.m4a';
+
+    try {
+      await _recorder.start(
+        const RecordConfig(
+          encoder: AudioEncoder.aacLc,
+          bitRate: 128000,
+          sampleRate: 44100,
+          numChannels: 1,
         ),
+        path: path,
       );
-    } on VoiceEntryException {
-      rethrow;
+    } catch (e) {
+      state = state.copyWith(
+        status: VoiceEntryStatus.error,
+        error: 'no_speech_detected',
+      );
+      return;
+    }
+
+    state = state.copyWith(
+      status: VoiceEntryStatus.recording,
+      clearError: true,
+      clearParsedDebt: true,
+      clearTranscript: true,
+      recordingStarted: DateTime.now(),
+      soundLevel: 0.0,
+      recordedFilePath: path,
+    );
+
+    _ampSub = _recorder
+        .onAmplitudeChanged(const Duration(milliseconds: 200))
+        .listen((amp) {
+      if (!mounted || !state.isRecording) return;
+      final normalized = pow(10, amp.current / 20).clamp(0.0, 1.0);
+      state = state.copyWith(soundLevel: normalized.toDouble());
+    });
+  }
+
+  Future<void> stopRecording() async {
+    await _ampSub?.cancel();
+    _ampSub = null;
+
+    String? path;
+    try {
+      path = await _recorder.stop();
+    } catch (_) {}
+
+    if (!mounted) return;
+
+    if (path == null || path.isEmpty) {
+      state = state.copyWith(
+        status: VoiceEntryStatus.error,
+        error: 'no_speech_detected',
+        clearRecordingStarted: true,
+        soundLevel: 0.0,
+      );
+      return;
+    }
+
+    await _processAudio(path);
+  }
+
+  Future<void> retryParsing() async {
+    final transcript = state.transcript;
+    if (transcript == null || transcript.isEmpty) return;
+    await _runParsing(transcript);
+  }
+
+  void updateParsedDebt(VoiceParsedDebt updated) {
+    if (mounted) {
+      state = state.copyWith(parsedDebt: updated);
+    }
+  }
+
+  void reRecord() {
+    reset();
+    startRecording();
+  }
+
+  Future<void> _processAudio(String filePath) async {
+    if (!mounted) return;
+
+    state = state.copyWith(
+      status: VoiceEntryStatus.transcribing,
+      clearRecordingStarted: true,
+      soundLevel: 0.0,
+    );
+
+    if (!await ConnectivityService().checkConnection()) {
+      if (mounted) {
+        state = state.copyWith(
+          status: VoiceEntryStatus.error,
+          error: 'no_internet',
+        );
+      }
+      return;
+    }
+
+    try {
+      final transcript = await _transcribeAudio(filePath);
+      if (!mounted) return;
+      state = state.copyWith(transcript: transcript);
+      await _runParsing(transcript);
+    } on VoiceEntryException catch (e) {
+      if (mounted) {
+        state = state.copyWith(
+          status: VoiceEntryStatus.error,
+          error: e.message,
+        );
+      }
     } catch (e) {
       if (mounted) {
         state = state.copyWith(
@@ -164,67 +191,10 @@ class VoiceEntryNotifier extends StateNotifier<VoiceEntryState> {
     }
   }
 
-  Future<void> stopRecording() async {
-    try {
-      await _speech.stop().timeout(const Duration(seconds: 2));
-    } catch (_) {}
-    await Future.delayed(const Duration(milliseconds: 400));
-
-    final transcript = state.transcript;
+  Future<void> _runParsing(String transcript) async {
     if (!mounted) return;
 
-    if (transcript != null && transcript.isNotEmpty) {
-      state = state.copyWith(
-        status: VoiceEntryStatus.editing,
-        transcript: transcript,
-      );
-    } else {
-      state = state.copyWith(
-        status: VoiceEntryStatus.error,
-        error: 'No speech detected. Please try again.',
-      );
-    }
-  }
-
-  Future<void> confirmTranscript(String text) async {
-    if (text.trim().isEmpty) return;
-    await _processTranscript(text.trim());
-  }
-
-  Future<void> retryParsing() async {
-    final transcript = state.transcript;
-    if (transcript == null || transcript.isEmpty) return;
-    _processing = false;
-    await _processTranscript(transcript);
-  }
-
-  void updateParsedDebt(VoiceParsedDebt updated) {
-    if (mounted) {
-      state = state.copyWith(parsedDebt: updated);
-    }
-  }
-
-  Future<void> _processTranscript(String transcript) async {
-    if (!mounted || _processing) return;
-    _processing = true;
-    state = state.copyWith(
-      status: VoiceEntryStatus.transcribing,
-      transcript: transcript,
-    );
-
-    if (!await ConnectivityService().checkConnection()) {
-      if (mounted) {
-        state = state.copyWith(
-          status: VoiceEntryStatus.error,
-          error: 'Requires internet connection',
-        );
-      }
-      return;
-    }
-
-    if (mounted) {
-      state = state.copyWith(status: VoiceEntryStatus.parsing);
-    }
+    state = state.copyWith(status: VoiceEntryStatus.parsing);
 
     try {
       final result = await _parseTranscript(transcript);
@@ -252,13 +222,16 @@ class VoiceEntryNotifier extends StateNotifier<VoiceEntryState> {
   }
 
   void reset() {
-    _committedTranscript = '';
+    _ampSub?.cancel();
+    _ampSub = null;
+    _recorder.stop();
     state = const VoiceEntryState();
   }
 
   @override
   void dispose() {
-    _speech.cancel();
+    _ampSub?.cancel();
+    _recorder.dispose();
     super.dispose();
   }
 }

@@ -248,5 +248,13 @@
   "parse": "Parse",
   "noSpeechDetected": "No speech detected. Please try again.",
   "parsedItemsReady": "Voice input parsed successfully!",
-  "itemsSummary": "{count} items • {total}"
+  "itemsSummary": "{count} items • {total}",
+  "apiKeyNotConfigured": "API key not configured. Run with --dart-define-from-file=dart_define_config.env",
+  "noInternet": "No internet connection. Check your connection and try again.",
+  "listeningDuration": "Listening {duration}",
+  "serverError": "Server error. Please try again later.",
+  "retry": "Retry",
+  "transcript": "Transcript",
+  "reRecord": "Re-record",
+  "remove": "Remove"
 }

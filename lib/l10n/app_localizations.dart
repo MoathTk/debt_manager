@@ -1573,6 +1573,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{count} items • {total}'**
   String itemsSummary(Object count, Object total);
+
+  /// No description provided for @apiKeyNotConfigured.
+  ///
+  /// In en, this message translates to:
+  /// **'API key not configured. Run with --dart-define-from-file=dart_define_config.env'**
+  String get apiKeyNotConfigured;
+
+  /// No description provided for @noInternet.
+  ///
+  /// In en, this message translates to:
+  /// **'No internet connection. Check your connection and try again.'**
+  String get noInternet;
+
+  /// No description provided for @listeningDuration.
+  ///
+  /// In en, this message translates to:
+  /// **'Listening {duration}'**
+  String listeningDuration(Object duration);
+
+  /// No description provided for @serverError.
+  ///
+  /// In en, this message translates to:
+  /// **'Server error. Please try again later.'**
+  String get serverError;
+
+  /// No description provided for @retry.
+  ///
+  /// In en, this message translates to:
+  /// **'Retry'**
+  String get retry;
+
+  /// No description provided for @transcript.
+  ///
+  /// In en, this message translates to:
+  /// **'Transcript'**
+  String get transcript;
+
+  /// No description provided for @reRecord.
+  ///
+  /// In en, this message translates to:
+  /// **'Re-record'**
+  String get reRecord;
+
+  /// No description provided for @remove.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove'**
+  String get remove;
 }
 
 class _AppLocalizationsDelegate
