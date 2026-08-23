@@ -54,8 +54,7 @@ class AiParsingDatasource {
       }
 
       final data = jsonDecode(response.body);
-      final content =
-          data['choices']?[0]?['message']?['content'] as String?;
+      final content = data['choices']?[0]?['message']?['content'] as String?;
       if (content == null) {
         throw const AiParsingException('Invalid API response format');
       }
@@ -149,7 +148,11 @@ Extract items, amounts in Iraqi Dinars (IQD), and due dates from the transcript 
 
 STRICT RULES:
 1. OUTPUT FORMAT: Return ONLY raw JSON without markdown syntax, codeblocks, or extra text.
-2. MERGE DUPLICATES: Combine identical items and sum their total amounts.
+
+2. STUTTERING vs MERGING DUPLICATES (CRITICAL): 
+   - STT GLITCHES: If exact words, items, or prices are repeated back-to-back (e.g., "طحين طحين", or "لحم ب 22 لحم ب 22"), treat it as a microphone stutter. KEEP ONLY ONE and DO NOT sum the amounts.
+   - GENUINE MERGING: Only combine items and sum amounts if they are clearly mentioned as separate entries later in the sentence.
+
 3. IRAQI DIALECT NUMBERS & SHORTHAND:
    - Convert spoken numbers to full IQD amounts:
      * "بعشرة" / "10" / "عشرة" -> 10000
@@ -166,9 +169,10 @@ STRICT RULES:
    - This prompt is strictly for RECORDING DEBT (إضافة دين).
    - Ignore payment terms like "وافي", "سدد", "رجعلي", "انطاني من الدين". 
 
-6. CLEANING TEXT:
+6. CLEANING TEXT & GLITCHES:
    - Strip greetings and Iraqi fillers: "رحمة لأبيك", "والله", "عيني", "أغاتي", "حبيبي", "سجل يمعود".
    - Strip customer references: "على أبو شهاب", "حساب أحمد".
+   - Ignore standalone stuttered numbers that don't make sense in context.
 
 7. DUE DATE CALCULATION:
    - Relative to TODAY ($today).
@@ -186,11 +190,11 @@ EXAMPLES:
 Transcript: "والله سجل على ابو جاسم 3 كواني طحين ب 45 و كارتين آسيا ب 20 عقب باجر ينطيها"
 {"items": [{"name": "طحين (3 كواني)", "amount": 45000}, {"name": "كارت آسيا (2)", "amount": 20000}], "total_amount": 65000, "due_date": "2026-08-25"}
 
+Transcript: "سجل سجل عيني كيلو لحم لحم ب 22 ب 22 وخمسة وثلاثين رصيد"
+{"items": [{"name": "لحم (1 كيلو)", "amount": 22000}, {"name": "رصيد", "amount": 35000}], "total_amount": 57000, "due_date": null}
+
 Transcript: "عيني كيلوين طماطة ب ألفين ونص وربع كيلو خيار ب 500"
 {"items": [{"name": "طماطة (2 كيلو)", "amount": 2500}, {"name": "خيار (ربع كيلو)", "amount": 500}], "total_amount": 3000, "due_date": null}
-
-Transcript: "كيلو لحم ب 22 وخمسة وثلاثين رصيد"
-{"items": [{"name": "لحم (1 كيلو)", "amount": 22000}, {"name": "رصيد", "amount": 35000}], "total_amount": 57000, "due_date": null}
 
 Transcript: $transcript
 ''';
