@@ -69,26 +69,25 @@ class VoiceEntryNotifier extends StateNotifier<VoiceEntryState> {
     final words = result.recognizedWords as String? ?? '';
     if (words.isEmpty) return;
     final isFinal = result.finalResult as bool? ?? false;
-    final currentTranscript = state.transcript ?? '';
+    final current = state.transcript ?? '';
 
-    // Detect new session: the engine reset and gave us fresh words
-    // that don't include what we already have
-    final isOldSessionDone =
-        currentTranscript.isNotEmpty &&
-        words != currentTranscript &&
-        !words.startsWith(currentTranscript);
-    if (isOldSessionDone) {
-      _committedTranscript = currentTranscript;
+    if (current.isEmpty) {
+      // First result
+      state = state.copyWith(transcript: words);
+    } else if (words.startsWith(current)) {
+      // Engine extended the current text (same session)
+      state = state.copyWith(transcript: words);
+    } else if (current.startsWith(words)) {
+      // Engine corrected itself — ignore shorter result
+      return;
+    } else {
+      // New session — engine restarted with fresh words
+      _committedTranscript = current;
+      state = state.copyWith(transcript: '$_committedTranscript $words');
     }
 
-    final full = _committedTranscript.isEmpty
-        ? words
-        : '$_committedTranscript $words';
-
-    state = state.copyWith(transcript: full);
-
     if (isFinal) {
-      _committedTranscript = full;
+      _committedTranscript = state.transcript ?? '';
     }
   }
 
