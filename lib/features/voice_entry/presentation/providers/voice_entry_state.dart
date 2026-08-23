@@ -7,7 +7,15 @@ library;
 
 import '../../domain/entities/voice_parsed_debt.dart';
 
-enum VoiceEntryStatus { idle, recording, transcribing, parsing, ready, error }
+enum VoiceEntryStatus {
+  idle,
+  recording,
+  editing,
+  transcribing,
+  parsing,
+  ready,
+  error,
+}
 
 class VoiceEntryState {
   final VoiceEntryStatus status;
@@ -41,6 +49,7 @@ class VoiceEntryState {
 
   bool get isIdle => status == VoiceEntryStatus.idle;
   bool get isRecording => status == VoiceEntryStatus.recording;
+  bool get isEditing => status == VoiceEntryStatus.editing;
   bool get isTranscribing => status == VoiceEntryStatus.transcribing;
   bool get isParsing => status == VoiceEntryStatus.parsing;
   bool get isReady => status == VoiceEntryStatus.ready;

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../l10n/app_localizations.dart';
 import '../features/subscription/presentation/widgets/mutation_guard.dart';
-import 'add_debt_sheet.dart';
+import 'add_debt_sheet/add_debt_sheet.dart';
 import 'record_payment_sheet.dart';
 import 'records_list_sheet.dart';
 

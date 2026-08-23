@@ -1513,6 +1513,66 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Speak now...'**
   String get speakNow;
+
+  /// No description provided for @parsedItems.
+  ///
+  /// In en, this message translates to:
+  /// **'Parsed Items'**
+  String get parsedItems;
+
+  /// No description provided for @total.
+  ///
+  /// In en, this message translates to:
+  /// **'Total'**
+  String get total;
+
+  /// No description provided for @due.
+  ///
+  /// In en, this message translates to:
+  /// **'Due'**
+  String get due;
+
+  /// No description provided for @acceptAndSave.
+  ///
+  /// In en, this message translates to:
+  /// **'Accept & Save'**
+  String get acceptAndSave;
+
+  /// No description provided for @retryParsing.
+  ///
+  /// In en, this message translates to:
+  /// **'Retry'**
+  String get retryParsing;
+
+  /// No description provided for @editTranscript.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Transcript'**
+  String get editTranscript;
+
+  /// No description provided for @parse.
+  ///
+  /// In en, this message translates to:
+  /// **'Parse'**
+  String get parse;
+
+  /// No description provided for @noSpeechDetected.
+  ///
+  /// In en, this message translates to:
+  /// **'No speech detected. Please try again.'**
+  String get noSpeechDetected;
+
+  /// No description provided for @parsedItemsReady.
+  ///
+  /// In en, this message translates to:
+  /// **'Voice input parsed successfully!'**
+  String get parsedItemsReady;
+
+  /// No description provided for @itemsSummary.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} items • {total}'**
+  String itemsSummary(Object count, Object total);
 }
 
 class _AppLocalizationsDelegate

@@ -14,6 +14,7 @@ import '../../domain/usecases/parse_voice_transcript.dart';
 import '../../data/datasources/ai_parsing_datasource.dart';
 import '../../data/repositories/voice_entry_repository_impl.dart';
 import 'voice_entry_state.dart';
+import '../../domain/entities/voice_parsed_debt.dart';
 
 /// Provider for the voice entry notifier.
 ///
@@ -164,29 +165,42 @@ class VoiceEntryNotifier extends StateNotifier<VoiceEntryState> {
   }
 
   Future<void> stopRecording() async {
-    // Stop speech first — this may trigger a final onResult callback
     try {
       await _speech.stop().timeout(const Duration(seconds: 2));
     } catch (_) {}
-
-    // Small delay to let any pending onResult callback update state.transcript
     await Future.delayed(const Duration(milliseconds: 400));
 
     final transcript = state.transcript;
+    if (!mounted) return;
 
-    // Force UI out of "Listening..."
-    if (mounted) {
-      state = state.copyWith(status: VoiceEntryStatus.idle);
-    }
-
-    if (_processing) return;
     if (transcript != null && transcript.isNotEmpty) {
-      await _processTranscript(transcript);
-    } else if (mounted) {
+      state = state.copyWith(
+        status: VoiceEntryStatus.editing,
+        transcript: transcript,
+      );
+    } else {
       state = state.copyWith(
         status: VoiceEntryStatus.error,
         error: 'No speech detected. Please try again.',
       );
+    }
+  }
+
+  Future<void> confirmTranscript(String text) async {
+    if (text.trim().isEmpty) return;
+    await _processTranscript(text.trim());
+  }
+
+  Future<void> retryParsing() async {
+    final transcript = state.transcript;
+    if (transcript == null || transcript.isEmpty) return;
+    _processing = false;
+    await _processTranscript(transcript);
+  }
+
+  void updateParsedDebt(VoiceParsedDebt updated) {
+    if (mounted) {
+      state = state.copyWith(parsedDebt: updated);
     }
   }
 

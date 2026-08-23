@@ -732,4 +732,36 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get speakNow => 'تحدث الآن...';
+
+  @override
+  String get parsedItems => 'العناصر المستخرجة';
+
+  @override
+  String get total => 'المجموع';
+
+  @override
+  String get due => 'تاريخ الاستحقاق';
+
+  @override
+  String get acceptAndSave => 'قبول وحفظ';
+
+  @override
+  String get retryParsing => 'إعادة المحاولة';
+
+  @override
+  String get editTranscript => 'تعديل النص';
+
+  @override
+  String get parse => 'تحليل';
+
+  @override
+  String get noSpeechDetected => 'لم يتم اكتشاف كلام. يرجى المحاولة مرة أخرى.';
+
+  @override
+  String get parsedItemsReady => 'تمت معالجة الإدخال الصوتي بنجاح!';
+
+  @override
+  String itemsSummary(Object count, Object total) {
+    return '$count عناصر • $total';
+  }
 }

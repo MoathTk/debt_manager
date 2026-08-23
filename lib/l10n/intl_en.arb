@@ -238,5 +238,15 @@
   "transcriptLabel": "Transcript",
   "voiceInputError": "Voice input failed. Try again.",
   "requiresInternet": "Voice input requires internet connection",
-  "speakNow": "Speak now..."
+  "speakNow": "Speak now...",
+  "parsedItems": "Parsed Items",
+  "total": "Total",
+  "due": "Due",
+  "acceptAndSave": "Accept & Save",
+  "retryParsing": "Retry",
+  "editTranscript": "Edit Transcript",
+  "parse": "Parse",
+  "noSpeechDetected": "No speech detected. Please try again.",
+  "parsedItemsReady": "Voice input parsed successfully!",
+  "itemsSummary": "{count} items • {total}"
 }

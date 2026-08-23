@@ -237,5 +237,15 @@
   "transcriptLabel": "النص المسجل",
   "voiceInputError": "فشل الإدخال الصوتي. حاول مجدداً.",
   "requiresInternet": "الإدخال الصوتي يتطلب اتصال بالإنترنت",
-  "speakNow": "تحدث الآن..."
+  "speakNow": "تحدث الآن...",
+  "parsedItems": "العناصر المستخرجة",
+  "total": "المجموع",
+  "due": "تاريخ الاستحقاق",
+  "acceptAndSave": "قبول وحفظ",
+  "retryParsing": "إعادة المحاولة",
+  "editTranscript": "تعديل النص",
+  "parse": "تحليل",
+  "noSpeechDetected": "لم يتم اكتشاف كلام. يرجى المحاولة مرة أخرى.",
+  "parsedItemsReady": "تمت معالجة الإدخال الصوتي بنجاح!",
+  "itemsSummary": "{count} عناصر • {total}"
 }

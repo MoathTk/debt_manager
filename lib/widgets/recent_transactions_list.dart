@@ -3,13 +3,16 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../l10n/app_localizations.dart';
 import '../Providers/database_provider.dart';
 import '../data/models/transaction.dart' as model;
-import 'add_debt_sheet.dart';
+import 'add_debt_sheet/add_debt_sheet.dart';
 import 'record_payment_sheet.dart';
 import 'records_list_sheet.dart';
 
 String _fmt(double n) {
   final s = n % 1 == 0 ? n.toStringAsFixed(0) : n.toStringAsFixed(2);
-  return s.replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (m) => '${m[1]},');
+  return s.replaceAllMapped(
+    RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+    (m) => '${m[1]},',
+  );
 }
 
 /// Displays the 5 most recent transactions on the dashboard.
@@ -46,9 +49,8 @@ class RecentTransactionsList extends ConsumerWidget {
                 transaction: txn,
                 l10n: l10n,
                 showDivider: !isLast,
-                onTap: () => _showTransactionActions(
-                  context, ref, txn.customerId,
-                ),
+                onTap: () =>
+                    _showTransactionActions(context, ref, txn.customerId),
               );
             }).toList(),
           ),

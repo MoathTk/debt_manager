@@ -735,4 +735,36 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get speakNow => 'Speak now...';
+
+  @override
+  String get parsedItems => 'Parsed Items';
+
+  @override
+  String get total => 'Total';
+
+  @override
+  String get due => 'Due';
+
+  @override
+  String get acceptAndSave => 'Accept & Save';
+
+  @override
+  String get retryParsing => 'Retry';
+
+  @override
+  String get editTranscript => 'Edit Transcript';
+
+  @override
+  String get parse => 'Parse';
+
+  @override
+  String get noSpeechDetected => 'No speech detected. Please try again.';
+
+  @override
+  String get parsedItemsReady => 'Voice input parsed successfully!';
+
+  @override
+  String itemsSummary(Object count, Object total) {
+    return '$count items • $total';
+  }
 }
