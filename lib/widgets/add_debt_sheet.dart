@@ -311,13 +311,14 @@ class _ErrorBanner extends StatelessWidget {
         border: Border.all(color: cs.error.withValues(alpha: 0.3)),
       ),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Icon(Icons.error_outline, size: 16, color: cs.error),
           const SizedBox(width: 8),
           Expanded(
             child: Text(
               message,
-              style: TextStyle(color: cs.error, fontSize: 13),
+              style: TextStyle(color: cs.error, fontSize: 13, height: 1.4),
             ),
           ),
         ],

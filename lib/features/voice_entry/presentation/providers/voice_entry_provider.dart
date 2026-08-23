@@ -18,7 +18,7 @@ import 'voice_entry_state.dart';
 /// Provider for the voice entry notifier.
 ///
 /// Uses a compile-time environment variable for the API key.
-/// Pass --dart-define=OPENAI_API_KEY=your_key at build time.
+/// Pass --dart-define-from-file=dart_define_config.env at build time.
 /// The provider is autoDispose since voice entry is session-based.
 final voiceEntryProvider =
     StateNotifierProvider.autoDispose<VoiceEntryNotifier, VoiceEntryState>((
@@ -27,7 +27,7 @@ final voiceEntryProvider =
       final parseTranscript = ParseVoiceTranscript(
         VoiceEntryRepositoryImpl(
           AiParsingDatasource(
-            apiKey: const String.fromEnvironment('GEMINI_API_KEY'),
+            apiKey: const String.fromEnvironment('OPENAI_API_KEY'),
           ),
         ),
       );
@@ -118,6 +118,15 @@ class VoiceEntryNotifier extends StateNotifier<VoiceEntryState> {
   }
 
   Future<void> startRecording() async {
+    const apiKey = String.fromEnvironment('OPENAI_API_KEY');
+    if (apiKey.isEmpty) {
+      state = state.copyWith(
+        status: VoiceEntryStatus.error,
+        error:
+            'API key not configured. Run with:\n--dart-define-from-file=dart_define_config.env',
+      );
+      return;
+    }
     try {
       await _initSpeech();
       _processing = false;

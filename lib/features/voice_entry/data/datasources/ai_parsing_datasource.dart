@@ -1,11 +1,11 @@
 /// VOICE ENTRY FEATURE — DATA LAYER: AI PARSING DATASOURCE
 ///
-/// Handles communication with Google Gemini API to parse
+/// Handles communication with OpenAI API to parse
 /// voice transcripts into structured debt data.
 ///
 /// WHY THIS EXISTS:
 /// - The domain layer defines WHAT to parse (repository interface)
-/// - This datasource defines HOW to parse (Gemini API)
+/// - This datasource defines HOW to parse (OpenAI API)
 /// - Separation allows swapping AI providers without touching domain code
 /// ---------------------------------------------------------------------------
 library;
@@ -19,47 +19,30 @@ class AiParsingDatasource {
   final String apiKey;
   final http.Client _client;
 
-  static const _primaryModel = 'gemini-3.5-flash-lite';
-  static const _fallbackModel = 'gemini-3.6-flash';
+  static const _model = 'gpt-4o-mini';
 
   AiParsingDatasource({required this.apiKey, http.Client? client})
     : _client = client ?? http.Client();
 
   Future<VoiceParsedDebt> parse(String transcript) async {
-    final today = DateTime.now().toIso8601String().substring(
-      0,
-      10,
-    ); //ntp or firebase timestap might perform better.
+    final today = DateTime.now().toIso8601String().substring(0, 10);
     final prompt = _buildPrompt(today, transcript);
     final body = _buildBody(prompt);
 
-    // Try primary model first
-    try {
-      final result = await _callModel(_primaryModel, body);
-      return result;
-    } on AiParsingException catch (e) {
-      final msg = e.message;
-      // Retry with fallback model on rate limit or server overload
-      if (msg.contains('429') || msg.contains('503')) {
-        return await _callModel(_fallbackModel, body);
-      }
-      rethrow;
-    }
+    return await _callModel(body);
   }
 
-  Future<VoiceParsedDebt> _callModel(
-    String model,
-    Map<String, dynamic> body,
-  ) async {
+  Future<VoiceParsedDebt> _callModel(Map<String, dynamic> body) async {
     try {
-      final url = Uri.parse(
-        'https://generativelanguage.googleapis.com/v1beta/models/$model:generateContent?key=$apiKey',
-      );
+      final url = Uri.parse('https://api.openai.com/v1/chat/completions');
 
       final response = await _client
           .post(
             url,
-            headers: {'Content-Type': 'application/json'},
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer $apiKey',
+            },
             body: jsonEncode(body),
           )
           .timeout(const Duration(seconds: 15));
@@ -71,8 +54,9 @@ class AiParsingDatasource {
       }
 
       final data = jsonDecode(response.body);
-      final content = data['candidates']?[0]?['content']?['parts']?[0]?['text'];
-      if (content == null || content is! String) {
+      final content =
+          data['choices']?[0]?['message']?['content'] as String?;
+      if (content == null) {
         throw const AiParsingException('Invalid API response format');
       }
 
@@ -85,17 +69,23 @@ class AiParsingDatasource {
   }
 
   Map<String, dynamic> _buildBody(String prompt) => {
-    'contents': [
+    'model': _model,
+    'messages': [
       {
-        'parts': [
-          {'text': prompt},
-        ],
+        'role': 'system',
+        'content':
+            'You are an expert Iraqi accounting AI for a retail shopkeeper app. '
+            'You extract items, amounts in Iraqi Dinars (IQD), and due dates from voice transcripts. '
+            'You ALWAYS respond with raw JSON only — no markdown, no codeblocks, no extra text.',
       },
+      {'role': 'user', 'content': prompt},
     ],
-    'generationConfig': {'temperature': 0.1, 'maxOutputTokens': 500},
+    'response_format': {'type': 'json_object'},
+    'temperature': 0.1,
+    'max_tokens': 500,
   };
 
-  /// Parse the Gemini response text into a [VoiceParsedDebt].
+  /// Parse the OpenAI response text into a [VoiceParsedDebt].
   VoiceParsedDebt _parseResponse(String content) {
     try {
       final jsonStr = _extractJson(content);
@@ -116,7 +106,7 @@ class AiParsingDatasource {
 
       DateTime? dueDate;
       if (data['due_date'] != null && data['due_date'] is String) {
-        dueDate = DateTime.tryParse(data['due_date']); //not safe.
+        dueDate = DateTime.tryParse(data['due_date']);
       }
 
       return VoiceParsedDebt(
@@ -155,33 +145,52 @@ class AiParsingDatasource {
 
   String _buildPrompt(String today, String transcript) =>
       '''
-You are a debt parser for a shopkeeper application.
-The shopkeeper speaks in a casual mix of Arabic and English (often "Arabish").
-They list items with prices, optionally mention a customer name and payment due date.
+Extract items, amounts in Iraqi Dinars (IQD), and due dates from the transcript below.
 
-Given their voice transcript, extract ALL items mentioned, their amounts, and optional due date.
+STRICT RULES:
+1. OUTPUT FORMAT: Return ONLY raw JSON without markdown syntax, codeblocks, or extra text.
+2. MERGE DUPLICATES: Combine identical items and sum their total amounts.
+3. IRAQI DIALECT NUMBERS & SHORTHAND:
+   - Convert spoken numbers to full IQD amounts:
+     * "بعشرة" / "10" / "عشرة" -> 10000
+     * "خمسة وثلاثين" -> 35000
+     * "ألفين ونص" / "2.5" -> 2500
+     * "ربع" -> 500 | "نص" -> 500 (if alone) | "ثلاث أرباع" -> 750
+     * "شدة" (if used in electronic/big shops) -> 100 USD or equivalent, but default explicitly to IQD when context implies dinars.
+   - If exact hundreds are mentioned ("500", "750", "1500"), keep as absolute IQD.
 
-RULES:
-- Extract EVERY item separately — if the speaker lists 2 items, return 2 items in the array
-- Amounts are numbers (no currency symbols, no commas in output)
-- If the speaker says "after X days", calculate the due date from TODAY ($today)
-- If no due date is mentioned, set due_date to null
-- Item names should be clean, short, and in the language the speaker used
-- total_amount MUST equal the sum of ALL individual item amounts
-- Customer names should NOT be included in items — they go elsewhere in the app
-- If the transcript is unclear, make your best interpretation
+4. HANDLE QUANTITIES:
+   - If speaker says "3 كواني طحين ب 45", set name as "طحين (3 كواني)" and amount as 45000.
 
-EXAMPLES:
-Speaker: "رسيفر ب 300 و سبورة ب 200" → {"items": [{"name": "رسيفر", "amount": 300}, {"name": "سبورة", "amount": 200}], "total_amount": 500, "due_date": null}
-Speaker: "مكواه 200 بعد أسبوع" → {"items": [{"name": "مكواه", "amount": 200}], "total_amount": 200, "due_date": "2026-08-27"}
-Speaker: "شاحن 50 و كفر جوال 30 و سماعة 70" → {"items": [{"name": "شاحن", "amount": 50}, {"name": "كفر جوال", "amount": 30}, {"name": "سماعة", "amount": 70}], "total_amount": 150, "due_date": null}
+5. PAYMENT vs DEBT (CRITICAL):
+   - This prompt is strictly for RECORDING DEBT (إضافة دين).
+   - Ignore payment terms like "وافي", "سدد", "رجعلي", "انطاني من الدين". 
 
-Return ONLY valid JSON (no explanation, no markdown):
+6. CLEANING TEXT:
+   - Strip greetings and Iraqi fillers: "رحمة لأبيك", "والله", "عيني", "أغاتي", "حبيبي", "سجل يمعود".
+   - Strip customer references: "على أبو شهاب", "حساب أحمد".
+
+7. DUE DATE CALCULATION:
+   - Relative to TODAY ($today).
+   - "باجر" -> +1 day | "عقبه / عقب باجر" -> +2 days | "نهاية الشهر" -> last day of current month.
+
+JSON FORMAT:
 {
-  "items": [{"name": "item name", "amount": 123}],
-  "total_amount": 123,
+  "items": [{"name": "item_name", "amount": 10000}],
+  "total_amount": 10000,
   "due_date": "YYYY-MM-DD" or null
 }
+
+EXAMPLES:
+
+Transcript: "والله سجل على ابو جاسم 3 كواني طحين ب 45 و كارتين آسيا ب 20 عقب باجر ينطيها"
+{"items": [{"name": "طحين (3 كواني)", "amount": 45000}, {"name": "كارت آسيا (2)", "amount": 20000}], "total_amount": 65000, "due_date": "2026-08-25"}
+
+Transcript: "عيني كيلوين طماطة ب ألفين ونص وربع كيلو خيار ب 500"
+{"items": [{"name": "طماطة (2 كيلو)", "amount": 2500}, {"name": "خيار (ربع كيلو)", "amount": 500}], "total_amount": 3000, "due_date": null}
+
+Transcript: "كيلو لحم ب 22 وخمسة وثلاثين رصيد"
+{"items": [{"name": "لحم (1 كيلو)", "amount": 22000}, {"name": "رصيد", "amount": 35000}], "total_amount": 57000, "due_date": null}
 
 Transcript: $transcript
 ''';
