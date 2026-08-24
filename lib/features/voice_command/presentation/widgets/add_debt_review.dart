@@ -8,6 +8,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:local_debt_management/l10n/app_localizations.dart';
 import 'package:local_debt_management/data/models/customer.dart';
 import 'package:local_debt_management/widgets/amount_input_formatter.dart';
@@ -287,15 +288,53 @@ class _DueRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Icon(Icons.calendar_today_rounded, size: 13, color: cs.onSurfaceVariant),
-        const SizedBox(width: 6),
-        Text(
-          '${l10n.due}: ${date.day}/${date.month}/${date.year}',
-          style: TextStyle(fontSize: 13, color: cs.onSurfaceVariant),
-        ),
-      ],
+    final locale = Localizations.localeOf(context);
+    final formattedDate = DateFormat.yMMMd(locale.languageCode).format(date);
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(
+        color: Colors.teal.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: Colors.teal.withValues(alpha: 0.25)),
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(6),
+            decoration: BoxDecoration(
+              color: Colors.teal.withValues(alpha: 0.15),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(Icons.calendar_today_rounded, size: 16, color: Colors.teal.shade700),
+          ),
+          const SizedBox(width: 10),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                l10n.due.toUpperCase(),
+                style: TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.teal.shade700,
+                  letterSpacing: 0.8,
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                formattedDate,
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: cs.onSurface,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 }
