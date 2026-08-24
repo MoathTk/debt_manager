@@ -267,6 +267,7 @@
   "unknownAction": "Unknown action",
   "confirmPayment": "Confirm & Pay",
   "paymentSuccess": "Payment recorded successfully",
+  "customerCreated": "Customer created successfully",
   "paymentAmount": "Payment Amount",
   "outstandingDebts": "Outstanding Debts",
   "amountExceedsRemaining": "Amount capped to remaining balance",

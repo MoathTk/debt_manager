@@ -266,6 +266,7 @@
   "unknownAction": "إجراء غير معروف",
   "confirmPayment": "تأكيد الدفعة",
   "paymentSuccess": "تم تسجيل الدفعة بنجاح",
+  "customerCreated": "تم إنشاء العميل بنجاح",
   "paymentAmount": "مبلغ الدفعة",
   "outstandingDebts": "الديون المستحقة",
   "amountExceedsRemaining": "تم تعديل المبلغ حسب المتبقي",

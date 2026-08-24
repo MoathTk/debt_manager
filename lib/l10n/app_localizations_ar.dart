@@ -824,6 +824,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get paymentSuccess => 'تم تسجيل الدفعة بنجاح';
 
   @override
+  String get customerCreated => 'تم إنشاء العميل بنجاح';
+
+  @override
   String get paymentAmount => 'مبلغ الدفعة';
 
   @override

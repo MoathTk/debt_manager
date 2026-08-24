@@ -10,6 +10,7 @@ enum VoiceAction {
   addDebt,
   recordPayment,
   viewBalance,
+  addCustomer,
   unknown,
 }
 
@@ -21,6 +22,7 @@ class VoiceCommand {
   final VoiceAction action;
   final String customerName;
   final String? customerId;
+  final String? phone;
   final List<VoiceCommandItem> items;
   final double totalAmount;
   final DateTime? dueDate;
@@ -31,6 +33,7 @@ class VoiceCommand {
     required this.action,
     required this.customerName,
     this.customerId,
+    this.phone,
     this.items = const [],
     this.totalAmount = 0,
     this.dueDate,
@@ -43,6 +46,8 @@ class VoiceCommand {
     String? customerName,
     String? customerId,
     bool clearCustomerId = false,
+    String? phone,
+    bool clearPhone = false,
     List<VoiceCommandItem>? items,
     double? totalAmount,
     bool clearDueDate = false,
@@ -53,9 +58,8 @@ class VoiceCommand {
     return VoiceCommand(
       action: action ?? this.action,
       customerName: customerName ?? this.customerName,
-      customerId: clearCustomerId
-          ? null
-          : (customerId ?? this.customerId),
+      customerId: clearCustomerId ? null : (customerId ?? this.customerId),
+      phone: clearPhone ? null : (phone ?? this.phone),
       items: items ?? this.items,
       totalAmount: totalAmount ?? this.totalAmount,
       dueDate: clearDueDate ? null : (dueDate ?? this.dueDate),
@@ -67,6 +71,7 @@ class VoiceCommand {
   bool get isAddDebt => action == VoiceAction.addDebt;
   bool get isRecordPayment => action == VoiceAction.recordPayment;
   bool get isViewBalance => action == VoiceAction.viewBalance;
+  bool get isAddCustomer => action == VoiceAction.addCustomer;
   bool get isUnknown => action == VoiceAction.unknown;
   bool get hasCustomerMatch => customerId != null;
 }

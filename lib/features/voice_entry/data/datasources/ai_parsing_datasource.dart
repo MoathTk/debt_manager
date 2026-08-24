@@ -327,10 +327,12 @@ Transcript: $transcript
       }
 
       final note = (data['note'] as String?)?.trim();
+      final phone = (data['phone'] as String?)?.trim();
 
       return VoiceCommand(
         action: action,
         customerName: customerName,
+        phone: phone,
         items: items ?? [],
         totalAmount: totalAmount,
         dueDate: dueDate,
@@ -372,6 +374,15 @@ Transcript: $transcript
       case 'make_payment':
       case 'make payment':
         return VoiceAction.recordPayment;
+      case 'add_customer':
+      case 'add customer':
+      case 'create_customer':
+      case 'create customer':
+      case 'new_customer':
+      case 'new customer':
+      case 'register_customer':
+      case 'register customer':
+        return VoiceAction.addCustomer;
       default:
         return VoiceAction.unknown;
     }
@@ -391,11 +402,15 @@ POSSIBLE ACTIONS:
 3. "record_payment" — user wants to record a payment from a customer (paying off debt)
    Examples: "سدد لأحمد 5000", "ادفع لابو حسين 10 آلاف", "دفع أحمد 20", "أحمد دفع 5000", "رجعلي 3000 من أبو حسين"
 
-4. "unknown" — cannot determine what the user wants
+4. "add_customer" — user wants to add/register a new customer
+   Examples: "أضف عميل اسمه محمد", "add customer Ahmed", "سجّل عميل جديد أبو حسين", "عميل جديد اسمه خالد"
+
+5. "unknown" — cannot determine what the user wants
 
 DETECT:
-- action: one of "add_debt", "view_balance", "record_payment", "unknown"
+- action: one of "add_debt", "view_balance", "record_payment", "add_customer", "unknown"
 - customer_name: the customer's name (extracted from speech, clean)
+- phone: ONLY for add_customer — phone number if mentioned (digits only, e.g. "07701234567"), or null
 - items: ONLY for add_debt — list of {name, amount} objects
 - total_amount: for add_debt (sum of items) AND for record_payment (the payment amount)
 - due_date: ONLY for add_debt — "YYYY-MM-DD" relative to TODAY ($today)
@@ -415,8 +430,9 @@ CLEANING:
 
 JSON FORMAT:
 {
-  "action": "add_debt" | "view_balance" | "record_payment" | "unknown",
+  "action": "add_debt" | "view_balance" | "record_payment" | "add_customer" | "unknown",
   "customer_name": "extracted_name",
+  "phone": "phone_number" or null,
   "items": [{"name": "item_name", "amount": 10000}],
   "total_amount": 10000,
   "due_date": "YYYY-MM-DD" or null,
@@ -448,6 +464,15 @@ Command: "ادفع لابو حسين 10 آلاف"
 
 Command: "أحمد دفع 20"
 {"action": "record_payment", "customer_name": "أحمد", "items": [], "total_amount": 20000, "due_date": null, "note": null}
+
+Command: "أضف عميل اسمه محمد"
+{"action": "add_customer", "customer_name": "محمد", "phone": null, "items": [], "total_amount": 0, "due_date": null, "note": null}
+
+Command: "add customer Ahmed 07701234567"
+{"action": "add_customer", "customer_name": "Ahmed", "phone": "07701234567", "items": [], "total_amount": 0, "due_date": null, "note": null}
+
+Command: "سجّل عميل جديد أبو حسين 07809876543"
+{"action": "add_customer", "customer_name": "ابو حسين", "phone": "07809876543", "items": [], "total_amount": 0, "due_date": null, "note": null}
 
 Command: $transcript
 ''';

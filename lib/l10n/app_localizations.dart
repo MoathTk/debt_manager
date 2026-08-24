@@ -1682,6 +1682,12 @@ abstract class AppLocalizations {
   /// **'Payment recorded successfully'**
   String get paymentSuccess;
 
+  /// No description provided for @customerCreated.
+  ///
+  /// In en, this message translates to:
+  /// **'Customer created successfully'**
+  String get customerCreated;
+
   /// No description provided for @paymentAmount.
   ///
   /// In en, this message translates to:

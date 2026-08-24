@@ -828,6 +828,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get paymentSuccess => 'Payment recorded successfully';
 
   @override
+  String get customerCreated => 'Customer created successfully';
+
+  @override
   String get paymentAmount => 'Payment Amount';
 
   @override

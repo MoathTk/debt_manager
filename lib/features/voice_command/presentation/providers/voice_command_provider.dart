@@ -204,6 +204,14 @@ class VoiceCommandNotifier extends StateNotifier<VoiceCommandState> {
   Future<void> _matchCustomer(VoiceCommand command) async {
     if (!mounted) return;
 
+    if (command.isAddCustomer) {
+      state = state.copyWith(
+        status: VoiceCommandStatus.ready,
+        command: command,
+      );
+      return;
+    }
+
     if (command.customerName.trim().isEmpty) {
       state = state.copyWith(
         status: command.isUnknown
@@ -369,6 +377,34 @@ class VoiceCommandNotifier extends StateNotifier<VoiceCommandState> {
         amount: cmd.totalAmount,
         debtId: state.selectedDebtId,
         note: cmd.note,
+      );
+      if (mounted) {
+        state = state.copyWith(saveSuccess: true);
+      }
+      return true;
+    } catch (e) {
+      if (mounted) {
+        state = state.copyWith(
+          status: VoiceCommandStatus.ready,
+          error: e.toString(),
+        );
+      }
+      return false;
+    }
+  }
+
+  Future<bool> confirmAddCustomer(ProviderContainer container) async {
+    if (!mounted) return false;
+    final cmd = state.command;
+    if (cmd == null || cmd.customerName.trim().isEmpty) return false;
+
+    state = state.copyWith(status: VoiceCommandStatus.saving);
+
+    try {
+      await addCustomer(
+        container,
+        name: cmd.customerName.trim(),
+        phone: cmd.phone?.trim().isEmpty == true ? null : cmd.phone?.trim(),
       );
       if (mounted) {
         state = state.copyWith(saveSuccess: true);

@@ -16,6 +16,7 @@ import '../providers/voice_command_provider.dart';
 import '../providers/voice_command_state.dart';
 import '../../../../widgets/add_debt_sheet/recording_indicator.dart';
 import 'add_debt_review.dart';
+import 'add_customer_review.dart';
 import 'find_customer_review.dart';
 import 'record_payment_review.dart';
 
@@ -192,6 +193,13 @@ class _VoiceCommandSheetState extends ConsumerState<VoiceCommandSheet> {
           onReRecord: () => notifier.reRecord(),
         );
     }
+    if (state.command!.isAddCustomer) {
+      return AddCustomerReview(
+        command: state.command!,
+        onConfirm: (cmd) => _saveCustomer(cmd, notifier, l10n),
+        onReRecord: () => notifier.reRecord(),
+      );
+    }
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(20),
@@ -289,6 +297,37 @@ class _VoiceCommandSheetState extends ConsumerState<VoiceCommandSheet> {
           SnackBar(content: Text(l10n.paymentSuccess)),
         );
       } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(l10n.serverError)),
+        );
+      }
+    }
+  }
+
+  Future<void> _saveCustomer(
+    dynamic command,
+    VoiceCommandNotifier notifier,
+    AppLocalizations l10n,
+  ) async {
+    if (command.customerName.trim().isEmpty) return;
+    try {
+      final container = ProviderScope.containerOf(context, listen: false);
+      final success = await notifier.confirmAddCustomer(container);
+      if (mounted) {
+        if (success) {
+          notifier.reset();
+          Navigator.of(context).pop();
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(l10n.customerCreated)),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(l10n.serverError)),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(l10n.serverError)),
         );
