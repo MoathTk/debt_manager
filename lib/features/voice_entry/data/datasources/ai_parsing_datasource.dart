@@ -326,8 +326,8 @@ Transcript: $transcript
         dueDate = DateTime.tryParse(data['due_date']);
       }
 
-      final note = (data['note'] as String?)?.trim();
-      final phone = (data['phone'] as String?)?.trim();
+      final note = data['note']?.toString().trim();
+      final phone = data['phone']?.toString().trim();
 
       return VoiceCommand(
         action: action,

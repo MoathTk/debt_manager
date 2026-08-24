@@ -12,10 +12,10 @@ import 'dart:io';
 import 'dart:math';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:record/record.dart';
-import 'package:audioplayers/audioplayers.dart';
 import 'package:local_debt_management/services/connectivity_service.dart';
 import '../../domain/entities/voice_command.dart';
 import '../../domain/exceptions/voice_command_exception.dart';
+import '../../../voice_entry/domain/exceptions/voice_entry_exception.dart';
 import '../../domain/usecases/process_voice_command.dart';
 import '../../data/repositories/voice_command_repository_impl.dart';
 import 'voice_command_state.dart';
@@ -33,8 +33,8 @@ final voiceCommandProvider =
       apiKey: const String.fromEnvironment('OPENAI_API_KEY'),
     );
     final repo = VoiceCommandRepositoryImpl(datasource);
-    final customerRepo = ref.watch(customerRepositoryProvider);
-    final txRepo = ref.watch(transactionRepositoryProvider);
+    final customerRepo = ref.read(customerRepositoryProvider);
+    final txRepo = ref.read(transactionRepositoryProvider);
     return VoiceCommandNotifier(ProcessVoiceCommand(repo), customerRepo, txRepo);
   },
 );
@@ -44,7 +44,6 @@ class VoiceCommandNotifier extends StateNotifier<VoiceCommandState> {
   final CustomerRepository _customerRepo;
   final TransactionRepository _txRepo;
   final AudioRecorder _recorder = AudioRecorder();
-  final AudioPlayer _beepPlayer = AudioPlayer();
   StreamSubscription<Amplitude>? _ampSub;
 
   VoiceCommandNotifier(this._processCommand, this._customerRepo, this._txRepo)
@@ -63,8 +62,6 @@ class VoiceCommandNotifier extends StateNotifier<VoiceCommandState> {
       );
       return;
     }
-
-    _beepPlayer.play(AssetSource('audio/beep.wav'), volume: 0.6);
 
     try {
       if (!await _recorder.hasPermission()) {
@@ -185,6 +182,16 @@ class VoiceCommandNotifier extends StateNotifier<VoiceCommandState> {
         state = state.copyWith(
           status: VoiceCommandStatus.error,
           error: e.message,
+        );
+      }
+    } on VoiceEntryException catch (e) {
+      if (mounted) {
+        final msg = e.message;
+        state = state.copyWith(
+          status: VoiceCommandStatus.error,
+          error: msg.contains('401') || msg.contains('API key')
+              ? 'api_key_not_configured'
+              : msg,
         );
       }
     } catch (e) {
@@ -424,7 +431,6 @@ class VoiceCommandNotifier extends StateNotifier<VoiceCommandState> {
   @override
   void dispose() {
     _ampSub?.cancel();
-    _beepPlayer.dispose();
     _recorder.dispose();
     super.dispose();
   }

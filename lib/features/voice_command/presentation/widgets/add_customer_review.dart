@@ -1,13 +1,14 @@
 /// VOICE COMMAND FEATURE — PRESENTATION LAYER: ADD CUSTOMER REVIEW
 ///
 /// Review screen for "add_customer" voice commands.
-/// Shows parsed customer name, optional phone, and confirm/re-record actions.
+/// Shows editable name + optional phone with validation, and confirm/re-record.
 ///
 /// RULES: <80 lines per class, Theme.of(context), Semantics, l10n.
 /// ---------------------------------------------------------------------------
 library;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:local_debt_management/l10n/app_localizations.dart';
 import '../../domain/entities/voice_command.dart';
 
@@ -27,6 +28,7 @@ class AddCustomerReview extends StatefulWidget {
 }
 
 class _AddCustomerReviewState extends State<AddCustomerReview> {
+  final _formKey = GlobalKey<FormState>();
   late final TextEditingController _nameController;
   late final TextEditingController _phoneController;
 
@@ -44,47 +46,53 @@ class _AddCustomerReviewState extends State<AddCustomerReview> {
     super.dispose();
   }
 
+  void _handleConfirm() {
+    if (!_formKey.currentState!.validate()) return;
+    final cmd = widget.command.copyWith(
+      customerName: _nameController.text.trim(),
+      phone: _phoneController.text.trim().isEmpty
+          ? null
+          : _phoneController.text.trim(),
+    );
+    widget.onConfirm(cmd);
+  }
+
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
     final l10n = AppLocalizations.of(context)!;
 
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: cs.tertiaryContainer.withValues(alpha: 0.3),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: cs.tertiary.withValues(alpha: 0.2)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          _Header(l10n: l10n, cs: cs),
-          const SizedBox(height: 12),
-          _NameField(l10n: l10n, cs: cs, controller: _nameController),
-          const SizedBox(height: 10),
-          _PhoneField(
-            l10n: l10n,
-            cs: cs,
-            controller: _phoneController,
+    return GestureDetector(
+      onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+      behavior: HitTestBehavior.opaque,
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: cs.tertiaryContainer.withValues(alpha: 0.3),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: cs.tertiary.withValues(alpha: 0.2)),
+        ),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _Header(l10n: l10n, cs: cs),
+              const SizedBox(height: 12),
+              _NameField(l10n: l10n, cs: cs, controller: _nameController),
+              const SizedBox(height: 10),
+              _PhoneField(l10n: l10n, cs: cs, controller: _phoneController),
+              const SizedBox(height: 12),
+              _Actions(
+                l10n: l10n,
+                onReRecord: widget.onReRecord,
+                onConfirm: _handleConfirm,
+              ),
+            ],
           ),
-          const SizedBox(height: 12),
-          _Actions(
-            l10n: l10n,
-            onReRecord: widget.onReRecord,
-            onConfirm: () {
-              final cmd = widget.command.copyWith(
-                customerName: _nameController.text.trim(),
-                phone: _phoneController.text.trim().isEmpty
-                    ? null
-                    : _phoneController.text.trim(),
-              );
-              widget.onConfirm(cmd);
-            },
-          ),
-        ],
+        ),
       ),
     );
   }
@@ -126,25 +134,44 @@ class _NameField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return TextField(
+    return TextFormField(
       controller: controller,
       textCapitalization: TextCapitalization.words,
-      style: const TextStyle(fontSize: 14),
+      textInputAction: TextInputAction.next,
+      style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
+      validator: (v) => (v == null || v.trim().isEmpty) ? l10n.nameRequired : null,
       decoration: InputDecoration(
         labelText: l10n.customerName,
-        prefixIcon: const Icon(Icons.person_rounded, size: 18),
+        hintText: 'e.g. Ahmed',
+        prefixIcon: const Icon(Icons.person_rounded, size: 20),
+        suffixIcon: const Icon(Icons.edit_rounded, size: 16),
         filled: true,
         fillColor: cs.surfaceContainerHighest.withValues(alpha: 0.4),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide.none,
+        errorStyle: TextStyle(
+          fontSize: 12,
+          fontWeight: FontWeight.w500,
+          color: cs.error,
+        ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14),
+          borderSide: BorderSide(color: cs.error, width: 1.5),
+        ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14),
+          borderSide: BorderSide(color: cs.error, width: 2),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14),
+          borderSide: BorderSide(
+            color: cs.outlineVariant.withValues(alpha: 0.3),
+          ),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(14),
           borderSide: BorderSide(color: cs.tertiary, width: 2),
         ),
         contentPadding:
-            const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       ),
     );
   }
@@ -160,29 +187,57 @@ class _PhoneField extends StatelessWidget {
     required this.controller,
   });
 
+  String? _validatePhone(String? v) {
+    if (v == null || v.trim().isEmpty) return null;
+    final digits = v.replaceAll(RegExp(r'[^0-9]'), '');
+    if (digits.length != 11) return l10n.phoneInvalid;
+    return null;
+  }
+
   @override
   Widget build(BuildContext context) {
-    return TextField(
+    return TextFormField(
       controller: controller,
       keyboardType: TextInputType.phone,
-      maxLength: 11,
-      style: const TextStyle(fontSize: 14),
+      textInputAction: TextInputAction.done,
+      inputFormatters: [
+        FilteringTextInputFormatter.digitsOnly,
+        LengthLimitingTextInputFormatter(11),
+      ],
+      style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
+      validator: _validatePhone,
       decoration: InputDecoration(
-        counterText: '',
         labelText: l10n.customerPhone,
-        prefixIcon: const Icon(Icons.phone_rounded, size: 18),
+        hintText: '07XX XXX XXXX',
+        prefixIcon: const Icon(Icons.phone_rounded, size: 20),
+        suffixIcon: const Icon(Icons.dialpad_rounded, size: 16),
         filled: true,
         fillColor: cs.surfaceContainerHighest.withValues(alpha: 0.4),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide.none,
+        errorStyle: TextStyle(
+          fontSize: 12,
+          fontWeight: FontWeight.w500,
+          color: cs.error,
+        ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14),
+          borderSide: BorderSide(color: cs.error, width: 1.5),
+        ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14),
+          borderSide: BorderSide(color: cs.error, width: 2),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14),
+          borderSide: BorderSide(
+            color: cs.outlineVariant.withValues(alpha: 0.3),
+          ),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(14),
           borderSide: BorderSide(color: cs.tertiary, width: 2),
         ),
         contentPadding:
-            const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       ),
     );
   }

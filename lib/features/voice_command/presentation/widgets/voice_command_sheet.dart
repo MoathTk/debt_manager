@@ -469,6 +469,8 @@ class _ErrorState extends StatelessWidget {
         return l10n.noInternet;
       case 'no_speech_detected':
         return l10n.noSpeechDetected;
+      case 'unknown_action':
+        return l10n.voiceInputError;
       default:
         return l10n.serverError;
     }
