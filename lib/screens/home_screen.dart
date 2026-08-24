@@ -43,12 +43,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
+      constraints: BoxConstraints(minWidth: double.infinity),
       backgroundColor: Theme.of(context).colorScheme.surface,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (_) => DraggableScrollableSheet(
-        initialChildSize: 0.35,
+        initialChildSize: 0.30,
         minChildSize: 0.2,
         maxChildSize: 0.9,
         expand: false,
@@ -133,7 +134,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         onClose: () => _scaffoldKey.currentState?.closeEndDrawer(),
       ),
       body: IndexedStack(index: _currentIndex, children: screens),
-        bottomNavigationBar: _ModernNavBar(
+      bottomNavigationBar: _ModernNavBar(
         currentIndex: _currentIndex,
         onTap: (i) {
           if (i == 3) {

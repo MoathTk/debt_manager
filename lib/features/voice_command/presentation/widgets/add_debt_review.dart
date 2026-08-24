@@ -1,7 +1,7 @@
 /// VOICE COMMAND FEATURE — PRESENTATION LAYER: ADD DEBT REVIEW
 ///
 /// Review screen for "add_debt" voice commands.
-/// Shows customer match, editable items, total, and save/retry actions.
+/// Shows customer match, parsed items as cards, formatted total, and save actions.
 ///
 /// RULES: <80 lines per class, Theme.of(context), Semantics, l10n.
 /// ---------------------------------------------------------------------------
@@ -10,6 +10,7 @@ library;
 import 'package:flutter/material.dart';
 import 'package:local_debt_management/l10n/app_localizations.dart';
 import 'package:local_debt_management/data/models/customer.dart';
+import 'package:local_debt_management/widgets/amount_input_formatter.dart';
 import '../../domain/entities/voice_command.dart';
 import 'customer_match_chip.dart';
 
@@ -21,6 +22,7 @@ class AddDebtReview extends StatelessWidget {
   final ValueChanged<VoiceCommand> onConfirm;
   final VoidCallback onRetry;
   final VoidCallback onReRecord;
+  final ValueChanged<int> onRemoveItem;
   const AddDebtReview({
     super.key,
     required this.command,
@@ -30,6 +32,7 @@ class AddDebtReview extends StatelessWidget {
     required this.onConfirm,
     required this.onRetry,
     required this.onReRecord,
+    required this.onRemoveItem,
   });
 
   @override
@@ -57,21 +60,25 @@ class AddDebtReview extends StatelessWidget {
             onSelect: onCustomerSelected,
           ),
           const SizedBox(height: 10),
-          _ItemsHeader(l10n: l10n, cs: cs),
+          _ItemsHeader(l10n: l10n, cs: cs, count: command.items.length),
           const SizedBox(height: 6),
-          ...command.items.asMap().entries.map((e) =>
-              _ItemRow(item: e.value, cs: cs)),
-          const SizedBox(height: 6),
-          _TotalRow(l10n: l10n, cs: cs, total: command.totalAmount),
+          ...command.items.asMap().entries.map((e) => _ItemCard(
+                index: e.key,
+                item: e.value,
+                cs: cs,
+                l10n: l10n,
+                onRemove: onRemoveItem,
+              )),
+          const SizedBox(height: 8),
+          _TotalSection(l10n: l10n, cs: cs, total: command.totalAmount),
           if (command.dueDate != null) ...[
-            const SizedBox(height: 4),
+            const SizedBox(height: 6),
             _DueRow(l10n: l10n, cs: cs, date: command.dueDate!),
           ],
           const SizedBox(height: 12),
           _Actions(
             l10n: l10n,
             onReRecord: onReRecord,
-            onRetry: onRetry,
             onConfirm: () => onConfirm(command),
           ),
         ],
@@ -99,9 +106,14 @@ class _CustomerSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(l10n.customerName,
-            style: TextStyle(
-                fontSize: 12, fontWeight: FontWeight.w600, color: cs.primary)),
+        Text(
+          l10n.customerName,
+          style: TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w600,
+            color: cs.primary,
+          ),
+        ),
         const SizedBox(height: 4),
         CustomerMatchChip(
           customers: customers,
@@ -116,63 +128,153 @@ class _CustomerSection extends StatelessWidget {
 class _ItemsHeader extends StatelessWidget {
   final AppLocalizations l10n;
   final ColorScheme cs;
-  const _ItemsHeader({required this.l10n, required this.cs});
+  final int count;
+  const _ItemsHeader({
+    required this.l10n,
+    required this.cs,
+    required this.count,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Icon(Icons.check_circle_outline, size: 14, color: cs.primary),
-        const SizedBox(width: 4),
-        Text(l10n.parsedItems,
-            style: TextStyle(
-                fontSize: 12, fontWeight: FontWeight.w600, color: cs.primary)),
+        Icon(Icons.receipt_long_rounded, size: 14, color: Colors.amber.shade700),
+        const SizedBox(width: 6),
+        Text(
+          '${l10n.parsedItems} ($count)',
+          style: TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w600,
+            color: Colors.amber.shade700,
+          ),
+        ),
       ],
     );
   }
 }
 
-class _ItemRow extends StatelessWidget {
+class _ItemCard extends StatelessWidget {
+  final int index;
   final VoiceCommandItem item;
   final ColorScheme cs;
-  const _ItemRow({required this.item, required this.cs});
+  final AppLocalizations l10n;
+  final ValueChanged<int> onRemove;
+  const _ItemCard({
+    required this.index,
+    required this.item,
+    required this.cs,
+    required this.l10n,
+    required this.onRemove,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 2),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Expanded(child: Text(item.name, style: const TextStyle(fontSize: 14))),
-          Text('${item.amount.toInt()}',
-              style: TextStyle(
+    return Dismissible(
+      key: ValueKey('item_$index'),
+      direction: DismissDirection.endToStart,
+      onDismissed: (_) => onRemove(index),
+      background: Container(
+        alignment: Alignment.centerRight,
+        margin: const EdgeInsets.only(bottom: 4),
+        padding: const EdgeInsets.only(right: 16),
+        decoration: BoxDecoration(
+          color: Colors.red.shade400,
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: const Icon(Icons.delete_outline_rounded, color: Colors.white),
+      ),
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 4),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        decoration: BoxDecoration(
+          color: Colors.amber.withValues(alpha: 0.12),
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(color: Colors.amber.withValues(alpha: 0.25)),
+        ),
+        child: Row(
+          children: [
+            Icon(Icons.label_rounded, size: 16, color: Colors.amber.shade700),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                item.name,
+                style: TextStyle(
                   fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  color: cs.onSurface)),
-        ],
+                  fontWeight: FontWeight.w500,
+                  color: cs.onSurface,
+                ),
+              ),
+            ),
+            Text(
+              formatAmount(item.amount),
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w700,
+                color: Colors.amber.shade900,
+              ),
+            ),
+            const SizedBox(width: 6),
+            Semantics(
+              label: l10n.deleteDebt,
+              button: true,
+              child: GestureDetector(
+                onTap: () => onRemove(index),
+                child: Icon(
+                  Icons.close_rounded,
+                  size: 18,
+                  color: Colors.red.shade400,
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 }
 
-class _TotalRow extends StatelessWidget {
+class _TotalSection extends StatelessWidget {
   final AppLocalizations l10n;
   final ColorScheme cs;
   final double total;
-  const _TotalRow({required this.l10n, required this.cs, required this.total});
+  const _TotalSection({
+    required this.l10n,
+    required this.cs,
+    required this.total,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(l10n.total,
-            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700)),
-        Text('${total.toInt()}',
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      decoration: BoxDecoration(
+        color: Colors.red.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.red.withValues(alpha: 0.25)),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            l10n.total,
             style: TextStyle(
-                fontSize: 14, fontWeight: FontWeight.w800, color: cs.primary)),
-      ],
+              fontSize: 15,
+              fontWeight: FontWeight.w700,
+              color: Colors.red.shade700,
+            ),
+          ),
+          Text(
+            formatAmount(total),
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w800,
+              color: Colors.red.shade700,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -187,8 +289,8 @@ class _DueRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Icon(Icons.calendar_today, size: 13, color: cs.onSurfaceVariant),
-        const SizedBox(width: 4),
+        Icon(Icons.calendar_today_rounded, size: 13, color: cs.onSurfaceVariant),
+        const SizedBox(width: 6),
         Text(
           '${l10n.due}: ${date.day}/${date.month}/${date.year}',
           style: TextStyle(fontSize: 13, color: cs.onSurfaceVariant),
@@ -201,12 +303,10 @@ class _DueRow extends StatelessWidget {
 class _Actions extends StatelessWidget {
   final AppLocalizations l10n;
   final VoidCallback onReRecord;
-  final VoidCallback onRetry;
   final VoidCallback onConfirm;
   const _Actions({
     required this.l10n,
     required this.onReRecord,
-    required this.onRetry,
     required this.onConfirm,
   });
 
@@ -214,32 +314,36 @@ class _Actions extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Row(
-          children: [
-            Expanded(
-              child: OutlinedButton.icon(
-                onPressed: onReRecord,
-                icon: const Icon(Icons.mic, size: 16),
-                label: Text(l10n.reRecord),
+        Semantics(
+          label: l10n.reRecord,
+          button: true,
+          child: SizedBox(
+            width: double.infinity,
+            height: 48,
+            child: OutlinedButton.icon(
+              onPressed: onReRecord,
+              style: OutlinedButton.styleFrom(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14),
+                ),
               ),
+              icon: const Icon(Icons.mic_rounded, size: 18),
+              label: Text(l10n.reRecord),
             ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: OutlinedButton.icon(
-                onPressed: onRetry,
-                icon: const Icon(Icons.refresh, size: 16),
-                label: Text(l10n.retryParsing),
-              ),
-            ),
-          ],
+          ),
         ),
         const SizedBox(height: 8),
-        SizedBox(
-          width: double.infinity,
-          child: FilledButton.icon(
-            onPressed: onConfirm,
-            icon: const Icon(Icons.check, size: 18),
-            label: Text(l10n.acceptAndSave),
+        Semantics(
+          label: l10n.acceptAndSave,
+          button: true,
+          child: SizedBox(
+            width: double.infinity,
+            height: 52,
+            child: FilledButton.icon(
+              onPressed: onConfirm,
+              icon: const Icon(Icons.check_circle_rounded, size: 20),
+              label: Text(l10n.acceptAndSave),
+            ),
           ),
         ),
       ],

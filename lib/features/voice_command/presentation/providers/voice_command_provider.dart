@@ -12,6 +12,7 @@ import 'dart:io';
 import 'dart:math';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:record/record.dart';
+import 'package:audioplayers/audioplayers.dart';
 import 'package:local_debt_management/services/connectivity_service.dart';
 import '../../domain/entities/voice_command.dart';
 import '../../domain/exceptions/voice_command_exception.dart';
@@ -43,6 +44,7 @@ class VoiceCommandNotifier extends StateNotifier<VoiceCommandState> {
   final CustomerRepository _customerRepo;
   final TransactionRepository _txRepo;
   final AudioRecorder _recorder = AudioRecorder();
+  final AudioPlayer _beepPlayer = AudioPlayer();
   StreamSubscription<Amplitude>? _ampSub;
 
   VoiceCommandNotifier(this._processCommand, this._customerRepo, this._txRepo)
@@ -61,6 +63,8 @@ class VoiceCommandNotifier extends StateNotifier<VoiceCommandState> {
       );
       return;
     }
+
+    _beepPlayer.play(AssetSource('audio/beep.wav'), volume: 0.6);
 
     try {
       if (!await _recorder.hasPermission()) {
@@ -384,6 +388,7 @@ class VoiceCommandNotifier extends StateNotifier<VoiceCommandState> {
   @override
   void dispose() {
     _ampSub?.cancel();
+    _beepPlayer.dispose();
     _recorder.dispose();
     super.dispose();
   }

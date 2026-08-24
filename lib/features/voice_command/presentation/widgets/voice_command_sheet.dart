@@ -155,6 +155,7 @@ class _VoiceCommandSheetState extends ConsumerState<VoiceCommandSheet> {
         onConfirm: (cmd) => _saveDebt(cmd, notifier, l10n),
         onRetry: () => notifier.reRecord(),
         onReRecord: () => notifier.reRecord(),
+        onRemoveItem: (i) => notifier.removeItem(i),
       );
     }
     if (state.command!.isViewBalance) {
