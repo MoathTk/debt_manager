@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import '../l10n/app_localizations.dart';
+import 'debt_detail_dialog.dart';
 
 /// Selectable debt tile showing original amount and remaining balance.
+/// Tap selects the debt. Info icon shows DebtDetailDialog.
 class DebtSelectorTile extends StatelessWidget {
   final String id;
   final double amount;
   final double remaining;
   final String? note;
+  final String? date;
   final bool isSelected;
   final VoidCallback onTap;
 
@@ -16,6 +19,7 @@ class DebtSelectorTile extends StatelessWidget {
     required this.amount,
     required this.remaining,
     this.note,
+    this.date,
     required this.isSelected,
     required this.onTap,
   });
@@ -59,6 +63,15 @@ class DebtSelectorTile extends StatelessWidget {
                   child: _Info(amount: amount, note: note),
                 ),
                 _Badge(remaining: remaining, l10n: l10n),
+                const SizedBox(width: 4),
+                _InfoIcon(
+                  debtId: id,
+                  amount: amount,
+                  remaining: remaining,
+                  note: note,
+                  date: date,
+                  paid: amount - remaining,
+                ),
               ],
             ),
           ),
@@ -156,6 +169,55 @@ class _Badge extends StatelessWidget {
     return s.replaceAllMapped(
       RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
       (m) => '${m[1]},',
+    );
+  }
+}
+
+class _InfoIcon extends StatelessWidget {
+  final String debtId;
+  final double amount;
+  final double remaining;
+  final String? note;
+  final String? date;
+  final double paid;
+  const _InfoIcon({
+    required this.debtId,
+    required this.amount,
+    required this.remaining,
+    this.note,
+    this.date,
+    required this.paid,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    return Semantics(
+      label: 'Debt details',
+      button: true,
+      child: GestureDetector(
+        onTap: () => showDebtDetailDialog(
+          context,
+          debtId: debtId,
+          amount: amount,
+          remaining: remaining,
+          note: note,
+          date: date,
+          paid: paid,
+        ),
+        child: Container(
+          padding: const EdgeInsets.all(6),
+          decoration: BoxDecoration(
+            color: cs.surfaceContainerHighest.withValues(alpha: 0.6),
+            shape: BoxShape.circle,
+          ),
+          child: Icon(
+            Icons.info_outline_rounded,
+            size: 16,
+            color: cs.onSurfaceVariant,
+          ),
+        ),
+      ),
     );
   }
 }

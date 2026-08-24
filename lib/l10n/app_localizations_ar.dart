@@ -860,4 +860,19 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get errorSaving => 'فشل الحفظ. حاول مرة أخرى.';
+
+  @override
+  String get debtDetails => 'تفاصيل الدين';
+
+  @override
+  String get originalAmount => 'المبلغ الأصلي';
+
+  @override
+  String get amountPaid => 'المبلغ المدفوع';
+
+  @override
+  String get remainingAmount => 'المتبقي';
+
+  @override
+  String get dateLabel => 'التاريخ';
 }

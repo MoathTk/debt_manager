@@ -207,6 +207,7 @@ class _DebtSection extends StatelessWidget {
             amount: amount,
             remaining: remaining,
             note: note,
+            date: d['date'] as String?,
             isSelected: selectedId == id,
             onTap: () => onSelect(id, remaining),
           );

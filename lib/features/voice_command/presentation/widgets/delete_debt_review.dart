@@ -282,6 +282,7 @@ class _DebtList extends StatelessWidget {
               amount: (d['amount'] as num).toDouble(),
               remaining: (d['remaining'] as num).toDouble(),
               note: d['note'] as String?,
+              date: d['date'] as String?,
               isSelected: d['id'] == selectedDebtId,
               onTap: () => onSelectDebt(d['id'] as String),
             ),

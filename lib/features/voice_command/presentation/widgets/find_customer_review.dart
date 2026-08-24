@@ -198,6 +198,7 @@ class _BalanceSection extends StatelessWidget {
                 amount: (d['amount'] as num).toDouble(),
                 remaining: remaining,
                 note: d['note'] as String?,
+                date: d['date'] as String?,
                 isSelected: selectedId == id,
                 onTap: onDebtSelected != null
                     ? () => onDebtSelected!(id, remaining)

@@ -278,5 +278,10 @@
   "confirmDeleteVoice": "Confirm Delete",
   "noDebtsFound": "No debts found",
   "noTransactionHistory": "No transactions yet",
-  "errorSaving": "Failed to save. Try again."
+  "errorSaving": "Failed to save. Try again.",
+  "debtDetails": "Debt Details",
+  "originalAmount": "Original Amount",
+  "amountPaid": "Amount Paid",
+  "remainingAmount": "Remaining",
+  "dateLabel": "Date"
 }

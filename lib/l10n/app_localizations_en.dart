@@ -864,4 +864,19 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get errorSaving => 'Failed to save. Try again.';
+
+  @override
+  String get debtDetails => 'Debt Details';
+
+  @override
+  String get originalAmount => 'Original Amount';
+
+  @override
+  String get amountPaid => 'Amount Paid';
+
+  @override
+  String get remainingAmount => 'Remaining';
+
+  @override
+  String get dateLabel => 'Date';
 }

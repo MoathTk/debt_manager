@@ -1753,6 +1753,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Failed to save. Try again.'**
   String get errorSaving;
+
+  /// No description provided for @debtDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Debt Details'**
+  String get debtDetails;
+
+  /// No description provided for @originalAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Original Amount'**
+  String get originalAmount;
+
+  /// No description provided for @amountPaid.
+  ///
+  /// In en, this message translates to:
+  /// **'Amount Paid'**
+  String get amountPaid;
+
+  /// No description provided for @remainingAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Remaining'**
+  String get remainingAmount;
+
+  /// No description provided for @dateLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Date'**
+  String get dateLabel;
 }
 
 class _AppLocalizationsDelegate

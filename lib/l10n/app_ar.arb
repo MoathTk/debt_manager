@@ -277,5 +277,10 @@
   "confirmDeleteVoice": "تأكيد الحذف",
   "noDebtsFound": "لا توجد ديون",
   "noTransactionHistory": "لا توجد معاملات بعد",
-  "errorSaving": "فشل الحفظ. حاول مرة أخرى."
+  "errorSaving": "فشل الحفظ. حاول مرة أخرى.",
+  "debtDetails": "تفاصيل الدين",
+  "originalAmount": "المبلغ الأصلي",
+  "amountPaid": "المبلغ المدفوع",
+  "remainingAmount": "المتبقي",
+  "dateLabel": "التاريخ"
 }
