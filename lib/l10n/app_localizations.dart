@@ -1621,6 +1621,90 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Remove'**
   String get remove;
+
+  /// No description provided for @voiceCommand.
+  ///
+  /// In en, this message translates to:
+  /// **'Voice Command'**
+  String get voiceCommand;
+
+  /// No description provided for @customerMatch.
+  ///
+  /// In en, this message translates to:
+  /// **'Customer Match'**
+  String get customerMatch;
+
+  /// No description provided for @noMatchFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No matching customer found'**
+  String get noMatchFound;
+
+  /// No description provided for @confirmAndSave.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm & Save'**
+  String get confirmAndSave;
+
+  /// No description provided for @viewCustomer.
+  ///
+  /// In en, this message translates to:
+  /// **'View Customer'**
+  String get viewCustomer;
+
+  /// No description provided for @voiceCommandError.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not understand the command. Try again.'**
+  String get voiceCommandError;
+
+  /// No description provided for @recordPaymentAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Record Payment'**
+  String get recordPaymentAction;
+
+  /// No description provided for @unknownAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown action'**
+  String get unknownAction;
+
+  /// No description provided for @confirmPayment.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm & Pay'**
+  String get confirmPayment;
+
+  /// No description provided for @paymentSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment recorded successfully'**
+  String get paymentSuccess;
+
+  /// No description provided for @paymentAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment Amount'**
+  String get paymentAmount;
+
+  /// No description provided for @outstandingDebts.
+  ///
+  /// In en, this message translates to:
+  /// **'Outstanding Debts'**
+  String get outstandingDebts;
+
+  /// No description provided for @amountExceedsRemaining.
+  ///
+  /// In en, this message translates to:
+  /// **'Amount capped to remaining balance'**
+  String get amountExceedsRemaining;
+
+  /// No description provided for @maxPaymentIs.
+  ///
+  /// In en, this message translates to:
+  /// **'Maximum payable: {amount}'**
+  String maxPaymentIs(Object amount);
 }
 
 class _AppLocalizationsDelegate

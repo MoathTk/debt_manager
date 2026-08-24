@@ -792,4 +792,48 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get remove => 'إزالة';
+
+  @override
+  String get voiceCommand => 'أمر صوتي';
+
+  @override
+  String get customerMatch => 'مطابقة العميل';
+
+  @override
+  String get noMatchFound => 'لم يتم العثور على عميل مطابق';
+
+  @override
+  String get confirmAndSave => 'تأكيد وحفظ';
+
+  @override
+  String get viewCustomer => 'عرض العميل';
+
+  @override
+  String get voiceCommandError => 'لم يتم فهم الأمر. حاول مرة أخرى.';
+
+  @override
+  String get recordPaymentAction => 'تسجيل دفعة';
+
+  @override
+  String get unknownAction => 'إجراء غير معروف';
+
+  @override
+  String get confirmPayment => 'تأكيد الدفعة';
+
+  @override
+  String get paymentSuccess => 'تم تسجيل الدفعة بنجاح';
+
+  @override
+  String get paymentAmount => 'مبلغ الدفعة';
+
+  @override
+  String get outstandingDebts => 'الديون المستحقة';
+
+  @override
+  String get amountExceedsRemaining => 'تم تعديل المبلغ حسب المتبقي';
+
+  @override
+  String maxPaymentIs(Object amount) {
+    return 'الحد الأقصى للدفع: $amount';
+  }
 }

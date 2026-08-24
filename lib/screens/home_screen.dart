@@ -6,6 +6,7 @@ import '../l10n/app_localizations.dart';
 import '../Providers/database_provider.dart';
 import '../Providers/sync_provider.dart';
 import '../features/subscription/presentation/widgets/subscription_status_icon.dart';
+import '../features/voice_command/presentation/widgets/voice_command_sheet.dart';
 import '../services/update_service.dart';
 import '../widgets/update/update_dialog.dart';
 
@@ -35,6 +36,29 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       ref.read(syncProvider.notifier).syncNow();
       _checkForUpdate();
     });
+  }
+
+  void _showVoiceCommandSheet() {
+    final dsc = DraggableScrollableController();
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (_) => DraggableScrollableSheet(
+        initialChildSize: 0.35,
+        minChildSize: 0.2,
+        maxChildSize: 0.9,
+        expand: false,
+        controller: dsc,
+        builder: (ctx, scrollController) => VoiceCommandSheet(
+          scrollController: scrollController,
+          dragController: dsc,
+        ),
+      ),
+    );
   }
 
   Future<void> _checkForUpdate() async {
@@ -109,9 +133,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         onClose: () => _scaffoldKey.currentState?.closeEndDrawer(),
       ),
       body: IndexedStack(index: _currentIndex, children: screens),
-      bottomNavigationBar: _ModernNavBar(
+        bottomNavigationBar: _ModernNavBar(
         currentIndex: _currentIndex,
-        onTap: (i) => setState(() => _currentIndex = i),
+        onTap: (i) {
+          if (i == 3) {
+            _showVoiceCommandSheet();
+          } else {
+            setState(() => _currentIndex = i);
+          }
+        },
         items: [
           _NavItem(
             icon: Icons.home_rounded,
@@ -128,6 +158,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             activeIcon: Icons.notifications_active_rounded,
             label: l10n.reminders,
             badge: pendingCount,
+          ),
+          _NavItem(
+            icon: Icons.mic_rounded,
+            activeIcon: Icons.mic_rounded,
+            label: l10n.voiceInput,
           ),
         ],
       ),

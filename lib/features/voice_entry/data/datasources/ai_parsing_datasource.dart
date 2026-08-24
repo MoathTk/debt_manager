@@ -14,6 +14,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../../domain/entities/voice_parsed_debt.dart';
 import '../../domain/exceptions/voice_entry_exception.dart';
+import '../../../voice_command/domain/entities/voice_command.dart';
 
 class AiParsingDatasource {
   final String apiKey;
@@ -235,5 +236,209 @@ Transcript: "عيني كيلوين طماطة ب ألفين ونص وربع كي
 {"items": [{"name": "طماطة (2 كيلو)", "amount": 2500}, {"name": "خيار (ربع كيلو)", "amount": 500}], "total_amount": 3000, "due_date": null}
 
 Transcript: $transcript
+''';
+
+  // ---------------------------------------------------------------------------
+  // VOICE COMMAND PARSING (used by Voice Command feature)
+  // ---------------------------------------------------------------------------
+
+  Future<VoiceCommand> parseVoiceCommand(String transcript) async {
+    try {
+      final today = DateTime.now().toIso8601String().substring(0, 10);
+      final prompt = _buildCommandPrompt(today, transcript);
+      final body = {
+        'model': _parseModel,
+        'messages': [
+          {
+            'role': 'system',
+            'content':
+                'You are an Iraqi retail shopkeeper AI. '
+                'You detect what ACTION the user wants to perform from a voice command, '
+                'and extract relevant details (customer name, items, amounts). '
+                'You ALWAYS respond with raw JSON only — no markdown, no codeblocks.',
+          },
+          {'role': 'user', 'content': prompt},
+        ],
+        'response_format': {'type': 'json_object'},
+        'temperature': 0.1,
+        'max_tokens': 500,
+      };
+
+      final url = Uri.parse('https://api.openai.com/v1/chat/completions');
+      final response = await _client
+          .post(
+            url,
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer $apiKey',
+            },
+            body: jsonEncode(body),
+          )
+          .timeout(const Duration(seconds: 15));
+
+      if (response.statusCode != 200) {
+        throw AiParsingException(
+          'API returned status ${response.statusCode}: ${response.body}',
+        );
+      }
+
+      final data = jsonDecode(response.body);
+      final content = data['choices']?[0]?['message']?['content'] as String?;
+      if (content == null) {
+        throw const AiParsingException('Invalid API response format');
+      }
+
+      return _parseVoiceCommandResponse(content, transcript);
+    } on AiParsingException {
+      rethrow;
+    } catch (e) {
+      throw AiParsingException('Failed to parse voice command', e);
+    }
+  }
+
+  VoiceCommand _parseVoiceCommandResponse(
+    String content,
+    String transcript,
+  ) {
+    try {
+      final jsonStr = _extractJson(content);
+      final data = jsonDecode(jsonStr);
+
+      final actionStr = (data['action'] as String?)?.toLowerCase().trim();
+      final action = _resolveAction(actionStr);
+
+      final customerName =
+          (data['customer_name'] as String?)?.trim() ?? '';
+
+      final items = (data['items'] as List?)?.map((item) {
+        return VoiceCommandItem(
+          name: (item['name'] as String?)?.trim() ?? 'Unknown',
+          amount: _parseAmount(item['amount']),
+        );
+      }).toList();
+
+      final totalAmount = (data['total_amount'] != null)
+          ? _parseAmount(data['total_amount'])
+          : (items ?? []).fold(0.0, (sum, i) => sum + i.amount);
+
+      DateTime? dueDate;
+      if (data['due_date'] != null && data['due_date'] is String) {
+        dueDate = DateTime.tryParse(data['due_date']);
+      }
+
+      final note = (data['note'] as String?)?.trim();
+
+      return VoiceCommand(
+        action: action,
+        customerName: customerName,
+        items: items ?? [],
+        totalAmount: totalAmount,
+        dueDate: dueDate,
+        note: note,
+        transcript: transcript,
+      );
+    } catch (e) {
+      if (e is AiParsingException) rethrow;
+      throw AiParsingException('Failed to parse AI command response', e);
+    }
+  }
+
+  VoiceAction _resolveAction(String? actionStr) {
+    switch (actionStr) {
+      case 'add_debt':
+      case 'add debt':
+      case 'record_debt':
+      case 'record debt':
+        return VoiceAction.addDebt;
+      case 'find_customer':
+      case 'find customer':
+      case 'search_customer':
+      case 'search customer':
+      case 'lookup_customer':
+      case 'lookup customer':
+      case 'show_customer':
+      case 'show customer':
+      case 'view_customer':
+      case 'view customer':
+        return VoiceAction.findCustomer;
+      case 'record_payment':
+      case 'record payment':
+      case 'pay_debt':
+      case 'pay debt':
+      case 'make_payment':
+      case 'make payment':
+        return VoiceAction.recordPayment;
+      default:
+        return VoiceAction.unknown;
+    }
+  }
+
+  String _buildCommandPrompt(String today, String transcript) =>
+      '''
+Analyze the voice command below and determine what action the user wants.
+
+POSSIBLE ACTIONS:
+1. "add_debt" — user wants to record a debt/sale for a customer
+   Examples: "سجّل على أحمد 3 طحين ب 45", "أضف دين لابو حسين"
+
+2. "find_customer" — user wants to look up or view a customer's info/balance
+   Examples: "وين أحمد", "拔ابو شهاب", " show customer فلان", " شكد علي_هذا_الزبون"
+
+3. "record_payment" — user wants to record a payment from a customer (paying off debt)
+   Examples: "سدد لأحمد 5000", "ادفع لابو حسين 10 آلاف", "دفع أحمد 20", "أحمد دفع 5000", "رجعلي 3000 من أبو حسين"
+
+4. "unknown" — cannot determine what the user wants
+
+DETECT:
+- action: one of "add_debt", "find_customer", "record_payment", "unknown"
+- customer_name: the customer's name (extracted from speech, clean)
+- items: ONLY for add_debt — list of {name, amount} objects
+- total_amount: for add_debt (sum of items) AND for record_payment (the payment amount)
+- due_date: ONLY for add_debt — "YYYY-MM-DD" relative to TODAY ($today)
+- note: ONLY for record_payment — optional note about the payment (e.g. " partial", " settles all")
+
+IRAQI DIALECT NUMBERS:
+- "بعشرة" / "10" -> 10000
+- "خمسة وثلاثين" -> 35000
+- "ألفين ونص" / "2.5" -> 2500
+
+STUTTERING RULES:
+- If exact words repeat back-to-back ("طحين طحين"), keep only ONE.
+
+CLEANING:
+- Strip fillers: "والله", "عيني", "أغاتي", "حبيبي", "سجل يمعود"
+- Strip customer references: "على أبو شهاب" -> customer is "أبو شهاب"
+
+JSON FORMAT:
+{
+  "action": "add_debt" | "find_customer" | "record_payment" | "unknown",
+  "customer_name": "extracted_name",
+  "items": [{"name": "item_name", "amount": 10000}],
+  "total_amount": 10000,
+  "due_date": "YYYY-MM-DD" or null,
+  "note": "optional note" or null
+}
+
+EXAMPLES:
+
+Command: "سجّل على ابو جاسم 3 طحين ب 45 وكارت آسيا ب 20"
+{"action": "add_debt", "customer_name": "ابو جاسم", "items": [{"name": "طحين (3)", "amount": 45000}, {"name": "كارت آسيا", "amount": 20000}], "total_amount": 65000, "due_date": null, "note": null}
+
+Command: "وين أحمد شكد علي_ه"
+{"action": "find_customer", "customer_name": "أحمد", "items": [], "total_amount": 0, "due_date": null, "note": null}
+
+Command: "ابو حسين وينه"
+{"action": "find_customer", "customer_name": "ابو حسين", "items": [], "total_amount": 0, "due_date": null, "note": null}
+
+Command: "سدد لأحمد 5000"
+{"action": "record_payment", "customer_name": "أحمد", "items": [], "total_amount": 5000, "due_date": null, "note": null}
+
+Command: "ادفع لابو حسين 10 آلاف"
+{"action": "record_payment", "customer_name": "ابو حسين", "items": [], "total_amount": 10000, "due_date": null, "note": null}
+
+Command: "أحمد دفع 20"
+{"action": "record_payment", "customer_name": "أحمد", "items": [], "total_amount": 20000, "due_date": null, "note": null}
+
+Command: $transcript
 ''';
 }

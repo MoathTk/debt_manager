@@ -795,4 +795,49 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get remove => 'Remove';
+
+  @override
+  String get voiceCommand => 'Voice Command';
+
+  @override
+  String get customerMatch => 'Customer Match';
+
+  @override
+  String get noMatchFound => 'No matching customer found';
+
+  @override
+  String get confirmAndSave => 'Confirm & Save';
+
+  @override
+  String get viewCustomer => 'View Customer';
+
+  @override
+  String get voiceCommandError =>
+      'Could not understand the command. Try again.';
+
+  @override
+  String get recordPaymentAction => 'Record Payment';
+
+  @override
+  String get unknownAction => 'Unknown action';
+
+  @override
+  String get confirmPayment => 'Confirm & Pay';
+
+  @override
+  String get paymentSuccess => 'Payment recorded successfully';
+
+  @override
+  String get paymentAmount => 'Payment Amount';
+
+  @override
+  String get outstandingDebts => 'Outstanding Debts';
+
+  @override
+  String get amountExceedsRemaining => 'Amount capped to remaining balance';
+
+  @override
+  String maxPaymentIs(Object amount) {
+    return 'Maximum payable: $amount';
+  }
 }

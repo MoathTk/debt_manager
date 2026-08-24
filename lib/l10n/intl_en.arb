@@ -256,5 +256,19 @@
   "retry": "Retry",
   "transcript": "Transcript",
   "reRecord": "Re-record",
-  "remove": "Remove"
+  "remove": "Remove",
+  "voiceCommand": "Voice Command",
+  "customerMatch": "Customer Match",
+  "noMatchFound": "No matching customer found",
+  "confirmAndSave": "Confirm & Save",
+  "viewCustomer": "View Customer",
+  "voiceCommandError": "Could not understand the command. Try again.",
+  "recordPaymentAction": "Record Payment",
+  "unknownAction": "Unknown action",
+  "confirmPayment": "Confirm & Pay",
+  "paymentSuccess": "Payment recorded successfully",
+  "paymentAmount": "Payment Amount",
+  "outstandingDebts": "Outstanding Debts",
+  "amountExceedsRemaining": "Amount capped to remaining balance",
+  "maxPaymentIs": "Maximum payable: {amount}"
 }
