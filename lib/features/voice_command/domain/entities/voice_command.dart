@@ -8,8 +8,8 @@ library;
 /// Actions the AI can detect from a voice command.
 enum VoiceAction {
   addDebt,
-  findCustomer,
   recordPayment,
+  viewBalance,
   unknown,
 }
 
@@ -65,8 +65,8 @@ class VoiceCommand {
   }
 
   bool get isAddDebt => action == VoiceAction.addDebt;
-  bool get isFindCustomer => action == VoiceAction.findCustomer;
   bool get isRecordPayment => action == VoiceAction.recordPayment;
+  bool get isViewBalance => action == VoiceAction.viewBalance;
   bool get isUnknown => action == VoiceAction.unknown;
   bool get hasCustomerMatch => customerId != null;
 }

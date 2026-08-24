@@ -360,7 +360,11 @@ Transcript: $transcript
       case 'show customer':
       case 'view_customer':
       case 'view customer':
-        return VoiceAction.findCustomer;
+      case 'view_balance':
+      case 'view balance':
+      case 'check_balance':
+      case 'check balance':
+        return VoiceAction.viewBalance;
       case 'record_payment':
       case 'record payment':
       case 'pay_debt':
@@ -381,8 +385,8 @@ POSSIBLE ACTIONS:
 1. "add_debt" — user wants to record a debt/sale for a customer
    Examples: "سجّل على أحمد 3 طحين ب 45", "أضف دين لابو حسين"
 
-2. "find_customer" — user wants to look up or view a customer's info/balance
-   Examples: "وين أحمد", "拔ابو شهاب", " show customer فلان", " شكد علي_هذا_الزبون"
+2. "view_balance" — user wants to look up or view a customer's balance/debts
+   Examples: "وين أحمد", "拔ابو شهاب", "شكد علي أحمد", "كم عليّ أبو حسين", "give me Ahmed's debts", "أحمد وينه"
 
 3. "record_payment" — user wants to record a payment from a customer (paying off debt)
    Examples: "سدد لأحمد 5000", "ادفع لابو حسين 10 آلاف", "دفع أحمد 20", "أحمد دفع 5000", "رجعلي 3000 من أبو حسين"
@@ -390,7 +394,7 @@ POSSIBLE ACTIONS:
 4. "unknown" — cannot determine what the user wants
 
 DETECT:
-- action: one of "add_debt", "find_customer", "record_payment", "unknown"
+- action: one of "add_debt", "view_balance", "record_payment", "unknown"
 - customer_name: the customer's name (extracted from speech, clean)
 - items: ONLY for add_debt — list of {name, amount} objects
 - total_amount: for add_debt (sum of items) AND for record_payment (the payment amount)
@@ -411,7 +415,7 @@ CLEANING:
 
 JSON FORMAT:
 {
-  "action": "add_debt" | "find_customer" | "record_payment" | "unknown",
+  "action": "add_debt" | "view_balance" | "record_payment" | "unknown",
   "customer_name": "extracted_name",
   "items": [{"name": "item_name", "amount": 10000}],
   "total_amount": 10000,
@@ -424,11 +428,17 @@ EXAMPLES:
 Command: "سجّل على ابو جاسم 3 طحين ب 45 وكارت آسيا ب 20"
 {"action": "add_debt", "customer_name": "ابو جاسم", "items": [{"name": "طحين (3)", "amount": 45000}, {"name": "كارت آسيا", "amount": 20000}], "total_amount": 65000, "due_date": null, "note": null}
 
-Command: "وين أحمد شكد علي_ه"
-{"action": "find_customer", "customer_name": "أحمد", "items": [], "total_amount": 0, "due_date": null, "note": null}
+Command: "شكد علي أحمد"
+{"action": "view_balance", "customer_name": "أحمد", "items": [], "total_amount": 0, "due_date": null, "note": null}
+
+Command: "كم عليّ أبو حسين"
+{"action": "view_balance", "customer_name": "ابو حسين", "items": [], "total_amount": 0, "due_date": null, "note": null}
+
+Command: "give me Ahmed's debts"
+{"action": "view_balance", "customer_name": "Ahmed", "items": [], "total_amount": 0, "due_date": null, "note": null}
 
 Command: "ابو حسين وينه"
-{"action": "find_customer", "customer_name": "ابو حسين", "items": [], "total_amount": 0, "due_date": null, "note": null}
+{"action": "view_balance", "customer_name": "ابو حسين", "items": [], "total_amount": 0, "due_date": null, "note": null}
 
 Command: "سدد لأحمد 5000"
 {"action": "record_payment", "customer_name": "أحمد", "items": [], "total_amount": 5000, "due_date": null, "note": null}

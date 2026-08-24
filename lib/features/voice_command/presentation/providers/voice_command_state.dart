@@ -35,6 +35,7 @@ class VoiceCommandState {
   final String? selectedDebtId;
   final double? maxPayment;
   final String? paymentWarning;
+  final double? customerBalance;
 
   const VoiceCommandState({
     this.status = VoiceCommandStatus.idle,
@@ -50,6 +51,7 @@ class VoiceCommandState {
     this.selectedDebtId,
     this.maxPayment,
     this.paymentWarning,
+    this.customerBalance,
   });
 
   VoiceCommandState copyWith({
@@ -75,6 +77,8 @@ class VoiceCommandState {
     double? maxPayment,
     bool clearPaymentWarning = false,
     String? paymentWarning,
+    bool clearCustomerBalance = false,
+    double? customerBalance,
   }) {
     return VoiceCommandState(
       status: status ?? this.status,
@@ -100,6 +104,7 @@ class VoiceCommandState {
           : (selectedDebtId ?? this.selectedDebtId),
       maxPayment: clearMaxPayment ? null : (maxPayment ?? this.maxPayment),
       paymentWarning: clearPaymentWarning ? null : (paymentWarning ?? this.paymentWarning),
+      customerBalance: clearCustomerBalance ? null : (customerBalance ?? this.customerBalance),
     );
   }
 

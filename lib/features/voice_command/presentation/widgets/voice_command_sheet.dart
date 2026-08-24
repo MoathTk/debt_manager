@@ -157,13 +157,22 @@ class _VoiceCommandSheetState extends ConsumerState<VoiceCommandSheet> {
         onReRecord: () => notifier.reRecord(),
       );
     }
-    if (state.command!.isFindCustomer) {
-      return FindCustomerReview(
+    if (state.command!.isViewBalance) {
+      return ViewBalanceReview(
         customerName: state.command!.customerName,
         matchedCustomers: state.matchedCustomers,
         selectedCustomer: state.selectedCustomer,
         onCustomerSelected: (c) => notifier.selectCustomer(c),
         onReRecord: () => notifier.reRecord(),
+        onConfirmPayment: () => _savePayment(notifier, l10n),
+        customerBalance: state.customerBalance,
+        remainingDebts: state.remainingDebts,
+        selectedDebtId: state.selectedDebtId,
+        paymentWarning: state.paymentWarning,
+        maxPayment: state.maxPayment,
+        onDebtSelected: (id, max) => notifier.selectDebt(id, max),
+        onAmountChanged: (a) => notifier.updateAmount(a),
+        paymentAmount: state.command!.totalAmount,
       );
     }
     if (state.command!.isRecordPayment) {

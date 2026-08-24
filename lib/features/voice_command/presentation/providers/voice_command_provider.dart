@@ -223,8 +223,11 @@ class VoiceCommandNotifier extends StateNotifier<VoiceCommandState> {
           selectedCustomer: results.first,
           command: command.copyWith(customerId: results.first.id),
         );
-        if (command.isRecordPayment) {
+        if (command.isRecordPayment || command.isViewBalance) {
           await _fetchRemainingDebts(results.first.id);
+        }
+        if (command.isViewBalance) {
+          await _fetchCustomerBalance(results.first.id);
         }
       } else {
         state = state.copyWith(
@@ -254,6 +257,16 @@ class VoiceCommandNotifier extends StateNotifier<VoiceCommandState> {
     } catch (_) {}
   }
 
+  Future<void> _fetchCustomerBalance(String customerId) async {
+    if (!mounted) return;
+    try {
+      final balance = await _txRepo.getCustomerBalance(customerId);
+      if (mounted) {
+        state = state.copyWith(customerBalance: balance);
+      }
+    } catch (_) {}
+  }
+
   // ---------------------------------------------------------------------------
   // USER ACTIONS
   // ---------------------------------------------------------------------------
@@ -266,9 +279,15 @@ class VoiceCommandNotifier extends StateNotifier<VoiceCommandState> {
       clearSelectedDebtId: true,
       clearMaxPayment: true,
       clearPaymentWarning: true,
+      clearCustomerBalance: true,
+      clearRemainingDebts: true,
     );
-    if (state.command?.isRecordPayment == true) {
+    if (state.command?.isRecordPayment == true ||
+        state.command?.isViewBalance == true) {
       _fetchRemainingDebts(customer.id);
+    }
+    if (state.command?.isViewBalance == true) {
+      _fetchCustomerBalance(customer.id);
     }
   }
 
