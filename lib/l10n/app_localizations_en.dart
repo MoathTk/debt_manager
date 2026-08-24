@@ -843,4 +843,25 @@ class AppLocalizationsEn extends AppLocalizations {
   String maxPaymentIs(Object amount) {
     return 'Maximum payable: $amount';
   }
+
+  @override
+  String get debtDeleted => 'Debt deleted successfully';
+
+  @override
+  String get transactionHistory => 'Transaction History';
+
+  @override
+  String get deleteDebtAction => 'Delete Debt';
+
+  @override
+  String get confirmDeleteVoice => 'Confirm Delete';
+
+  @override
+  String get noDebtsFound => 'No debts found';
+
+  @override
+  String get noTransactionHistory => 'No transactions yet';
+
+  @override
+  String get errorSaving => 'Failed to save. Try again.';
 }

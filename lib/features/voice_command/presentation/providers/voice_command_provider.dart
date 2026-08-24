@@ -242,11 +242,14 @@ class VoiceCommandNotifier extends StateNotifier<VoiceCommandState> {
           selectedCustomer: results.first,
           command: command.copyWith(customerId: results.first.id),
         );
-        if (command.isRecordPayment || command.isViewBalance) {
+        if (command.isRecordPayment || command.isViewBalance || command.isDeleteDebt) {
           await _fetchRemainingDebts(results.first.id);
         }
-        if (command.isViewBalance) {
+        if (command.isViewBalance || command.isViewHistory) {
           await _fetchCustomerBalance(results.first.id);
+        }
+        if (command.isViewHistory) {
+          await _fetchTransactionHistory(results.first.id);
         }
       } else {
         state = state.copyWith(
@@ -286,6 +289,16 @@ class VoiceCommandNotifier extends StateNotifier<VoiceCommandState> {
     } catch (_) {}
   }
 
+  Future<void> _fetchTransactionHistory(String customerId) async {
+    if (!mounted) return;
+    try {
+      final transactions = await _txRepo.getByCustomer(customerId);
+      if (mounted) {
+        state = state.copyWith(transactionHistory: transactions);
+      }
+    } catch (_) {}
+  }
+
   // ---------------------------------------------------------------------------
   // USER ACTIONS
   // ---------------------------------------------------------------------------
@@ -300,13 +313,19 @@ class VoiceCommandNotifier extends StateNotifier<VoiceCommandState> {
       clearPaymentWarning: true,
       clearCustomerBalance: true,
       clearRemainingDebts: true,
+      clearTransactionHistory: true,
     );
     if (state.command?.isRecordPayment == true ||
-        state.command?.isViewBalance == true) {
+        state.command?.isViewBalance == true ||
+        state.command?.isDeleteDebt == true) {
       _fetchRemainingDebts(customer.id);
     }
-    if (state.command?.isViewBalance == true) {
+    if (state.command?.isViewBalance == true ||
+        state.command?.isViewHistory == true) {
       _fetchCustomerBalance(customer.id);
+    }
+    if (state.command?.isViewHistory == true) {
+      _fetchTransactionHistory(customer.id);
     }
   }
 
@@ -384,6 +403,35 @@ class VoiceCommandNotifier extends StateNotifier<VoiceCommandState> {
         amount: cmd.totalAmount,
         debtId: state.selectedDebtId,
         note: cmd.note,
+      );
+      if (mounted) {
+        state = state.copyWith(saveSuccess: true);
+      }
+      return true;
+    } catch (e) {
+      if (mounted) {
+        state = state.copyWith(
+          status: VoiceCommandStatus.ready,
+          error: e.toString(),
+        );
+      }
+      return false;
+    }
+  }
+
+  Future<bool> executeDeleteDebt(ProviderContainer container) async {
+    if (!mounted) return false;
+    final cmd = state.command;
+    if (cmd == null || cmd.customerId == null) return false;
+    if (state.selectedDebtId == null) return false;
+
+    state = state.copyWith(status: VoiceCommandStatus.saving);
+
+    try {
+      await deleteTransaction(
+        container,
+        state.selectedDebtId!,
+        cmd.customerId!,
       );
       if (mounted) {
         state = state.copyWith(saveSuccess: true);

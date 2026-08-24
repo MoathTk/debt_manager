@@ -1711,6 +1711,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Maximum payable: {amount}'**
   String maxPaymentIs(Object amount);
+
+  /// No description provided for @debtDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Debt deleted successfully'**
+  String get debtDeleted;
+
+  /// No description provided for @transactionHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'Transaction History'**
+  String get transactionHistory;
+
+  /// No description provided for @deleteDebtAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Debt'**
+  String get deleteDebtAction;
+
+  /// No description provided for @confirmDeleteVoice.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm Delete'**
+  String get confirmDeleteVoice;
+
+  /// No description provided for @noDebtsFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No debts found'**
+  String get noDebtsFound;
+
+  /// No description provided for @noTransactionHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'No transactions yet'**
+  String get noTransactionHistory;
+
+  /// No description provided for @errorSaving.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to save. Try again.'**
+  String get errorSaving;
 }
 
 class _AppLocalizationsDelegate

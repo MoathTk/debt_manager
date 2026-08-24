@@ -839,4 +839,25 @@ class AppLocalizationsAr extends AppLocalizations {
   String maxPaymentIs(Object amount) {
     return 'الحد الأقصى للدفع: $amount';
   }
+
+  @override
+  String get debtDeleted => 'تم حذف الدين بنجاح';
+
+  @override
+  String get transactionHistory => 'سجل المعاملات';
+
+  @override
+  String get deleteDebtAction => 'حذف الدين';
+
+  @override
+  String get confirmDeleteVoice => 'تأكيد الحذف';
+
+  @override
+  String get noDebtsFound => 'لا توجد ديون';
+
+  @override
+  String get noTransactionHistory => 'لا توجد معاملات بعد';
+
+  @override
+  String get errorSaving => 'فشل الحفظ. حاول مرة أخرى.';
 }

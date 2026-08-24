@@ -270,5 +270,12 @@
   "paymentAmount": "مبلغ الدفعة",
   "outstandingDebts": "الديون المستحقة",
   "amountExceedsRemaining": "تم تعديل المبلغ حسب المتبقي",
-  "maxPaymentIs": "الحد الأقصى للدفع: {amount}"
+  "maxPaymentIs": "الحد الأقصى للدفع: {amount}",
+  "debtDeleted": "تم حذف الدين بنجاح",
+  "transactionHistory": "سجل المعاملات",
+  "deleteDebtAction": "حذف الدين",
+  "confirmDeleteVoice": "تأكيد الحذف",
+  "noDebtsFound": "لا توجد ديون",
+  "noTransactionHistory": "لا توجد معاملات بعد",
+  "errorSaving": "فشل الحفظ. حاول مرة أخرى."
 }

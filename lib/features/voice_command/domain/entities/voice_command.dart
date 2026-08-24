@@ -11,6 +11,8 @@ enum VoiceAction {
   recordPayment,
   viewBalance,
   addCustomer,
+  deleteDebt,
+  viewHistory,
   unknown,
 }
 
@@ -72,6 +74,8 @@ class VoiceCommand {
   bool get isRecordPayment => action == VoiceAction.recordPayment;
   bool get isViewBalance => action == VoiceAction.viewBalance;
   bool get isAddCustomer => action == VoiceAction.addCustomer;
+  bool get isDeleteDebt => action == VoiceAction.deleteDebt;
+  bool get isViewHistory => action == VoiceAction.viewHistory;
   bool get isUnknown => action == VoiceAction.unknown;
   bool get hasCustomerMatch => customerId != null;
 }

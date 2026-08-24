@@ -17,8 +17,10 @@ import '../providers/voice_command_state.dart';
 import '../../../../widgets/add_debt_sheet/recording_indicator.dart';
 import 'add_debt_review.dart';
 import 'add_customer_review.dart';
+import 'delete_debt_review.dart';
 import 'find_customer_review.dart';
 import 'record_payment_review.dart';
+import 'view_history_review.dart';
 
 class VoiceCommandSheet extends ConsumerStatefulWidget {
   final ScrollController scrollController;
@@ -200,6 +202,30 @@ class _VoiceCommandSheetState extends ConsumerState<VoiceCommandSheet> {
         onReRecord: () => notifier.reRecord(),
       );
     }
+    if (state.command!.isDeleteDebt) {
+      return DeleteDebtReview(
+        command: state.command!,
+        matchedCustomers: state.matchedCustomers,
+        selectedCustomer: state.selectedCustomer,
+        onSelectCustomer: (c) => notifier.selectCustomer(c),
+        remainingDebts: state.remainingDebts ?? [],
+        selectedDebtId: state.selectedDebtId,
+        onSelectDebt: (id) => notifier.selectDebt(id, 0),
+        onConfirm: () => _handleDeleteDebt(notifier, l10n),
+        onReRecord: () => notifier.reRecord(),
+        isSaving: state.status == VoiceCommandStatus.saving,
+      );
+    }
+    if (state.command!.isViewHistory) {
+      return ViewHistoryReview(
+        command: state.command!,
+        matchedCustomers: state.matchedCustomers,
+        selectedCustomer: state.selectedCustomer,
+        onSelectCustomer: (c) => notifier.selectCustomer(c),
+        balance: state.customerBalance,
+        transactions: state.transactionHistory ?? [],
+      );
+    }
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(20),
@@ -330,6 +356,27 @@ class _VoiceCommandSheetState extends ConsumerState<VoiceCommandSheet> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(l10n.serverError)),
+        );
+      }
+    }
+  }
+
+  Future<void> _handleDeleteDebt(
+    VoiceCommandNotifier notifier,
+    AppLocalizations l10n,
+  ) async {
+    final container = ProviderScope.containerOf(context, listen: false);
+    final success = await notifier.executeDeleteDebt(container);
+    if (mounted) {
+      if (success) {
+        notifier.reset();
+        Navigator.of(context).pop();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(l10n.debtDeleted)),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(l10n.errorSaving)),
         );
       }
     }

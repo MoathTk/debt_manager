@@ -8,6 +8,7 @@
 library;
 
 import '../../../../data/models/customer.dart';
+import '../../../../data/models/transaction.dart';
 import '../../domain/entities/voice_command.dart';
 
 enum VoiceCommandStatus {
@@ -36,6 +37,7 @@ class VoiceCommandState {
   final double? maxPayment;
   final String? paymentWarning;
   final double? customerBalance;
+  final List<Transaction>? transactionHistory;
 
   const VoiceCommandState({
     this.status = VoiceCommandStatus.idle,
@@ -52,6 +54,7 @@ class VoiceCommandState {
     this.maxPayment,
     this.paymentWarning,
     this.customerBalance,
+    this.transactionHistory,
   });
 
   VoiceCommandState copyWith({
@@ -79,6 +82,8 @@ class VoiceCommandState {
     String? paymentWarning,
     bool clearCustomerBalance = false,
     double? customerBalance,
+    bool clearTransactionHistory = false,
+    List<Transaction>? transactionHistory,
   }) {
     return VoiceCommandState(
       status: status ?? this.status,
@@ -105,6 +110,9 @@ class VoiceCommandState {
       maxPayment: clearMaxPayment ? null : (maxPayment ?? this.maxPayment),
       paymentWarning: clearPaymentWarning ? null : (paymentWarning ?? this.paymentWarning),
       customerBalance: clearCustomerBalance ? null : (customerBalance ?? this.customerBalance),
+      transactionHistory: clearTransactionHistory
+          ? null
+          : (transactionHistory ?? this.transactionHistory),
     );
   }
 

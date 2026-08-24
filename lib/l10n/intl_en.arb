@@ -271,5 +271,12 @@
   "paymentAmount": "Payment Amount",
   "outstandingDebts": "Outstanding Debts",
   "amountExceedsRemaining": "Amount capped to remaining balance",
-  "maxPaymentIs": "Maximum payable: {amount}"
+  "maxPaymentIs": "Maximum payable: {amount}",
+  "debtDeleted": "Debt deleted successfully",
+  "transactionHistory": "Transaction History",
+  "deleteDebtAction": "Delete Debt",
+  "confirmDeleteVoice": "Confirm Delete",
+  "noDebtsFound": "No debts found",
+  "noTransactionHistory": "No transactions yet",
+  "errorSaving": "Failed to save. Try again."
 }

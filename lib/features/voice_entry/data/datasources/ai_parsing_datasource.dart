@@ -383,6 +383,22 @@ Transcript: $transcript
       case 'register_customer':
       case 'register customer':
         return VoiceAction.addCustomer;
+      case 'delete_debt':
+      case 'delete debt':
+      case 'cancel_debt':
+      case 'cancel debt':
+      case 'remove_debt':
+      case 'remove debt':
+      case 'erase_debt':
+      case 'erase debt':
+        return VoiceAction.deleteDebt;
+      case 'view_history':
+      case 'view history':
+      case 'show_history':
+      case 'show history':
+      case 'transaction_history':
+      case 'transaction history':
+        return VoiceAction.viewHistory;
       default:
         return VoiceAction.unknown;
     }
@@ -405,10 +421,16 @@ POSSIBLE ACTIONS:
 4. "add_customer" — user wants to add/register a new customer
    Examples: "أضف عميل اسمه محمد", "add customer Ahmed", "سجّل عميل جديد أبو حسين", "عميل جديد اسمه خالد"
 
-5. "unknown" — cannot determine what the user wants
+5. "delete_debt" — user wants to delete/cancel an existing debt
+   Examples: "احذف دين أحمد", "الغ آخر دين لأبو حسين", "امسح الدين اللي على أحمد", "delete Ahmed's debt", "cancel the debt"
+
+6. "view_history" — user wants to see transaction history for a customer
+   Examples: "شنو اشترى أحمد", "وين تاريخ علي", "what did Ahmed buy", "show Ahmed's transactions", "أحمد شنو اشترى"
+
+7. "unknown" — cannot determine what the user wants
 
 DETECT:
-- action: one of "add_debt", "view_balance", "record_payment", "add_customer", "unknown"
+- action: one of "add_debt", "view_balance", "record_payment", "add_customer", "delete_debt", "view_history", "unknown"
 - customer_name: the customer's name (extracted from speech, clean)
 - phone: ONLY for add_customer — phone number if mentioned (digits only, e.g. "07701234567"), or null
 - items: ONLY for add_debt — list of {name, amount} objects
@@ -430,7 +452,7 @@ CLEANING:
 
 JSON FORMAT:
 {
-  "action": "add_debt" | "view_balance" | "record_payment" | "add_customer" | "unknown",
+  "action": "add_debt" | "view_balance" | "record_payment" | "add_customer" | "delete_debt" | "view_history" | "unknown",
   "customer_name": "extracted_name",
   "phone": "phone_number" or null,
   "items": [{"name": "item_name", "amount": 10000}],
@@ -473,6 +495,18 @@ Command: "add customer Ahmed 07701234567"
 
 Command: "سجّل عميل جديد أبو حسين 07809876543"
 {"action": "add_customer", "customer_name": "ابو حسين", "phone": "07809876543", "items": [], "total_amount": 0, "due_date": null, "note": null}
+
+Command: "احذف دين أحمد"
+{"action": "delete_debt", "customer_name": "أحمد", "items": [], "total_amount": 0, "due_date": null, "note": null}
+
+Command: "الغ آخر دين لأبو حسين"
+{"action": "delete_debt", "customer_name": "ابو حسين", "items": [], "total_amount": 0, "due_date": null, "note": null}
+
+Command: "شنو اشترى أحمد"
+{"action": "view_history", "customer_name": "أحمد", "items": [], "total_amount": 0, "due_date": null, "note": null}
+
+Command: "what did Ahmed buy"
+{"action": "view_history", "customer_name": "Ahmed", "items": [], "total_amount": 0, "due_date": null, "note": null}
 
 Command: $transcript
 ''';
