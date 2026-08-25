@@ -1,17 +1,7 @@
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:firebase_auth_mocks/firebase_auth_mocks.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 import 'package:local_debt_management/services/auth_service.dart';
-
-class _FakeGoogleSignIn implements GoogleSignIn {
-  @override
-  Future<GoogleSignInAccount?> signIn() async => null;
-  @override
-  Future<GoogleSignInAccount?> signOut() async => null;
-  @override
-  dynamic noSuchMethod(Invocation invocation) => null;
-}
 
 /// In-memory fake for the flutter_secure_storage platform channel.
 /// The plugin talks to Android Keystore / iOS Keychain via a method channel,
@@ -48,9 +38,6 @@ void _mockSecureStorageChannel() {
 
 void main() {
   setUp(() {
-    // signOut() calls ClockIntegrityService.clear(), which now reads/writes
-    // flutter_secure_storage (Android Keystore / iOS Keychain). Provide an
-    // in-memory mock so the platform channel isn't invoked in tests.
     _secureStorage.clear();
     _mockSecureStorageChannel();
   });
@@ -105,22 +92,11 @@ void main() {
       });
     });
 
-    group('signInWithGoogle', () {
-      test('returns null when Google sign-in is cancelled', () async {
-        final google = _FakeGoogleSignIn();
-        final mockUser = MockUser(uid: 'google-uid', email: 'g@g.com');
-        final auth = MockFirebaseAuth(mockUser: mockUser);
-        final service = AuthService(auth: auth, google: google);
-        final result = await service.signInWithGoogle();
-        expect(result, null);
-      });
-    });
-
     group('signOut', () {
       test('clears current user', () async {
         final mockUser = MockUser(uid: 'uid-3');
         final auth = MockFirebaseAuth(mockUser: mockUser, signedIn: true);
-        final service = AuthService(auth: auth, google: _FakeGoogleSignIn());
+        final service = AuthService(auth: auth);
 
         expect(service.currentUser, isNotNull);
         await service.signOut();
@@ -130,7 +106,7 @@ void main() {
       test('ownerId is null after sign out', () async {
         final mockUser = MockUser(uid: 'uid-4');
         final auth = MockFirebaseAuth(mockUser: mockUser, signedIn: true);
-        final service = AuthService(auth: auth, google: _FakeGoogleSignIn());
+        final service = AuthService(auth: auth);
 
         await service.signOut();
         expect(service.ownerId, null);

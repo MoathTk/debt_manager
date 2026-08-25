@@ -424,7 +424,101 @@ class AppLocalizationsAr extends AppLocalizations {
   String get signInWithGoogle => 'تسجيل الدخول بحساب Google';
 
   @override
+  String get signInWithPhone => 'تسجيل الدخول بالهاتف';
+
+  @override
   String get signOut => 'تسجيل الخروج';
+
+  @override
+  String get phoneNumber => 'رقم الهاتف';
+
+  @override
+  String get phoneHint => 'أدخل رقم هاتفك';
+
+  @override
+  String get sendCode => 'إرسال الرمز';
+
+  @override
+  String get verifyCode => 'تحقق';
+
+  @override
+  String get codeSent => 'تم إرسال الرمز إلى هاتفك';
+
+  @override
+  String codeSentTo(Object phone) {
+    return 'تم إرسال الرمز إلى $phone';
+  }
+
+  @override
+  String get otpHint => 'أدخل الرمز المكون من6 أرقام';
+
+  @override
+  String get resendCode => 'إعادة إرسال الرمز';
+
+  @override
+  String resendIn(Object seconds) {
+    return 'إعادة الإرسال خلال $seconds ثانية';
+  }
+
+  @override
+  String get invalidOtp => 'رمز غير صحيح. حاول مرة أخرى.';
+
+  @override
+  String get verificationFailed => 'فشل التحقق. حاول مرة أخرى.';
+
+  @override
+  String get autoVerifying => 'جاري التحقق التلقائي...';
+
+  @override
+  String get createPin => 'إنشاء رمز PIN';
+
+  @override
+  String get enterPin => 'أدخل رمز PIN';
+
+  @override
+  String get confirmPin => 'تأكيد رمز PIN';
+
+  @override
+  String get pinHint => 'أدخل رمز PIN مكون من 4-6 أرقام';
+
+  @override
+  String get pinMismatch => 'رمز PIN غير متطابق';
+
+  @override
+  String get pinTooShort => 'يجب أن يكون رمز PIN 4 أرقام على الأقل';
+
+  @override
+  String get pinTooLong => 'يجب أن يكون رمز PIN 6 أرقام كحد أقصى';
+
+  @override
+  String get pinSetupTitle => 'إعداد رمز PIN';
+
+  @override
+  String get pinSetupSubtitle => 'أنشئ رمز PIN لتأمين حسابك';
+
+  @override
+  String get pinEntryTitle => 'مرحباً بعودتك';
+
+  @override
+  String get pinEntrySubtitle => 'أدخل رمز PIN للمتابعة';
+
+  @override
+  String get incorrectPin => 'رمز PIN غير صحيح. حاول مرة أخرى.';
+
+  @override
+  String get pinCreated => 'تم إنشاء رمز PIN بنجاح';
+
+  @override
+  String get yourName => 'اسمك';
+
+  @override
+  String get nameHint => 'أدخل اسمك';
+
+  @override
+  String get setupProfile => 'إعداد الملف الشخصي';
+
+  @override
+  String get profileSetupSubtitle => 'أدخل بياناتك للبدء';
 
   @override
   String get cloudSync => 'المزامنة السحابية';
@@ -452,9 +546,6 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get notSynced => 'غير متزامن';
-
-  @override
-  String get signInCancelled => 'تم إلغاء تسجيل الدخول';
 
   @override
   String get deleteLocalDatabase => 'حذف قاعدة البيانات المحلية';

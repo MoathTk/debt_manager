@@ -1,11 +1,19 @@
+/// Barrel file — re-exports auth providers and repositories from the
+/// authentication feature, plus a legacy [AuthService] wrapper for backward
+/// compatibility with existing consumer code.
+library;
+
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:local_debt_management/Providers/database_provider.dart';
 import 'package:local_debt_management/Providers/sync_provider.dart';
 import 'package:local_debt_management/features/subscription/presentation/providers/subscription_provider.dart';
+import 'package:local_debt_management/data/database_helper.dart';
 import 'package:local_debt_management/services/clock_integrity_service.dart';
-import '../data/database_helper.dart';
+import 'package:local_debt_management/features/authentication/data/repositories/pin_repository_impl.dart';
+
+export 'package:local_debt_management/features/authentication/data/providers/auth_providers.dart'
+    show authUserProvider;
 
 final authServiceProvider = Provider<AuthService>((ref) => AuthService());
 
@@ -15,31 +23,18 @@ final authStateProvider = StreamProvider<User?>((ref) {
 
 class AuthService {
   final FirebaseAuth _auth;
-  final GoogleSignIn _google;
 
-  AuthService({FirebaseAuth? auth, GoogleSignIn? google})
-    : _auth = auth ?? FirebaseAuth.instance,
-      _google = google ?? GoogleSignIn(scopes: ['email']);
+  AuthService({FirebaseAuth? auth}) : _auth = auth ?? FirebaseAuth.instance;
 
   User? get currentUser => _auth.currentUser;
   Stream<User?> get authStateChanges => _auth.authStateChanges();
-
   String? get ownerId => _auth.currentUser?.uid;
 
-  Future<UserCredential?> signInWithGoogle() async {
-    final googleUser = await _google.signIn();
-    if (googleUser == null) return null;
-    final auth = await googleUser.authentication;
-    final credential = GoogleAuthProvider.credential(
-      accessToken: auth.accessToken,
-      idToken: auth.idToken,
-    );
-    return await _auth.signInWithCredential(credential);
-  }
-
   Future<void> signOut([WidgetRef? ref]) async {
+    final uid = _auth.currentUser?.uid;
     await DatabaseHelper.instance.close();
     await ClockIntegrityService.clear();
+    if (uid != null) await PinRepositoryImpl().clearPin(uid);
     if (ref != null) {
       ref.invalidate(customersProvider);
       ref.invalidate(transactionsProvider);
@@ -50,6 +45,6 @@ class AuthService {
       ref.invalidate(syncProvider);
       ref.invalidate(subscriptionProvider);
     }
-    await Future.wait([_google.signOut(), _auth.signOut()]);
+    await _auth.signOut();
   }
 }

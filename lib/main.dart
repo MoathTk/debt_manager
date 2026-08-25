@@ -4,13 +4,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'Providers/theme_provider.dart';
 import 'Providers/locale_provider.dart';
-import 'data/database_helper.dart';
 import 'l10n/app_localizations.dart';
-import 'Providers/sync_provider.dart';
-import 'features/subscription/presentation/screens/subscription_check_screen.dart';
-import 'screens/login_screen.dart';
-import 'services/auth_service.dart';
 import 'services/clock_integrity_service.dart';
+import 'features/authentication/presentation/screens/auth_gate.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -55,57 +51,6 @@ class DebtManagementApp extends ConsumerWidget {
         return supportedLocales.first;
       },
       home: const AuthGate(),
-    );
-  }
-}
-
-class AuthGate extends ConsumerStatefulWidget {
-  const AuthGate({super.key});
-
-  @override
-  ConsumerState<AuthGate> createState() => _AuthGateState();
-}
-
-class _AuthGateState extends ConsumerState<AuthGate> {
-  bool _dbReady = false;
-  String? _currentUid;
-
-  void _initDb(String uid) async {
-    if (_currentUid == uid && _dbReady) return;
-    setState(() {
-      _dbReady = false;
-      _currentUid = uid;
-    });
-    try {
-      await DatabaseHelper.instance.init(uid);
-    } catch (_) {}
-    if (!mounted) return;
-    setState(() => _dbReady = true);
-    ref.read(syncProvider.notifier).onAuthChanged(uid);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final authState = ref.watch(authStateProvider);
-    return authState.when(
-      data: (user) {
-        if (user != null) {
-          _initDb(user.uid);
-          if (!_dbReady) {
-            return const Scaffold(
-              body: Center(child: CircularProgressIndicator()),
-            );
-          }
-          return const SubscriptionCheckScreen();
-        }
-        if (_currentUid != null) {
-          ref.read(syncProvider.notifier).onAuthChanged(null);
-        }
-        return const LoginScreen();
-      },
-      loading: () =>
-          const Scaffold(body: Center(child: CircularProgressIndicator())),
-      error: (_, __) => const LoginScreen(),
     );
   }
 }

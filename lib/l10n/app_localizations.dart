@@ -920,11 +920,191 @@ abstract class AppLocalizations {
   /// **'Sign in with Google'**
   String get signInWithGoogle;
 
+  /// No description provided for @signInWithPhone.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in with Phone'**
+  String get signInWithPhone;
+
   /// No description provided for @signOut.
   ///
   /// In en, this message translates to:
   /// **'Sign Out'**
   String get signOut;
+
+  /// No description provided for @phoneNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Phone Number'**
+  String get phoneNumber;
+
+  /// No description provided for @phoneHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your phone number'**
+  String get phoneHint;
+
+  /// No description provided for @sendCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Send Code'**
+  String get sendCode;
+
+  /// No description provided for @verifyCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Verify'**
+  String get verifyCode;
+
+  /// No description provided for @codeSent.
+  ///
+  /// In en, this message translates to:
+  /// **'Code sent to your phone'**
+  String get codeSent;
+
+  /// No description provided for @codeSentTo.
+  ///
+  /// In en, this message translates to:
+  /// **'Code sent to {phone}'**
+  String codeSentTo(Object phone);
+
+  /// No description provided for @otpHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter 6-digit code'**
+  String get otpHint;
+
+  /// No description provided for @resendCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Resend Code'**
+  String get resendCode;
+
+  /// No description provided for @resendIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Resend in {seconds}s'**
+  String resendIn(Object seconds);
+
+  /// No description provided for @invalidOtp.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid code. Try again.'**
+  String get invalidOtp;
+
+  /// No description provided for @verificationFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Verification failed. Try again.'**
+  String get verificationFailed;
+
+  /// No description provided for @autoVerifying.
+  ///
+  /// In en, this message translates to:
+  /// **'Auto-verifying...'**
+  String get autoVerifying;
+
+  /// No description provided for @createPin.
+  ///
+  /// In en, this message translates to:
+  /// **'Create PIN'**
+  String get createPin;
+
+  /// No description provided for @enterPin.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter PIN'**
+  String get enterPin;
+
+  /// No description provided for @confirmPin.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm PIN'**
+  String get confirmPin;
+
+  /// No description provided for @pinHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter 4-6 digit PIN'**
+  String get pinHint;
+
+  /// No description provided for @pinMismatch.
+  ///
+  /// In en, this message translates to:
+  /// **'PINs do not match'**
+  String get pinMismatch;
+
+  /// No description provided for @pinTooShort.
+  ///
+  /// In en, this message translates to:
+  /// **'PIN must be at least 4 digits'**
+  String get pinTooShort;
+
+  /// No description provided for @pinTooLong.
+  ///
+  /// In en, this message translates to:
+  /// **'PIN must be at most 6 digits'**
+  String get pinTooLong;
+
+  /// No description provided for @pinSetupTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Set Up Your PIN'**
+  String get pinSetupTitle;
+
+  /// No description provided for @pinSetupSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Create a PIN to secure your account'**
+  String get pinSetupSubtitle;
+
+  /// No description provided for @pinEntryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome Back'**
+  String get pinEntryTitle;
+
+  /// No description provided for @pinEntrySubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your PIN to continue'**
+  String get pinEntrySubtitle;
+
+  /// No description provided for @incorrectPin.
+  ///
+  /// In en, this message translates to:
+  /// **'Incorrect PIN. Try again.'**
+  String get incorrectPin;
+
+  /// No description provided for @pinCreated.
+  ///
+  /// In en, this message translates to:
+  /// **'PIN created successfully'**
+  String get pinCreated;
+
+  /// No description provided for @yourName.
+  ///
+  /// In en, this message translates to:
+  /// **'Your Name'**
+  String get yourName;
+
+  /// No description provided for @nameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your name'**
+  String get nameHint;
+
+  /// No description provided for @setupProfile.
+  ///
+  /// In en, this message translates to:
+  /// **'Set Up Profile'**
+  String get setupProfile;
+
+  /// No description provided for @profileSetupSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your details to get started'**
+  String get profileSetupSubtitle;
 
   /// No description provided for @cloudSync.
   ///
@@ -979,12 +1159,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Not synced'**
   String get notSynced;
-
-  /// No description provided for @signInCancelled.
-  ///
-  /// In en, this message translates to:
-  /// **'Sign in was cancelled'**
-  String get signInCancelled;
 
   /// No description provided for @deleteLocalDatabase.
   ///

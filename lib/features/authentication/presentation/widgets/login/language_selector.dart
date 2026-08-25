@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../Providers/locale_provider.dart';
+import '../../../../../Providers/locale_provider.dart';
 
 /// Compact language toggle chip for the login screen.
 class LanguageSelector extends ConsumerWidget {

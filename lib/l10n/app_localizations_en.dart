@@ -425,7 +425,101 @@ class AppLocalizationsEn extends AppLocalizations {
   String get signInWithGoogle => 'Sign in with Google';
 
   @override
+  String get signInWithPhone => 'Sign in with Phone';
+
+  @override
   String get signOut => 'Sign Out';
+
+  @override
+  String get phoneNumber => 'Phone Number';
+
+  @override
+  String get phoneHint => 'Enter your phone number';
+
+  @override
+  String get sendCode => 'Send Code';
+
+  @override
+  String get verifyCode => 'Verify';
+
+  @override
+  String get codeSent => 'Code sent to your phone';
+
+  @override
+  String codeSentTo(Object phone) {
+    return 'Code sent to $phone';
+  }
+
+  @override
+  String get otpHint => 'Enter 6-digit code';
+
+  @override
+  String get resendCode => 'Resend Code';
+
+  @override
+  String resendIn(Object seconds) {
+    return 'Resend in ${seconds}s';
+  }
+
+  @override
+  String get invalidOtp => 'Invalid code. Try again.';
+
+  @override
+  String get verificationFailed => 'Verification failed. Try again.';
+
+  @override
+  String get autoVerifying => 'Auto-verifying...';
+
+  @override
+  String get createPin => 'Create PIN';
+
+  @override
+  String get enterPin => 'Enter PIN';
+
+  @override
+  String get confirmPin => 'Confirm PIN';
+
+  @override
+  String get pinHint => 'Enter 4-6 digit PIN';
+
+  @override
+  String get pinMismatch => 'PINs do not match';
+
+  @override
+  String get pinTooShort => 'PIN must be at least 4 digits';
+
+  @override
+  String get pinTooLong => 'PIN must be at most 6 digits';
+
+  @override
+  String get pinSetupTitle => 'Set Up Your PIN';
+
+  @override
+  String get pinSetupSubtitle => 'Create a PIN to secure your account';
+
+  @override
+  String get pinEntryTitle => 'Welcome Back';
+
+  @override
+  String get pinEntrySubtitle => 'Enter your PIN to continue';
+
+  @override
+  String get incorrectPin => 'Incorrect PIN. Try again.';
+
+  @override
+  String get pinCreated => 'PIN created successfully';
+
+  @override
+  String get yourName => 'Your Name';
+
+  @override
+  String get nameHint => 'Enter your name';
+
+  @override
+  String get setupProfile => 'Set Up Profile';
+
+  @override
+  String get profileSetupSubtitle => 'Enter your details to get started';
 
   @override
   String get cloudSync => 'Cloud Sync';
@@ -453,9 +547,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get notSynced => 'Not synced';
-
-  @override
-  String get signInCancelled => 'Sign in was cancelled';
 
   @override
   String get deleteLocalDatabase => 'Delete Local Database';
