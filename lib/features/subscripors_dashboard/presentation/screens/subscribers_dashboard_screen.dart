@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:local_debt_management/Providers/admin_provider.dart';
+import 'package:local_debt_management/core/theme/app_colors.dart';
 import 'package:local_debt_management/l10n/app_localizations.dart';
 import '../../data/models/subscriber_model.dart';
 import '../providers/subscribers_provider.dart';
@@ -38,13 +39,14 @@ class SubscribersDashboardScreen extends ConsumerWidget {
   }
 
   Widget _accessDenied(BuildContext context, AppLocalizations l10n) {
+    final appColors = AppColors.of(context);
     return Scaffold(
       appBar: AppBar(title: Text(l10n.subscribersDashboard)),
       body: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.lock_outline, size: 64, color: Colors.red),
+            Icon(Icons.lock_outline, size: 64, color: appColors.error),
             const SizedBox(height: 16),
             Text(l10n.accessDenied, style: const TextStyle(fontSize: 16)),
           ],

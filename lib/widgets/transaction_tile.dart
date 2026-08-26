@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../core/theme/app_colors.dart';
 import '../data/models/transaction.dart' as model;
 import '../l10n/app_localizations.dart';
 
@@ -19,11 +20,10 @@ class TransactionTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final appColors = AppColors.of(context);
     final isDebt = transaction.isDebt;
-    final color = isDebt ? theme.colorScheme.error : const Color(0xFF2E7D32);
-    final bg = isDebt
-        ? theme.colorScheme.errorContainer
-        : const Color(0xFFE8F5E9);
+    final color = isDebt ? appColors.debt : appColors.payment;
+    final bg = isDebt ? appColors.debtBg : appColors.paymentBg;
     final formatted = _fmt(transaction.amount);
 
     return Padding(
@@ -111,21 +111,24 @@ class _Info extends StatelessWidget {
             ),
             if (fullyPaid) ...[
               const SizedBox(width: 6),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFE8F5E9),
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                child: Text(
-                  l10n.fullyPaid,
-                  style: const TextStyle(
-                    fontSize: 10,
-                    fontWeight: FontWeight.w700,
-                    color: Color(0xFF2E7D32),
+              Builder(builder: (context) {
+                final appColors = AppColors.of(context);
+                return Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+                  decoration: BoxDecoration(
+                    color: appColors.paymentBg,
+                    borderRadius: BorderRadius.circular(4),
                   ),
-                ),
-              ),
+                  child: Text(
+                    l10n.fullyPaid,
+                    style: TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w700,
+                      color: appColors.payment,
+                    ),
+                  ),
+                );
+              }),
             ],
           ],
         ),

@@ -8,6 +8,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import 'package:local_debt_management/core/theme/app_colors.dart';
 import 'package:local_debt_management/l10n/app_localizations.dart';
 
 String _fmt(double n) {
@@ -61,6 +62,7 @@ class DebtDetailDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
+    final appColors = AppColors.of(context);
     final l10n = AppLocalizations.of(context)!;
     final progress = amount > 0 ? ((amount - remaining) / amount).clamp(0.0, 1.0) : 0.0;
     final isFullyPaid = remaining <= 0;
@@ -85,6 +87,7 @@ class DebtDetailDialog extends StatelessWidget {
                 paid: paid,
                 isFullyPaid: isFullyPaid,
                 cs: cs,
+                appColors: appColors,
                 l10n: l10n,
               ),
               const SizedBox(height: 16),
@@ -92,6 +95,7 @@ class DebtDetailDialog extends StatelessWidget {
                 progress: progress,
                 isFullyPaid: isFullyPaid,
                 cs: cs,
+                appColors: appColors,
                 l10n: l10n,
               ),
               if (note != null && note!.isNotEmpty) ...[
@@ -176,6 +180,7 @@ class _AmountCard extends StatelessWidget {
   final double paid;
   final bool isFullyPaid;
   final ColorScheme cs;
+  final AppColors appColors;
   final AppLocalizations l10n;
   const _AmountCard({
     required this.amount,
@@ -183,13 +188,14 @@ class _AmountCard extends StatelessWidget {
     required this.paid,
     required this.isFullyPaid,
     required this.cs,
+    required this.appColors,
     required this.l10n,
   });
 
   @override
   Widget build(BuildContext context) {
-    final statusColor = isFullyPaid ? const Color(0xFF2E7D32) : cs.error;
-    final statusBg = isFullyPaid ? const Color(0xFFE8F5E9) : cs.errorContainer;
+    final statusColor = isFullyPaid ? appColors.payment : cs.error;
+    final statusBg = isFullyPaid ? appColors.paymentBg : cs.errorContainer;
     final statusLabel = isFullyPaid ? l10n.settled : l10n.owes;
 
     return Container(
@@ -250,7 +256,7 @@ class _AmountCard extends StatelessWidget {
                 child: _MiniStat(
                   label: l10n.amountPaid,
                   value: _fmt(paid),
-                  color: const Color(0xFF2E7D32),
+                  color: appColors.payment,
                 ),
               ),
               Container(
@@ -262,7 +268,7 @@ class _AmountCard extends StatelessWidget {
                 child: _MiniStat(
                   label: l10n.remainingAmount,
                   value: _fmt(remaining > 0 ? remaining : 0),
-                  color: remaining > 0 ? cs.error : const Color(0xFF2E7D32),
+                  color: remaining > 0 ? cs.error : appColors.payment,
                 ),
               ),
             ],
@@ -314,17 +320,19 @@ class _ProgressBar extends StatelessWidget {
   final double progress;
   final bool isFullyPaid;
   final ColorScheme cs;
+  final AppColors appColors;
   final AppLocalizations l10n;
   const _ProgressBar({
     required this.progress,
     required this.isFullyPaid,
     required this.cs,
+    required this.appColors,
     required this.l10n,
   });
 
   @override
   Widget build(BuildContext context) {
-    final color = isFullyPaid ? const Color(0xFF2E7D32) : cs.error;
+    final color = isFullyPaid ? appColors.payment : cs.error;
     final percentage = (progress * 100).toInt();
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

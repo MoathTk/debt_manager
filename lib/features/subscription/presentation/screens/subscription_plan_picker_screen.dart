@@ -2,6 +2,7 @@ library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:local_debt_management/core/theme/app_colors.dart';
 import 'package:local_debt_management/l10n/app_localizations.dart';
 import '../providers/subscription_provider.dart';
 import '../widgets/plan_card.dart';
@@ -14,6 +15,7 @@ class SubscriptionPlanPickerScreen extends ConsumerWidget {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final cs = theme.colorScheme;
+    final appColors = AppColors.of(context);
     final notifier = ref.read(subscriptionProvider.notifier);
 
     return Scaffold(
@@ -49,7 +51,7 @@ class SubscriptionPlanPickerScreen extends ConsumerWidget {
                 title: l10n.planTrial,
                 subtitle: l10n.planTrialDesc,
                 badge: l10n.free,
-                badgeColor: Colors.green,
+                badgeColor: appColors.success,
                 icon: Icons.star_rounded,
                 highlighted: true,
                 onTap: () => notifier.activateTrial(),

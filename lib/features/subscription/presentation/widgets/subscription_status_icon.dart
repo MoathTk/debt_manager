@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:local_debt_management/core/theme/app_colors.dart';
 import '../../domain/entities/subscription.dart';
 import '../providers/subscription_provider.dart';
 import 'subscription_status_dialog.dart';
@@ -11,7 +12,8 @@ class SubscriptionStatusIcon extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final sub = ref.watch(subscriptionProvider).subscription;
     if (sub == null) return const SizedBox.shrink();
-    final color = dotColor(sub);
+    final appColors = AppColors.of(context);
+    final color = dotColor(sub, appColors);
     return IconButton(
       onPressed: () => _showDetails(context, sub),
       icon: Semantics(

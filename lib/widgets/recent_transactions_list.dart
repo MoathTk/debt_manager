@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../core/theme/app_colors.dart';
 import '../l10n/app_localizations.dart';
 import '../Providers/database_provider.dart';
 import '../data/models/transaction.dart' as model;
@@ -176,6 +177,7 @@ class _TransactionTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final appColors = AppColors.of(context);
     return Column(
       children: [
         ListTile(
@@ -187,18 +189,14 @@ class _TransactionTile extends StatelessWidget {
           leading: Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: _isDebt
-                  ? const Color(0xFFFFEBEE)
-                  : const Color(0xFFE8F5E9),
+              color: _isDebt ? appColors.debtBg : appColors.paymentBg,
               borderRadius: BorderRadius.circular(10),
             ),
             child: Icon(
               _isDebt
                   ? Icons.arrow_upward_rounded
                   : Icons.arrow_downward_rounded,
-              color: _isDebt
-                  ? const Color(0xFFE53935)
-                  : const Color(0xFF43A047),
+              color: _isDebt ? appColors.debt : appColors.payment,
               size: 20,
             ),
           ),
@@ -207,9 +205,7 @@ class _TransactionTile extends StatelessWidget {
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w600,
-              color: _isDebt
-                  ? const Color(0xFFE53935)
-                  : const Color(0xFF43A047),
+              color: _isDebt ? appColors.debt : appColors.payment,
             ),
           ),
           subtitle: (transaction.note != null && transaction.note!.isNotEmpty)

@@ -9,6 +9,7 @@ library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:local_debt_management/core/theme/app_colors.dart';
 import 'package:local_debt_management/l10n/app_localizations.dart';
 import 'package:local_debt_management/data/models/customer.dart';
 import 'package:local_debt_management/widgets/debt_selector_tile.dart';
@@ -299,17 +300,18 @@ class _PaymentWarning extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final appColors = AppColors.of(context);
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
       decoration: BoxDecoration(
-        color: Colors.orange.withValues(alpha: 0.1),
+        color: appColors.warning.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.orange.withValues(alpha: 0.3)),
+        border: Border.all(color: appColors.warning.withValues(alpha: 0.3)),
       ),
       child: Row(
         children: [
-          Icon(Icons.info_outline_rounded, size: 18, color: Colors.orange.shade700),
+          Icon(Icons.info_outline_rounded, size: 18, color: appColors.warning),
           const SizedBox(width: 8),
           Expanded(
             child: Text(
@@ -319,7 +321,7 @@ class _PaymentWarning extends StatelessWidget {
               style: TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w500,
-                color: Colors.orange.shade800,
+                color: appColors.warning,
               ),
             ),
           ),

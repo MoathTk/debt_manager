@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
+import '../core/theme/app_colors.dart';
 import '../l10n/app_localizations.dart';
 
 class MonthlyBreakdownChart extends StatelessWidget {
@@ -10,6 +11,7 @@ class MonthlyBreakdownChart extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final cs = Theme.of(context).colorScheme;
+    final appColors = AppColors.of(context);
 
     if (data.isEmpty) return _empty(l10n, cs);
 
@@ -23,7 +25,7 @@ class MonthlyBreakdownChart extends StatelessWidget {
           barRods: [
             BarChartRodData(
               toY: d,
-              color: const Color(0xFFE53935),
+              color: appColors.debt,
               width: 12,
               borderRadius: const BorderRadius.vertical(
                 top: Radius.circular(4),
@@ -31,7 +33,7 @@ class MonthlyBreakdownChart extends StatelessWidget {
             ),
             BarChartRodData(
               toY: p,
-              color: const Color(0xFF43A047),
+              color: appColors.payment,
               width: 12,
               borderRadius: const BorderRadius.vertical(
                 top: Radius.circular(4),

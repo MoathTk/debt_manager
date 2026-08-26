@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:local_debt_management/core/theme/app_colors.dart';
 import '../../l10n/app_localizations.dart';
 import '../../utils/number_formatter.dart';
 
@@ -11,10 +12,10 @@ class BalanceBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final appColors = AppColors.of(context);
     final theme = Theme.of(context);
-    final textColor = _getTextColor(isDark, theme);
-    final bgColor = _getBgColor(isDark, theme);
+    final textColor = _getTextColor(appColors, theme);
+    final bgColor = _getBgColor(appColors, theme);
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -52,27 +53,15 @@ class BalanceBadge extends StatelessWidget {
     );
   }
 
-  Color _getTextColor(bool isDark, ThemeData theme) {
-    if (balance > 0) {
-      return isDark ? const Color(0xFFFFB4AB) : theme.colorScheme.error;
-    }
-    if (balance < 0) {
-      return isDark ? const Color(0xFF81C784) : const Color(0xFF2E7D32);
-    }
+  Color _getTextColor(AppColors appColors, ThemeData theme) {
+    if (balance > 0) return appColors.debt;
+    if (balance < 0) return appColors.payment;
     return theme.colorScheme.onSurfaceVariant;
   }
 
-  Color _getBgColor(bool isDark, ThemeData theme) {
-    if (balance > 0) {
-      return isDark
-          ? const Color(0xFF93000A).withValues(alpha: 0.3)
-          : theme.colorScheme.errorContainer;
-    }
-    if (balance < 0) {
-      return isDark
-          ? const Color(0xFF005313).withValues(alpha: 0.3)
-          : const Color(0xFFE8F5E9);
-    }
+  Color _getBgColor(AppColors appColors, ThemeData theme) {
+    if (balance > 0) return appColors.debtBg;
+    if (balance < 0) return appColors.paymentBg;
     return theme.colorScheme.surfaceContainerHighest;
   }
 

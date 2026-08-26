@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../Providers/database_provider.dart';
+import '../core/theme/app_colors.dart';
 import '../data/models/transaction.dart' as model;
 import '../l10n/app_localizations.dart';
 
@@ -13,10 +14,11 @@ class AllTransactionsTile extends ConsumerWidget {
     final theme = Theme.of(context);
     final cs = theme.colorScheme;
     final l10n = AppLocalizations.of(context)!;
+    final appColors = AppColors.of(context);
     final t = transaction;
     final isDebt = t.isDebt;
-    final color = isDebt ? const Color(0xFFE53935) : const Color(0xFF43A047);
-    final bg = isDebt ? const Color(0xFFFFEBEE) : const Color(0xFFE8F5E9);
+    final color = isDebt ? appColors.debt : appColors.payment;
+    final bg = isDebt ? appColors.debtBg : appColors.paymentBg;
     final amt = t.amount % 1 == 0
         ? t.amount.toStringAsFixed(0)
         : t.amount.toStringAsFixed(2);

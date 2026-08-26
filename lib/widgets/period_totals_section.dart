@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../core/theme/app_colors.dart';
 import '../l10n/app_localizations.dart';
 import '../Providers/database_provider.dart';
 import 'period_chips.dart';
@@ -21,6 +22,7 @@ class _PeriodTotalsState extends ConsumerState<PeriodTotalsSection> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final appColors = AppColors.of(context);
     final range = PeriodHelper.dateRange(_type, _ref);
     final key =
         '${range.start.toIso8601String()}|${range.end.toIso8601String()}';
@@ -59,7 +61,7 @@ class _PeriodTotalsState extends ConsumerState<PeriodTotalsSection> {
                 child: PeriodMiniCard(
                   label: l10n.periodDebts,
                   value: t['debts']!,
-                  color: const Color(0xFFE53935),
+                  color: appColors.debt,
                 ),
               ),
               const SizedBox(width: 12),
@@ -67,7 +69,7 @@ class _PeriodTotalsState extends ConsumerState<PeriodTotalsSection> {
                 child: PeriodMiniCard(
                   label: l10n.periodPayments,
                   value: t['payments']!,
-                  color: const Color(0xFF43A047),
+                  color: appColors.payment,
                 ),
               ),
             ],

@@ -9,6 +9,7 @@ library;
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:local_debt_management/core/theme/app_colors.dart';
 import 'package:local_debt_management/l10n/app_localizations.dart';
 import 'package:local_debt_management/data/models/customer.dart';
 import 'package:local_debt_management/widgets/amount_input_formatter.dart';
@@ -138,16 +139,17 @@ class _ItemsHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final appColors = AppColors.of(context);
     return Row(
       children: [
-        Icon(Icons.receipt_long_rounded, size: 14, color: Colors.amber.shade700),
+        Icon(Icons.receipt_long_rounded, size: 14, color: appColors.gold),
         const SizedBox(width: 6),
         Text(
           '${l10n.parsedItems} ($count)',
           style: TextStyle(
             fontSize: 12,
             fontWeight: FontWeight.w600,
-            color: Colors.amber.shade700,
+            color: appColors.gold,
           ),
         ),
       ],
@@ -171,6 +173,7 @@ class _ItemCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final appColors = AppColors.of(context);
     return Dismissible(
       key: ValueKey('item_$index'),
       direction: DismissDirection.endToStart,
@@ -180,7 +183,7 @@ class _ItemCard extends StatelessWidget {
         margin: const EdgeInsets.only(bottom: 4),
         padding: const EdgeInsets.only(right: 16),
         decoration: BoxDecoration(
-          color: Colors.red.shade400,
+          color: appColors.debt.withValues(alpha: 0.7),
           borderRadius: BorderRadius.circular(10),
         ),
         child: const Icon(Icons.delete_outline_rounded, color: Colors.white),
@@ -189,13 +192,13 @@ class _ItemCard extends StatelessWidget {
         margin: const EdgeInsets.only(bottom: 4),
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
         decoration: BoxDecoration(
-          color: Colors.amber.withValues(alpha: 0.12),
+          color: appColors.goldLight.withValues(alpha: 0.5),
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: Colors.amber.withValues(alpha: 0.25)),
+          border: Border.all(color: appColors.gold.withValues(alpha: 0.25)),
         ),
         child: Row(
           children: [
-            Icon(Icons.label_rounded, size: 16, color: Colors.amber.shade700),
+            Icon(Icons.label_rounded, size: 16, color: appColors.gold),
             const SizedBox(width: 8),
             Expanded(
               child: Text(
@@ -212,7 +215,7 @@ class _ItemCard extends StatelessWidget {
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w700,
-                color: Colors.amber.shade900,
+                color: appColors.goldDark,
               ),
             ),
             const SizedBox(width: 6),
@@ -224,7 +227,7 @@ class _ItemCard extends StatelessWidget {
                 child: Icon(
                   Icons.close_rounded,
                   size: 18,
-                  color: Colors.red.shade400,
+                  color: appColors.debt.withValues(alpha: 0.7),
                 ),
               ),
             ),
@@ -247,13 +250,14 @@ class _TotalSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final appColors = AppColors.of(context);
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       decoration: BoxDecoration(
-        color: Colors.red.withValues(alpha: 0.1),
+        color: appColors.debt.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.red.withValues(alpha: 0.25)),
+        border: Border.all(color: appColors.debt.withValues(alpha: 0.25)),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -263,7 +267,7 @@ class _TotalSection extends StatelessWidget {
             style: TextStyle(
               fontSize: 15,
               fontWeight: FontWeight.w700,
-              color: Colors.red.shade700,
+              color: appColors.debt,
             ),
           ),
           Text(
@@ -271,7 +275,7 @@ class _TotalSection extends StatelessWidget {
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w800,
-              color: Colors.red.shade700,
+              color: appColors.debt,
             ),
           ),
         ],
@@ -288,6 +292,7 @@ class _DueRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final appColors = AppColors.of(context);
     final locale = Localizations.localeOf(context);
     final formattedDate = DateFormat.yMMMd(locale.languageCode).format(date);
 
@@ -295,19 +300,19 @@ class _DueRow extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
-        color: Colors.teal.withValues(alpha: 0.1),
+        color: appColors.customer.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: Colors.teal.withValues(alpha: 0.25)),
+        border: Border.all(color: appColors.customer.withValues(alpha: 0.25)),
       ),
       child: Row(
         children: [
           Container(
             padding: const EdgeInsets.all(6),
             decoration: BoxDecoration(
-              color: Colors.teal.withValues(alpha: 0.15),
+              color: appColors.customer.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(8),
             ),
-            child: Icon(Icons.calendar_today_rounded, size: 16, color: Colors.teal.shade700),
+            child: Icon(Icons.calendar_today_rounded, size: 16, color: appColors.customer),
           ),
           const SizedBox(width: 10),
           Column(
@@ -318,7 +323,7 @@ class _DueRow extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 10,
                   fontWeight: FontWeight.w700,
-                  color: Colors.teal.shade700,
+                  color: appColors.customer,
                   letterSpacing: 0.8,
                 ),
               ),

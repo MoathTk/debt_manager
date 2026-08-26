@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../core/theme/app_colors.dart';
 import '../l10n/app_localizations.dart';
 import '../data/models/transaction.dart' as model;
 import '../Providers/database_provider.dart';
@@ -142,11 +143,10 @@ class _RecordTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final loc = AppLocalizations.of(context)!;
+    final appColors = AppColors.of(context);
     final isDebt = transaction.isDebt;
-    final color = isDebt ? theme.colorScheme.error : const Color(0xFF2E7D32);
-    final bg = isDebt
-        ? theme.colorScheme.errorContainer
-        : const Color(0xFFE8F5E9);
+    final color = isDebt ? appColors.debt : appColors.payment;
+    final bg = isDebt ? appColors.debtBg : appColors.paymentBg;
     final formatted = transaction.amount % 1 == 0
         ? transaction.amount.toStringAsFixed(0)
         : transaction.amount.toStringAsFixed(2);

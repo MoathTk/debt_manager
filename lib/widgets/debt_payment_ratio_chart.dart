@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
+import '../core/theme/app_colors.dart';
 import '../l10n/app_localizations.dart';
 
 class DebtPaymentRatioChart extends StatelessWidget {
@@ -15,6 +16,7 @@ class DebtPaymentRatioChart extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final cs = Theme.of(context).colorScheme;
+    final appColors = AppColors.of(context);
     final total = totalDebts + totalPayments;
 
     if (total == 0) return _empty(l10n, cs);
@@ -41,13 +43,13 @@ class DebtPaymentRatioChart extends StatelessWidget {
                 sections: [
                   PieChartSectionData(
                     value: debtPct,
-                    color: const Color(0xFFE53935),
+                    color: appColors.debt,
                     radius: 14,
                     title: '',
                   ),
                   PieChartSectionData(
                     value: payPct,
-                    color: const Color(0xFF43A047),
+                    color: appColors.payment,
                     radius: 14,
                     title: '',
                   ),
@@ -60,9 +62,9 @@ class DebtPaymentRatioChart extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _legend(l10n.debts, debtPct, const Color(0xFFE53935)),
+                _legend(l10n.debts, debtPct, appColors.debt),
                 const SizedBox(height: 8),
-                _legend(l10n.payments, payPct, const Color(0xFF43A047)),
+                _legend(l10n.payments, payPct, appColors.payment),
               ],
             ),
           ),

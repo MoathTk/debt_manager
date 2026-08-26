@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:local_debt_management/core/theme/app_colors.dart';
 import 'package:local_debt_management/l10n/app_localizations.dart';
 
 class SubscriberStatsRow extends StatelessWidget {
@@ -19,17 +20,18 @@ class SubscriberStatsRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final cs = Theme.of(context).colorScheme;
+    final appColors = AppColors.of(context);
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
       child: Row(
         children: [
           _card(l10n.totalSubscribers, total, cs.primary, cs),
           const SizedBox(width: 8),
-          _card(l10n.activeSubscribers, active, Colors.green, cs),
+          _card(l10n.activeSubscribers, active, appColors.success, cs),
           const SizedBox(width: 8),
-          _card(l10n.expiringSubscribers, expiring, Colors.orange, cs),
+          _card(l10n.expiringSubscribers, expiring, appColors.warning, cs),
           const SizedBox(width: 8),
-          _card(l10n.expiredSubscribers, expired, Colors.red, cs),
+          _card(l10n.expiredSubscribers, expired, appColors.error, cs),
         ],
       ),
     );

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:local_debt_management/core/theme/app_colors.dart';
 import 'package:local_debt_management/features/subscription/presentation/providers/subscription_provider.dart';
 import 'package:local_debt_management/l10n/app_localizations.dart';
 import '../../data/models/subscriber_model.dart';
@@ -13,8 +14,9 @@ class SubscriberTile extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final cs = Theme.of(context).colorScheme;
+    final appColors = AppColors.of(context);
     final l10n = AppLocalizations.of(context)!;
-    final color = sub.isExpired ? Colors.red : sub.daysRemaining <= 1 ? Colors.orange : Colors.green;
+    final color = sub.isExpired ? appColors.error : sub.daysRemaining <= 1 ? appColors.warning : appColors.success;
     final label = sub.isExpired ? l10n.expiredSubscribers : sub.daysRemaining <= 1 ? l10n.expiringSubscribers : l10n.activeSubscribers;
     final days = sub.isExpired ? l10n.daysAgo(sub.daysRemaining.abs()) : sub.daysRemaining == 0 ? l10n.subToday : l10n.daysLeft(sub.daysRemaining);
     final name = sub.userName.isNotEmpty ? sub.userName : sub.uid.substring(0, 8);
@@ -60,7 +62,7 @@ class SubscriberTile extends ConsumerWidget {
             ),
           ),
           IconButton(
-            icon: Icon(Icons.block_rounded, size: 20, color: Colors.red),
+            icon: Icon(Icons.block_rounded, size: 20, color: appColors.error),
             onPressed: sub.isExpired ? null : () => _confirmExpire(context, ref, l10n, name),
           ),
         ]),
@@ -69,17 +71,18 @@ class SubscriberTile extends ConsumerWidget {
   }
 
   Future<void> _confirmExpire(BuildContext context, WidgetRef ref, AppLocalizations l10n, String name) async {
+    final appColors = AppColors.of(context);
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        icon: const Icon(Icons.warning_amber_rounded, color: Colors.red, size: 32),
+        icon: Icon(Icons.warning_amber_rounded, color: appColors.error, size: 32),
         title: Text(l10n.confirmExpire),
         content: Text(l10n.confirmExpireMsg(name)),
         actions: [
           TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(l10n.cancel)),
           FilledButton(
             onPressed: () => Navigator.pop(ctx, true),
-            style: FilledButton.styleFrom(backgroundColor: Colors.red),
+            style: FilledButton.styleFrom(backgroundColor: appColors.error),
             child: Text(l10n.expireNow),
           ),
         ],

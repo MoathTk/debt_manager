@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:local_debt_management/core/theme/app_colors.dart';
 import '../l10n/app_localizations.dart';
 import '../data/models/transaction.dart' as model;
 import '../Providers/database_provider.dart';
@@ -28,6 +29,7 @@ class ReminderDetailInfo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final appColors = AppColors.of(context);
     final cs = Theme.of(context).colorScheme;
     final r = reminder;
     final nameAsync = ProviderScope.containerOf(
@@ -74,7 +76,7 @@ class ReminderDetailInfo extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.w600,
-                  color: Colors.green,
+                  color: appColors.success,
                 ),
               ),
             ),

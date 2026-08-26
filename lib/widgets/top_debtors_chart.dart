@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../Providers/database_provider.dart';
+import '../core/theme/app_colors.dart';
 import '../l10n/app_localizations.dart';
 
 class TopDebtorsChart extends ConsumerWidget {
@@ -75,6 +76,7 @@ class _Row extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
+    final appColors = AppColors.of(context);
     final formatted = amount % 1 == 0
         ? amount.toStringAsFixed(0)
         : amount.toStringAsFixed(2);
@@ -102,7 +104,7 @@ class _Row extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w700,
-                  color: const Color(0xFFE53935),
+                  color: appColors.debt,
                 ),
               ),
             ],
@@ -114,7 +116,7 @@ class _Row extends StatelessWidget {
               value: ratio,
               minHeight: 6,
               backgroundColor: cs.outlineVariant.withValues(alpha: 0.2),
-              valueColor: const AlwaysStoppedAnimation(Color(0xFFE53935)),
+              valueColor: AlwaysStoppedAnimation(appColors.debt),
             ),
           ),
         ],

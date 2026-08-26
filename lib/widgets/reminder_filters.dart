@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:local_debt_management/core/theme/app_colors.dart';
 import '../l10n/app_localizations.dart';
 
 /// Search bar for filtering reminders by customer name or message.
@@ -82,6 +83,7 @@ class ReminderFilterBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final appColors = AppColors.of(context);
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 4),
       child: Row(
@@ -102,21 +104,21 @@ class ReminderFilterBar extends StatelessWidget {
                   value: 'late',
                   label: l10n.overdue,
                   icon: Icons.error_outline_rounded,
-                  color: Colors.red,
+                  color: appColors.error,
                   count: statusCounts['late'],
                 ),
                 (
                   value: 'pending',
                   label: l10n.pendingReminders,
                   icon: Icons.schedule_rounded,
-                  color: Colors.orange,
+                  color: appColors.warning,
                   count: statusCounts['pending'],
                 ),
                 (
                   value: 'completed',
                   label: l10n.completedReminders,
                   icon: Icons.check_circle_outline_rounded,
-                  color: Colors.green,
+                  color: appColors.success,
                   count: statusCounts['completed'],
                 ),
               ],

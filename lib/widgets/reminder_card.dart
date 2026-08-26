@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:local_debt_management/core/theme/app_colors.dart';
 import 'package:local_debt_management/features/subscription/presentation/widgets/mutation_guard.dart';
 import '../l10n/app_localizations.dart';
 import '../Providers/database_provider.dart';
@@ -30,6 +31,7 @@ class ReminderCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
+    final appColors = AppColors.of(context);
     final cs = Theme.of(context).colorScheme;
     final dark = Theme.of(context).brightness == Brightness.dark;
     final nameAsync = ref.watch(customerByIdProvider(reminder.customerId));
@@ -133,6 +135,7 @@ class ReminderCard extends ConsumerWidget {
                       _MarkCompletedBtn(
                         reminder: reminder,
                         l10n: l10n,
+                        appColors: appColors,
                         onTap: () => _confirmToggle(context, ref, l10n),
                       ),
                     if (!reminder.completed) const SizedBox(width: 8),
@@ -258,20 +261,23 @@ class _AmountChip extends ConsumerWidget {
 class _MarkCompletedBtn extends ConsumerWidget {
   final DebtReminder reminder;
   final AppLocalizations l10n;
+  final AppColors appColors;
   final VoidCallback onTap;
 
   const _MarkCompletedBtn({
     required this.reminder,
     required this.l10n,
+    required this.appColors,
     required this.onTap,
   });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final cs = Theme.of(context).colorScheme;
     if (reminder.debtId == null) {
       return ReminderActionBtn(
         icon: Icons.check_circle_outline_rounded,
-        color: const Color(0xFF43A047),
+        color: appColors.payment,
         onTap: onTap,
       );
     }
@@ -283,7 +289,7 @@ class _MarkCompletedBtn extends ConsumerWidget {
         if (txn == null) {
           return ReminderActionBtn(
             icon: Icons.check_circle_outline_rounded,
-            color: const Color(0xFF43A047),
+            color: appColors.payment,
             onTap: onTap,
           );
         }
@@ -296,7 +302,7 @@ class _MarkCompletedBtn extends ConsumerWidget {
               icon: fullyPaid
                   ? Icons.check_circle
                   : Icons.check_circle_outline_rounded,
-              color: fullyPaid ? Colors.grey : const Color(0xFF43A047),
+              color: fullyPaid ? cs.outline : appColors.payment,
               onTap: fullyPaid ? () {} : onTap,
             );
           },

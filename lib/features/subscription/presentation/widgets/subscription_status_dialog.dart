@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:local_debt_management/core/theme/app_colors.dart';
 import 'package:local_debt_management/l10n/app_localizations.dart';
 import '../../domain/entities/subscription.dart';
 import 'subscription_status_header.dart';
@@ -31,9 +32,10 @@ class _State extends State<SubscriptionStatusDialog>
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
+    final appColors = AppColors.of(context);
     final l10n = AppLocalizations.of(context)!;
     final sub = widget.subscription;
-    final color = dotColor(sub);
+    final color = dotColor(sub, appColors);
     final diff = sub.expiresAt.difference(DateTime.now());
     final expired = diff.isNegative;
     final timeStr = expired
@@ -87,12 +89,12 @@ class _State extends State<SubscriptionStatusDialog>
   }
 }
 
-Color dotColor(Subscription sub) => switch (sub.status()) {
-  SubscriptionStatus.active => Colors.green,
-  SubscriptionStatus.expiring => Colors.orange,
-  SubscriptionStatus.grace => Colors.red,
-  SubscriptionStatus.blocked => Colors.red.shade900,
-  SubscriptionStatus.noData => Colors.blue,
+Color dotColor(Subscription sub, AppColors appColors) => switch (sub.status()) {
+  SubscriptionStatus.active => appColors.success,
+  SubscriptionStatus.expiring => appColors.warning,
+  SubscriptionStatus.grace => appColors.error,
+  SubscriptionStatus.blocked => appColors.expired,
+  SubscriptionStatus.noData => appColors.customer,
 };
 
 String _planLabel(SubscriptionPlan plan, AppLocalizations l10n) => switch (plan) {

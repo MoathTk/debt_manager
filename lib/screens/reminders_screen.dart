@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:local_debt_management/core/theme/app_colors.dart';
 import '../l10n/app_localizations.dart';
 import '../Providers/database_provider.dart';
 import '../data/models/debt_reminder.dart';
@@ -47,6 +48,7 @@ class _RemindersState extends ConsumerState<RemindersScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final appColors = AppColors.of(context);
     final l10n = AppLocalizations.of(context)!;
     final remindersAsync = ref.watch(allRemindersProvider);
     final allReminders = remindersAsync.valueOrNull ?? [];
@@ -82,7 +84,7 @@ class _RemindersState extends ConsumerState<RemindersScreen> {
                   itemCount: filtered.length,
                   itemBuilder: (ctx, i) => ReminderCard(
                     reminder: filtered[i],
-                    accent: _accent(filtered[i]),
+                    accent: _accent(filtered[i], appColors),
                     onTap: () => showReminderDetailSheet(ctx, ref, filtered[i]),
                   ),
                 );
@@ -150,12 +152,12 @@ class _RemindersState extends ConsumerState<RemindersScreen> {
     return list;
   }
 
-  Color _accent(DebtReminder r) {
-    if (r.completed) return Colors.grey;
+  Color _accent(DebtReminder r, AppColors appColors) {
+    if (r.completed) return Theme.of(context).colorScheme.outline;
     final todayStr = _todayStr();
-    if (r.reminderDate.compareTo(todayStr) < 0) return Colors.red;
-    if (r.reminderDate == todayStr) return Colors.orange;
-    return Colors.blue;
+    if (r.reminderDate.compareTo(todayStr) < 0) return appColors.error;
+    if (r.reminderDate == todayStr) return appColors.warning;
+    return appColors.customer;
   }
 
   Map<String, int> _counts(List<DebtReminder> all) {

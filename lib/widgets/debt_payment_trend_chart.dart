@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
+import '../core/theme/app_colors.dart';
 import '../l10n/app_localizations.dart';
 
 class DebtPaymentTrendChart extends StatelessWidget {
@@ -10,6 +11,7 @@ class DebtPaymentTrendChart extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final cs = Theme.of(context).colorScheme;
+    final appColors = AppColors.of(context);
 
     if (data.isEmpty) return _empty(l10n, cs);
 
@@ -81,23 +83,23 @@ class DebtPaymentTrendChart extends StatelessWidget {
                   LineChartBarData(
                     spots: debtSpots,
                     isCurved: true,
-                    color: const Color(0xFFE53935),
+                    color: appColors.debt,
                     barWidth: 2.5,
                     dotData: FlDotData(show: true),
                     belowBarData: BarAreaData(
                       show: true,
-                      color: const Color(0xFFE53935).withValues(alpha: 0.08),
+                      color: appColors.debt.withValues(alpha: 0.08),
                     ),
                   ),
                   LineChartBarData(
                     spots: paySpots,
                     isCurved: true,
-                    color: const Color(0xFF43A047),
+                    color: appColors.payment,
                     barWidth: 2.5,
                     dotData: FlDotData(show: true),
                     belowBarData: BarAreaData(
                       show: true,
-                      color: const Color(0xFF43A047).withValues(alpha: 0.08),
+                      color: appColors.payment.withValues(alpha: 0.08),
                     ),
                   ),
                 ],
@@ -133,11 +135,12 @@ class _Legend extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final appColors = AppColors.of(context);
     return Row(
       children: [
-        _dot(const Color(0xFFE53935), l10n.debts),
+        _dot(appColors.debt, l10n.debts),
         const SizedBox(width: 16),
-        _dot(const Color(0xFF43A047), l10n.payments),
+        _dot(appColors.payment, l10n.payments),
       ],
     );
   }

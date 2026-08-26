@@ -2,6 +2,7 @@ library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:local_debt_management/core/theme/app_colors.dart';
 import 'package:local_debt_management/l10n/app_localizations.dart';
 import '../../domain/entities/subscription.dart';
 import '../providers/subscription_provider.dart';
@@ -16,8 +17,9 @@ class SubscriptionBanner extends ConsumerWidget {
     if (sub == null) return const SizedBox.shrink();
 
     final status = state.isBlocked ? SubscriptionStatus.blocked : sub.status();
+    final appColors = AppColors.of(context);
     final l10n = AppLocalizations.of(context)!;
-    final (color, icon) = _style(status);
+    final (color, icon) = _style(status, appColors);
     final label = _label(status, l10n);
 
     return Container(
@@ -65,12 +67,12 @@ class SubscriptionBanner extends ConsumerWidget {
     return '${m}m';
   }
 
-  (Color, IconData) _style(SubscriptionStatus s) => switch (s) {
-    SubscriptionStatus.active => (Colors.green, Icons.check_circle_outline),
-    SubscriptionStatus.expiring => (Colors.orange, Icons.warning_amber_rounded),
-    SubscriptionStatus.grace => (Colors.red, Icons.error_outline),
-    SubscriptionStatus.blocked => (Colors.red.shade900, Icons.block),
-    SubscriptionStatus.noData => (Colors.blue, Icons.info_outline),
+  (Color, IconData) _style(SubscriptionStatus s, AppColors appColors) => switch (s) {
+    SubscriptionStatus.active => (appColors.success, Icons.check_circle_outline),
+    SubscriptionStatus.expiring => (appColors.warning, Icons.warning_amber_rounded),
+    SubscriptionStatus.grace => (appColors.error, Icons.error_outline),
+    SubscriptionStatus.blocked => (appColors.expired, Icons.block),
+    SubscriptionStatus.noData => (appColors.customer, Icons.info_outline),
   };
 
   String _label(SubscriptionStatus s, AppLocalizations l10n) => switch (s) {

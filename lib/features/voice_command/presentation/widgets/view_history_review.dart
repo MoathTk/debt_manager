@@ -8,6 +8,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import 'package:local_debt_management/core/theme/app_colors.dart';
 import 'package:local_debt_management/data/models/customer.dart';
 import 'package:local_debt_management/l10n/app_localizations.dart';
 import 'package:local_debt_management/data/models/transaction.dart';
@@ -254,9 +255,10 @@ class _TransactionTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final appColors = AppColors.of(context);
     final isDebt = tx.isDebt;
-    final color = isDebt ? cs.error : const Color(0xFF2E7D32);
-    final bgColor = isDebt ? cs.errorContainer : const Color(0xFFE8F5E9);
+    final color = isDebt ? cs.error : appColors.payment;
+    final bgColor = isDebt ? cs.errorContainer : appColors.paymentBg;
     final icon = isDebt
         ? Icons.arrow_upward_rounded
         : Icons.arrow_downward_rounded;

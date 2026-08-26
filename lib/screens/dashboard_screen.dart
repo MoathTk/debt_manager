@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../l10n/app_localizations.dart';
 import '../Providers/database_provider.dart';
 import '../Providers/mutations.dart';
+import '../core/theme/app_colors.dart';
 import '../widgets/stat_card.dart';
 import '../widgets/recent_transactions_list.dart';
 import 'all_transactions_screen.dart';
@@ -29,6 +30,7 @@ class DashboardScreen extends ConsumerWidget {
   }
 
   Widget _body(BuildContext ctx, AppLocalizations l10n, DashboardStats s) {
+    final appColors = AppColors.of(ctx);
     return SingleChildScrollView(
       physics: const AlwaysScrollableScrollPhysics(),
       //padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
@@ -48,7 +50,7 @@ class DashboardScreen extends ConsumerWidget {
                 icon: Icons.money_off,
                 label: l10n.totalDebts,
                 numValue: s.totalDebts,
-                color: const Color(0xFFE53935),
+                color: appColors.debt,
                 compact: true,
                 onTap: () => Navigator.push(
                   ctx,
@@ -61,7 +63,7 @@ class DashboardScreen extends ConsumerWidget {
                 icon: Icons.payments,
                 label: l10n.totalPayments,
                 numValue: s.totalPayments,
-                color: const Color(0xFF43A047),
+                color: appColors.payment,
                 compact: true,
                 onTap: () => Navigator.push(
                   ctx,
@@ -74,14 +76,14 @@ class DashboardScreen extends ConsumerWidget {
                 icon: Icons.people,
                 label: l10n.customers,
                 numValue: s.customerCount.toDouble(),
-                color: const Color(0xFF1E88E5),
+                color: appColors.customer,
                 onTap: () => onNavigateToTab?.call(1),
               ),
               StatCard(
                 icon: Icons.notifications_active,
                 label: l10n.pendingReminders,
                 numValue: s.pendingReminders.toDouble(),
-                color: const Color(0xFFF9A825),
+                color: appColors.reminder,
                 onTap: () => onNavigateToTab?.call(2),
               ),
             ],

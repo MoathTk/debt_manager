@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../core/theme/app_colors.dart';
 import '../l10n/app_localizations.dart';
 
 class CollectionProgressRing extends StatelessWidget {
@@ -9,12 +10,13 @@ class CollectionProgressRing extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final cs = Theme.of(context).colorScheme;
+    final appColors = AppColors.of(context);
     final pct = (rate * 100).clamp(0, 100);
     final color = rate >= 0.7
-        ? const Color(0xFF43A047)
+        ? appColors.payment
         : rate >= 0.4
-        ? const Color(0xFFF9A825)
-        : const Color(0xFFE53935);
+        ? appColors.reminder
+        : appColors.debt;
 
     return Container(
       padding: const EdgeInsets.all(20),

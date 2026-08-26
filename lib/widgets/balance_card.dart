@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../core/theme/app_colors.dart';
 import '../l10n/app_localizations.dart';
 
 /// Prominent balance card showing the customer's net balance with status color.
@@ -17,15 +18,16 @@ class BalanceCard extends StatelessWidget {
         : isOverpaid
         ? l10n.overpaid
         : l10n.settled;
+    final appColors = AppColors.of(context);
     final color = isOwed
-        ? theme.colorScheme.error
+        ? appColors.debt
         : isOverpaid
-        ? const Color(0xFF2E7D32)
+        ? appColors.payment
         : theme.colorScheme.onSurfaceVariant;
     final bgColor = isOwed
-        ? theme.colorScheme.errorContainer
+        ? appColors.debtBg
         : isOverpaid
-        ? const Color(0xFFE8F5E9)
+        ? appColors.paymentBg
         : theme.colorScheme.surfaceContainerHighest;
 
     return Container(
