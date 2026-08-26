@@ -24,6 +24,7 @@ import '../../../voice_entry/data/datasources/ai_parsing_datasource.dart'
 import '../../../../Providers/database_provider.dart';
 import '../../../../Providers/mutations.dart';
 import '../../../../data/repositories/customer_repository.dart';
+import '../../../../data/models/customer.dart';
 import '../../../../data/repositories/transaction_repository.dart';
 
 final voiceCommandProvider =
@@ -110,6 +111,7 @@ class VoiceCommandNotifier extends StateNotifier<VoiceCommandState> {
       soundLevel: 0.0,
       recordedFilePath: path,
       saveSuccess: false,
+      allCustomers: const [],
     );
 
     _ampSub = _recorder
@@ -251,6 +253,16 @@ class VoiceCommandNotifier extends StateNotifier<VoiceCommandState> {
         if (command.isViewHistory) {
           await _fetchTransactionHistory(results.first.id);
         }
+      } else if (results.isEmpty && command.isAddDebt) {
+        final all = await _customerRepo.getAll();
+        if (mounted) {
+          state = state.copyWith(
+            status: VoiceCommandStatus.ready,
+            matchedCustomers: const [],
+            allCustomers: all,
+            command: command,
+          );
+        }
       } else {
         state = state.copyWith(
           status: VoiceCommandStatus.ready,
@@ -327,6 +339,17 @@ class VoiceCommandNotifier extends StateNotifier<VoiceCommandState> {
     if (state.command?.isViewHistory == true) {
       _fetchTransactionHistory(customer.id);
     }
+  }
+
+  Future<void> selectNewlyAddedCustomer(Customer customer) async {
+    if (!mounted) return;
+    final all = await _customerRepo.getAll();
+    if (!mounted) return;
+    state = state.copyWith(
+      selectedCustomer: customer,
+      command: state.command?.copyWith(customerId: customer.id),
+      allCustomers: all,
+    );
   }
 
   void selectDebt(String debtId, double max) {

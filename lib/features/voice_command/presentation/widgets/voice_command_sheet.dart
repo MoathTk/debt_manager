@@ -12,6 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:local_debt_management/l10n/app_localizations.dart';
 import 'package:local_debt_management/Providers/mutations.dart';
+import 'package:local_debt_management/widgets/add_customer_sheet.dart';
 import '../providers/voice_command_provider.dart';
 import '../providers/voice_command_state.dart';
 import '../../../../widgets/add_debt_sheet/recording_indicator.dart';
@@ -153,8 +154,14 @@ class _VoiceCommandSheetState extends ConsumerState<VoiceCommandSheet> {
       return AddDebtReview(
         command: state.command!,
         matchedCustomers: state.matchedCustomers,
+        allCustomers: state.allCustomers,
         selectedCustomer: state.selectedCustomer,
         onCustomerSelected: (c) => notifier.selectCustomer(c),
+        onAddCustomer: () => showAddCustomerSheet(
+          context,
+          ref,
+          onCustomerAdded: (c) => notifier.selectNewlyAddedCustomer(c),
+        ),
         onConfirm: (cmd) => _saveDebt(cmd, notifier, l10n),
         onRetry: () => notifier.reRecord(),
         onReRecord: () => notifier.reRecord(),

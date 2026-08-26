@@ -3,6 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../l10n/app_localizations.dart';
 import '../Providers/mutations.dart';
+import '../Providers/database_provider.dart';
+import '../data/models/customer.dart';
 import '../features/subscription/presentation/widgets/mutation_guard.dart';
 import 'app_snackbar.dart';
 
@@ -10,7 +12,15 @@ import 'app_snackbar.dart';
 ///
 /// Features filled input fields, smooth animations, and clear hierarchy.
 /// Designed for quick, effortless customer creation.
-void showAddCustomerSheet(BuildContext context, WidgetRef ref) {
+///
+/// When [onCustomerAdded] is provided, it is called with the newly created
+/// [Customer] after save (instead of showing a snackbar). This allows callers
+/// to react to the new customer (e.g., auto-select it).
+void showAddCustomerSheet(
+  BuildContext context,
+  WidgetRef ref, {
+  ValueChanged<Customer>? onCustomerAdded,
+}) {
   if (MutationGuard.checkBlocked(context, ref)) return;
   final l10n = AppLocalizations.of(context)!;
   final nameController = TextEditingController();
@@ -28,16 +38,25 @@ void showAddCustomerSheet(BuildContext context, WidgetRef ref) {
       formKey: formKey,
       onSave: () async {
         if (!formKey.currentState!.validate()) return;
+        final name = nameController.text.trim();
+        final phone = phoneController.text.trim();
+        final container = ProviderScope.containerOf(ctx);
         await addCustomer(
-          ProviderScope.containerOf(ctx),
-          name: nameController.text.trim(),
-          phone: phoneController.text.trim().isEmpty
-              ? null
-              : phoneController.text.trim(),
+          container,
+          name: name,
+          phone: phone.isEmpty ? null : phone,
         );
         if (ctx.mounted) {
           Navigator.of(ctx).pop();
-          showSuccessSnackBar(context, '${l10n.addCustomer} ✓');
+          if (onCustomerAdded != null) {
+            final repo = container.read(customerRepositoryProvider);
+            final results = await repo.search(name);
+            if (results.isNotEmpty) {
+              onCustomerAdded(results.first);
+            }
+          } else {
+            showSuccessSnackBar(context, '${l10n.addCustomer} ✓');
+          }
         }
       },
     ),

@@ -26,6 +26,7 @@ class VoiceCommandState {
   final VoiceCommandStatus status;
   final VoiceCommand? command;
   final List<Customer> matchedCustomers;
+  final List<Customer> allCustomers;
   final Customer? selectedCustomer;
   final String? error;
   final DateTime? recordingStarted;
@@ -43,6 +44,7 @@ class VoiceCommandState {
     this.status = VoiceCommandStatus.idle,
     this.command,
     this.matchedCustomers = const [],
+    this.allCustomers = const [],
     this.selectedCustomer,
     this.error,
     this.recordingStarted,
@@ -62,6 +64,7 @@ class VoiceCommandState {
     bool clearCommand = false,
     VoiceCommand? command,
     List<Customer>? matchedCustomers,
+    List<Customer>? allCustomers,
     bool clearSelectedCustomer = false,
     Customer? selectedCustomer,
     bool clearError = false,
@@ -89,6 +92,7 @@ class VoiceCommandState {
       status: status ?? this.status,
       command: clearCommand ? null : (command ?? this.command),
       matchedCustomers: matchedCustomers ?? this.matchedCustomers,
+      allCustomers: allCustomers ?? this.allCustomers,
       selectedCustomer: clearSelectedCustomer
           ? null
           : (selectedCustomer ?? this.selectedCustomer),

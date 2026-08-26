@@ -897,6 +897,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get noMatchFound => 'No matching customer found';
 
   @override
+  String get addNewCustomer => 'Add new customer';
+
+  @override
   String get confirmAndSave => 'Confirm & Save';
 
   @override

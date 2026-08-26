@@ -288,6 +288,7 @@
   "voiceCommand": "أمر صوتي",
   "customerMatch": "مطابقة العميل",
   "noMatchFound": "لم يتم العثور على عميل مطابق",
+  "addNewCustomer": "إضافة عميل جديد",
   "confirmAndSave": "تأكيد وحفظ",
   "viewCustomer": "عرض العميل",
   "voiceCommandError": "لم يتم فهم الأمر. حاول مرة أخرى.",

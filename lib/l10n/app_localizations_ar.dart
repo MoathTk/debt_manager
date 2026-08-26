@@ -894,6 +894,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get noMatchFound => 'لم يتم العثور على عميل مطابق';
 
   @override
+  String get addNewCustomer => 'إضافة عميل جديد';
+
+  @override
   String get confirmAndSave => 'تأكيد وحفظ';
 
   @override

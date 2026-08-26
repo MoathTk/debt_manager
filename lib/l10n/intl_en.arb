@@ -289,6 +289,7 @@
   "voiceCommand": "Voice Command",
   "customerMatch": "Customer Match",
   "noMatchFound": "No matching customer found",
+  "addNewCustomer": "Add new customer",
   "confirmAndSave": "Confirm & Save",
   "viewCustomer": "View Customer",
   "voiceCommandError": "Could not understand the command. Try again.",

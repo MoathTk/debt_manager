@@ -1814,6 +1814,12 @@ abstract class AppLocalizations {
   /// **'No matching customer found'**
   String get noMatchFound;
 
+  /// No description provided for @addNewCustomer.
+  ///
+  /// In en, this message translates to:
+  /// **'Add new customer'**
+  String get addNewCustomer;
+
   /// No description provided for @confirmAndSave.
   ///
   /// In en, this message translates to:
