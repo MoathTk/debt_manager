@@ -5,7 +5,6 @@ import '../l10n/app_localizations.dart';
 import '../data/models/transaction.dart' as model;
 import '../Providers/database_provider.dart';
 import '../Providers/mutations.dart';
-import '../Providers/sync_provider.dart';
 import '../features/subscription/presentation/widgets/mutation_guard.dart';
 import 'amount_input_formatter.dart';
 import 'app_snackbar.dart';
@@ -111,26 +110,14 @@ class _BodyState extends ConsumerState<_EditDebtBody> {
 
   Future<void> _delete() async {
     setState(() => _saving = true);
-    final reminderRepo = ref.read(debtReminderRepositoryProvider);
-    await reminderRepo.deleteByDebtId(widget.debt.id);
-    final repo = ref.read(transactionRepositoryProvider);
-    await repo.deletePaymentsByDebtId(widget.debt.id);
-    await repo.delete(widget.debt.id);
-    ref.read(syncProvider.notifier).schedulePush();
-    _invalidate(ref);
-    ref.invalidate(allRemindersProvider);
-    ref.invalidate(pendingRemindersProvider);
-    ref.invalidate(dueTodayProvider);
+    await deleteDebt(
+      ProviderScope.containerOf(context),
+      widget.debt.id,
+      widget.debt.customerId,
+    );
     if (mounted) Navigator.pop(context);
   }
 
-  void _invalidate(WidgetRef ref) {
-    ref.invalidate(transactionsByCustomerProvider(widget.debt.customerId));
-    ref.invalidate(customerBalanceProvider(widget.debt.customerId));
-    ref.invalidate(debtsWithRemainingProvider(widget.debt.customerId));
-    ref.invalidate(transactionsProvider);
-    ref.invalidate(dashboardStatsProvider);
-  }
 
   @override
   Widget build(BuildContext context) {

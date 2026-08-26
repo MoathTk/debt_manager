@@ -275,6 +275,22 @@ Future<void> deleteTransaction(
   container.read(syncProvider.notifier).schedulePush();
 }
 
+/// Cascade-deletes a debt and all its associated payments and reminders.
+Future<void> deleteDebt(
+  ProviderContainer container,
+  String debtId,
+  String customerId,
+) async {
+  final txRepo = container.read(transactionRepositoryProvider);
+  final reminderRepo = container.read(debtReminderRepositoryProvider);
+  await txRepo.delete(debtId);
+  await txRepo.deletePaymentsByDebtId(debtId);
+  await reminderRepo.deleteByDebtId(debtId);
+  _invalidateTransactions(container, customerId);
+  _invalidateReminders(container);
+  container.read(syncProvider.notifier).schedulePush();
+}
+
 Future<void> updateTransaction(
   ProviderContainer container, {
   required model.Transaction transaction,

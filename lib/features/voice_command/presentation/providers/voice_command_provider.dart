@@ -428,7 +428,7 @@ class VoiceCommandNotifier extends StateNotifier<VoiceCommandState> {
     state = state.copyWith(status: VoiceCommandStatus.saving);
 
     try {
-      await deleteTransaction(
+      await deleteDebt(
         container,
         state.selectedDebtId!,
         cmd.customerId!,
