@@ -20,7 +20,7 @@ class SubscriberTile extends ConsumerWidget {
     final label = sub.isExpired ? l10n.expiredSubscribers : sub.daysRemaining <= 1 ? l10n.expiringSubscribers : l10n.activeSubscribers;
     final days = sub.isExpired ? l10n.daysAgo(sub.daysRemaining.abs()) : sub.daysRemaining == 0 ? l10n.subToday : l10n.daysLeft(sub.daysRemaining);
     final name = sub.userName.isNotEmpty ? sub.userName : sub.uid.substring(0, 8);
-    final subtext = sub.userEmail.isNotEmpty ? sub.userEmail : _planLabel(sub.plan, l10n);
+    final subtext = sub.userPhone.isNotEmpty ? sub.userPhone : _planLabel(sub.plan, l10n);
     final icon = sub.plan == 'weekly' ? Icons.view_week_rounded : sub.plan == 'monthly' ? Icons.calendar_month_rounded : Icons.science_rounded;
 
     return Card(

@@ -27,8 +27,10 @@ class PinScreen extends ConsumerStatefulWidget {
 }
 
 class _PinScreenState extends ConsumerState<PinScreen> {
+  final _nameController = TextEditingController();
   final _pinController = TextEditingController();
   final _confirmController = TextEditingController();
+  final _nameFocus = FocusNode();
   final _pinFocus = FocusNode();
   final _confirmFocus = FocusNode();
   bool _isConfirmStep = false;
@@ -36,8 +38,10 @@ class _PinScreenState extends ConsumerState<PinScreen> {
 
   @override
   void dispose() {
+    _nameController.dispose();
     _pinController.dispose();
     _confirmController.dispose();
+    _nameFocus.dispose();
     _pinFocus.dispose();
     _confirmFocus.dispose();
     super.dispose();
@@ -69,6 +73,10 @@ class _PinScreenState extends ConsumerState<PinScreen> {
   }
 
   bool get _canSubmit {
+    if (_isSetup && !_isConfirmStep) {
+      return _nameController.text.trim().isNotEmpty &&
+          _pinController.text.length >= 4;
+    }
     final len = (_isSetup && _isConfirmStep
             ? _confirmController
             : _pinController)
@@ -184,6 +192,57 @@ class _PinScreenState extends ConsumerState<PinScreen> {
                         textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: 36),
+                      if (_isSetup && !_isConfirmStep) ...[
+                        SizedBox(
+                          width: double.infinity,
+                          height: 54,
+                          child: TextField(
+                            controller: _nameController,
+                            focusNode: _nameFocus,
+                            textCapitalization: TextCapitalization.words,
+                            style: tt.bodyLarge?.copyWith(
+                              color: cs.onSurface,
+                            ),
+                            textAlign: TextAlign.center,
+                            decoration: InputDecoration(
+                              hintText: l10n.nameHint,
+                              hintStyle: tt.bodyMedium?.copyWith(
+                                color: cs.onSurfaceVariant
+                                    .withValues(alpha: 0.4),
+                              ),
+                              prefixIcon: Icon(
+                                Icons.person_outline_rounded,
+                                size: 20,
+                                color: cs.onSurfaceVariant,
+                              ),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(14),
+                                borderSide: BorderSide(
+                                  color:
+                                      cs.outline.withValues(alpha: 0.2),
+                                ),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(14),
+                                borderSide: BorderSide(
+                                  color: cs.primary,
+                                  width: 1.5,
+                                ),
+                              ),
+                              filled: true,
+                              fillColor: cs.surfaceContainerHighest
+                                  .withValues(alpha: 0.4),
+                            ),
+                            onChanged: (v) {
+                              ref
+                                  .read(authProvider.notifier)
+                                  .setUserName(v.trim());
+                              setState(() {});
+                            },
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                      ],
                       _PinDots(
                         length: pinLength,
                         maxLength: 6,

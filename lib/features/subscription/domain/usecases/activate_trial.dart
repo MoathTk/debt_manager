@@ -27,7 +27,7 @@ class ActivateTrial {
   Future<Subscription> call(
     String uid, {
     String userName = '',
-    String userEmail = '',
+    String userPhone = '',
   }) async {
     final sub = Subscription(
       plan: SubscriptionPlan.trial,
@@ -45,7 +45,7 @@ class ActivateTrial {
 
     // Save to Firestore — try to sync, but don't block on failure
     try {
-      await repo.saveRemote(uid, sub, userName: userName, userEmail: userEmail);
+      await repo.saveRemote(uid, sub, userName: userName, userPhone: userPhone);
     } on SubscriptionException {
       // Remote failure is non-critical — local cache is already saved
       // Caller can still use the trial, it will sync next time online

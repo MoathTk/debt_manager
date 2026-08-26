@@ -49,7 +49,7 @@ class SubscriptionRemoteDatasource {
         await _firestore.collection('subscriptions').doc(uid).set({
           ...sub.toFirestore(),
           'userName': user?.displayName ?? '',
-          'userEmail': user?.email ?? '',
+          'userPhone': user?.phoneNumber ?? '',
         }, SetOptions(merge: true));
       }
 
@@ -70,7 +70,7 @@ class SubscriptionRemoteDatasource {
   /// Write subscription to Firestore (set = create or overwrite).
   /// Also mirrors to top-level `subscriptions/{uid}` for admin dashboard.
   /// Throws [SubscriptionRemoteException] on Firestore or network error.
-  Future<void> save(String uid, SubscriptionModel sub, {String userName = '', String userEmail = ''}) async {
+  Future<void> save(String uid, SubscriptionModel sub, {String userName = '', String userPhone = ''}) async {
     try {
       final data = sub.toFirestore();
       final batch = _firestore.batch();
@@ -86,7 +86,7 @@ class SubscriptionRemoteDatasource {
       batch.set(adminRef, {
         ...data,
         'userName': userName,
-        'userEmail': userEmail,
+        'userPhone': userPhone,
       }, SetOptions(merge: true));
 
       await batch.commit();

@@ -7,7 +7,7 @@ class SubscriberModel {
   final DateTime activatedAt;
   final bool isActive;
   final String userName;
-  final String userEmail;
+  final String userPhone;
 
   const SubscriberModel({
     required this.uid,
@@ -16,7 +16,7 @@ class SubscriberModel {
     required this.activatedAt,
     required this.isActive,
     this.userName = '',
-    this.userEmail = '',
+    this.userPhone = '',
   });
 
   int get daysRemaining => expiresAt.difference(DateTime.now()).inDays;
@@ -36,7 +36,7 @@ class SubscriberModel {
       activatedAt: _parseDate(data['activatedAt']),
       isActive: data['is_active'] ?? false,
       userName: data['userName'] ?? '',
-      userEmail: data['userEmail'] ?? '',
+      userPhone: data['userPhone'] ?? '',
     );
   }
 
@@ -52,6 +52,6 @@ class SubscriberModel {
     'activatedAt': Timestamp.fromDate(activatedAt),
     'is_active': isActive,
     'userName': userName,
-    'userEmail': userEmail,
+    'userPhone': userPhone,
   };
 }

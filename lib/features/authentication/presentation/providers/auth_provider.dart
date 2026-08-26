@@ -210,7 +210,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
           uid: uid,
           pin: pin,
           name: state.userName ?? '',
-          phone: state.userPhone ?? '',
+          phone: state.isPinSetupStep ? state.phoneNumber : (state.userPhone ?? ''),
         );
         if (!mounted) return;
         state = state.copyWith(
@@ -256,6 +256,10 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
   void resetError() {
     state = state.copyWith(clearError: true);
+  }
+
+  void setUserName(String name) {
+    state = state.copyWith(userName: name);
   }
 
   // ---------------------------------------------------------------------------

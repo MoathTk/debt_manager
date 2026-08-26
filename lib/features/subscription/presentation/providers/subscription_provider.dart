@@ -133,7 +133,7 @@ class SubscriptionNotifier extends StateNotifier<SubscriptionState> {
       final sub = await _activateTrial(
         uid,
         userName: user?.displayName ?? '',
-        userEmail: user?.email ?? '',
+        userPhone: user?.phoneNumber ?? '',
       );
       if (!mounted) return;
       state = state.copyWith(isLoading: false, subscription: sub);
