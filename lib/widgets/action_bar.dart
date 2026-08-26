@@ -6,7 +6,7 @@ import 'add_debt_sheet/add_debt_sheet.dart';
 import 'record_payment_sheet.dart';
 import 'records_list_sheet.dart';
 
-/// Professional floating action bar with three action buttons.
+/// Gold segmented action bar with three action buttons.
 class ActionBar extends ConsumerWidget {
   final String customerId;
   const ActionBar({super.key, required this.customerId});
@@ -14,23 +14,25 @@ class ActionBar extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
-    final theme = Theme.of(context);
+    final cs = Theme.of(context).colorScheme;
 
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
-
       child: Container(
-        height: 64,
+        height: 72,
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20),
-          color: Colors.transparent,
+          borderRadius: BorderRadius.circular(16),
+          color: cs.surface,
           boxShadow: [
             BoxShadow(
-              color: theme.colorScheme.shadow.withValues(alpha: 0.1),
-              blurRadius: 20,
-              offset: const Offset(0, -4),
+              color: const Color(0xFF8B6914).withValues(alpha: 0.12),
+              blurRadius: 16,
+              offset: const Offset(0, -3),
             ),
           ],
+          border: Border.all(
+            color: cs.outlineVariant.withValues(alpha: 0.4),
+          ),
         ),
         child: Row(
           children: [
@@ -38,43 +40,31 @@ class ActionBar extends ConsumerWidget {
               child: _ActionBtn(
                 icon: Icons.add_rounded,
                 label: l10n.debt,
-                gradient: [
-                  theme.colorScheme.error,
-                  theme.colorScheme.error.withValues(alpha: 0.8),
-                ],
-                shadowColor: theme.colorScheme.error.withValues(alpha: 0.3),
+                color: const Color(0xFFC49A3C),
                 onTap: () {
                   if (MutationGuard.checkBlocked(context, ref)) return;
                   showAddDebtSheet(context, ref, customerId);
                 },
               ),
             ),
-            const SizedBox(width: 10),
+            _GoldDivider(),
             Expanded(
               child: _ActionBtn(
                 icon: Icons.payments_rounded,
                 label: l10n.payment,
-                gradient: [
-                  theme.colorScheme.primary,
-                  theme.colorScheme.primary.withValues(alpha: 0.8),
-                ],
-                shadowColor: theme.colorScheme.primary.withValues(alpha: 0.3),
+                color: const Color(0xFFB08928),
                 onTap: () {
                   if (MutationGuard.checkBlocked(context, ref)) return;
                   showRecordPaymentSheet(context, ref, customerId);
                 },
               ),
             ),
-            const SizedBox(width: 10),
+            _GoldDivider(),
             Expanded(
               child: _ActionBtn(
-                icon: Icons.edit_rounded,
+                icon: Icons.edit_note_rounded,
                 label: l10n.editRecords,
-                gradient: [
-                  theme.colorScheme.tertiary,
-                  theme.colorScheme.tertiary.withValues(alpha: 0.8),
-                ],
-                shadowColor: theme.colorScheme.tertiary.withValues(alpha: 0.3),
+                color: const Color(0xFFD4AC50),
                 onTap: () {
                   if (MutationGuard.checkBlocked(context, ref)) return;
                   showRecordsListSheet(context, ref, customerId);
@@ -88,57 +78,56 @@ class ActionBar extends ConsumerWidget {
   }
 }
 
+class _GoldDivider extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 1,
+      height: 36,
+      color: const Color(0xFFC49A3C).withValues(alpha: 0.2),
+    );
+  }
+}
+
 class _ActionBtn extends StatelessWidget {
   final IconData icon;
   final String label;
-  final List<Color> gradient;
-  final Color shadowColor;
+  final Color color;
   final VoidCallback onTap;
 
   const _ActionBtn({
     required this.icon,
     required this.label,
-    required this.gradient,
-    required this.shadowColor,
+    required this.color,
     required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(20),
-        onTap: onTap,
-        child: Ink(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: gradient,
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            borderRadius: BorderRadius.circular(20),
-            boxShadow: [
-              // BoxShadow(
-              //   color: shadowColor,
-              //   blurRadius: 12,
-              //   offset: const Offset(0, 4),
-              // ),
-            ],
-          ),
+    return Semantics(
+      label: label,
+      button: true,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(12),
+          onTap: onTap,
           child: Center(
-            child: Row(
+            child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(icon, color: Colors.white, size: 22),
-                const SizedBox(width: 8),
+                Icon(icon, color: color, size: 28),
+                const SizedBox(height: 4),
                 Text(
                   label,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
+                  style: TextStyle(
+                    color: color,
+                    fontSize: 10,
+                    fontWeight: FontWeight.w600,
+                    height: 1.1,
                   ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ],
             ),
