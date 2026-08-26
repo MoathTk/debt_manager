@@ -6,12 +6,14 @@ import 'Providers/theme_provider.dart';
 import 'Providers/locale_provider.dart';
 import 'l10n/app_localizations.dart';
 import 'services/clock_integrity_service.dart';
+import 'services/online_status_service.dart';
 import 'features/authentication/presentation/screens/auth_gate.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   try {
     await Firebase.initializeApp().timeout(const Duration(seconds: 10));
+    OnlineStatusService.instance.init();
   } catch (e) {
     // ignore: avoid_print
     print('[Main] Firebase init failed: $e');

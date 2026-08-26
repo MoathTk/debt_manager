@@ -3,6 +3,7 @@
 /// compatibility with existing consumer code.
 library;
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:local_debt_management/Providers/database_provider.dart';
@@ -10,6 +11,7 @@ import 'package:local_debt_management/Providers/sync_provider.dart';
 import 'package:local_debt_management/features/subscription/presentation/providers/subscription_provider.dart';
 import 'package:local_debt_management/data/database_helper.dart';
 import 'package:local_debt_management/services/clock_integrity_service.dart';
+import 'package:local_debt_management/services/online_status_service.dart';
 import 'package:local_debt_management/features/authentication/data/repositories/pin_repository_impl.dart';
 
 export 'package:local_debt_management/features/authentication/data/providers/auth_providers.dart'
@@ -32,6 +34,13 @@ class AuthService {
 
   Future<void> signOut([WidgetRef? ref]) async {
     final uid = _auth.currentUser?.uid;
+    OnlineStatusService.instance.dispose();
+    if (uid != null) {
+      await FirebaseFirestore.instance.collection('users').doc(uid).set({
+        'isOnline': false,
+        'lastSeen': FieldValue.serverTimestamp(),
+      }, SetOptions(merge: true));
+    }
     await DatabaseHelper.instance.close();
     await ClockIntegrityService.clear();
     if (uid != null) await PinRepositoryImpl().clearPin(uid);
