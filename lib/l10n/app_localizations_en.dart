@@ -973,4 +973,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get dateLabel => 'Date';
+
+  @override
+  String get paymentHistory => 'Payment History';
+
+  @override
+  String get noPaymentsYet => 'No payments recorded yet';
 }

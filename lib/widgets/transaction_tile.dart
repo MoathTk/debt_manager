@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../core/theme/app_colors.dart';
 import '../data/models/transaction.dart' as model;
 import '../l10n/app_localizations.dart';
+import '../Providers/database_provider.dart';
 import 'debt_detail_dialog.dart';
+import 'debt_payment_history_dialog.dart';
 
 /// Single transaction row with type icon, amount, date, and optional note.
 String _fmt(double n) {
@@ -10,6 +13,25 @@ String _fmt(double n) {
   return s.replaceAllMapped(
     RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
     (m) => '${m[1]},',
+  );
+}
+
+Future<void> _openPaymentHistory(BuildContext context, model.Transaction txn) async {
+  final container = ProviderScope.containerOf(context);
+  final repo = container.read(transactionRepositoryProvider);
+  final debt = await repo.getById(txn.debtId!);
+  if (debt == null) return;
+  if (!context.mounted) return;
+  final paid = await repo.getPaymentsForDebt(txn.debtId!);
+  if (!context.mounted) return;
+  showDebtPaymentHistoryDialog(
+    context,
+    debtId: txn.debtId!,
+    amount: debt.amount,
+    remaining: debt.amount - paid,
+    note: debt.note,
+    date: debt.date,
+    highlightPaymentId: txn.id,
   );
 }
 
@@ -66,7 +88,12 @@ class TransactionTile extends StatelessWidget {
     if (!isDebt) {
       return Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-        child: tile,
+        child: GestureDetector(
+          onTap: transaction.debtId != null
+              ? () => _openPaymentHistory(context, transaction)
+              : null,
+          child: tile,
+        ),
       );
     }
 

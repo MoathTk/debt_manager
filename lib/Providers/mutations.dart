@@ -93,6 +93,7 @@ Future<void> markReminderCompleted(
           ),
         );
         _invalidateTransactions(container, debt.customerId);
+        container.invalidate(paymentsByDebtProvider(reminder.debtId!));
       }
     }
   }
@@ -259,6 +260,7 @@ Future<void> recordPayment(
   );
   _invalidateTransactions(container, customerId);
   if (debtId != null) {
+    container.invalidate(paymentsByDebtProvider(debtId));
     await _autoCompleteRemindersIfSettled(container, debtId);
   }
   container.read(syncProvider.notifier).schedulePush();
@@ -270,8 +272,12 @@ Future<void> deleteTransaction(
   String customerId,
 ) async {
   final repo = container.read(transactionRepositoryProvider);
+  final txn = await repo.getById(transactionId);
   await repo.delete(transactionId);
   _invalidateTransactions(container, customerId);
+  if (txn != null && txn.isPayment && txn.debtId != null) {
+    container.invalidate(paymentsByDebtProvider(txn.debtId!));
+  }
   container.read(syncProvider.notifier).schedulePush();
 }
 
@@ -288,6 +294,7 @@ Future<void> deleteDebt(
   await reminderRepo.deleteByDebtId(debtId);
   _invalidateTransactions(container, customerId);
   _invalidateReminders(container);
+  container.invalidate(paymentsByDebtProvider(debtId));
   container.read(syncProvider.notifier).schedulePush();
 }
 
@@ -342,6 +349,7 @@ Future<void> settleDebt(
   );
   await _autoCompleteRemindersIfSettled(container, debtId);
   _invalidateTransactions(container, customerId);
+  container.invalidate(paymentsByDebtProvider(debtId));
   container.read(syncProvider.notifier).schedulePush();
 }
 

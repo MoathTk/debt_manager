@@ -969,4 +969,10 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get dateLabel => 'التاريخ';
+
+  @override
+  String get paymentHistory => 'سجل المدفوعات';
+
+  @override
+  String get noPaymentsYet => 'لا توجد مدفوعات مسجلة بعد';
 }

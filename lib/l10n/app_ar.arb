@@ -312,5 +312,7 @@
   "originalAmount": "المبلغ الأصلي",
   "amountPaid": "المبلغ المدفوع",
   "remainingAmount": "المتبقي",
-  "dateLabel": "التاريخ"
+  "dateLabel": "التاريخ",
+  "paymentHistory": "سجل المدفوعات",
+  "noPaymentsYet": "لا توجد مدفوعات مسجلة بعد"
 }

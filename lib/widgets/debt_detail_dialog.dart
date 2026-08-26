@@ -10,6 +10,7 @@ library;
 import 'package:flutter/material.dart';
 import 'package:local_debt_management/core/theme/app_colors.dart';
 import 'package:local_debt_management/l10n/app_localizations.dart';
+import 'debt_payment_history_dialog.dart';
 
 String _fmt(double n) {
   final s = n % 1 == 0 ? n.toStringAsFixed(0) : n.toStringAsFixed(2);
@@ -116,7 +117,36 @@ class DebtDetailDialog extends StatelessWidget {
                   cs: cs,
                 ),
               ],
-              const SizedBox(height: 20),
+              const SizedBox(height: 16),
+              Semantics(
+                label: l10n.paymentHistory,
+                button: true,
+                child: SizedBox(
+                  width: double.infinity,
+                  height: 44,
+                  child: OutlinedButton.icon(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                      showDebtPaymentHistoryDialog(
+                        context,
+                        debtId: debtId,
+                        amount: amount,
+                        remaining: remaining,
+                        note: note,
+                        date: date,
+                      );
+                    },
+                    style: OutlinedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                    ),
+                    icon: const Icon(Icons.payments_rounded, size: 18),
+                    label: Text(l10n.paymentHistory),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
               _CloseButton(l10n: l10n, cs: cs),
             ],
           ),

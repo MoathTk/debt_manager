@@ -313,5 +313,7 @@
   "originalAmount": "Original Amount",
   "amountPaid": "Amount Paid",
   "remainingAmount": "Remaining",
-  "dateLabel": "Date"
+  "dateLabel": "Date",
+  "paymentHistory": "Payment History",
+  "noPaymentsYet": "No payments recorded yet"
 }

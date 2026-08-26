@@ -5,6 +5,7 @@ import '../core/theme/app_colors.dart';
 import '../data/models/transaction.dart' as model;
 import '../l10n/app_localizations.dart';
 import 'debt_detail_dialog.dart';
+import 'debt_payment_history_dialog.dart';
 
 class AllTransactionsTile extends ConsumerWidget {
   final model.Transaction transaction;
@@ -114,7 +115,28 @@ class AllTransactionsTile extends ConsumerWidget {
       ),
     );
 
-    if (!isDebt) return tile;
+    if (!isDebt) {
+      if (t.debtId == null) return tile;
+      return GestureDetector(
+        onTap: () async {
+          final repo = ref.read(transactionRepositoryProvider);
+          final debt = await repo.getById(t.debtId!);
+          if (debt == null || !context.mounted) return;
+          final paid = await repo.getPaymentsForDebt(t.debtId!);
+          if (!context.mounted) return;
+          showDebtPaymentHistoryDialog(
+            context,
+            debtId: t.debtId!,
+            amount: debt.amount,
+            remaining: debt.amount - paid,
+            note: debt.note,
+            date: debt.date,
+            highlightPaymentId: t.id,
+          );
+        },
+        child: tile,
+      );
+    }
 
     return GestureDetector(
       onTap: onTap ??

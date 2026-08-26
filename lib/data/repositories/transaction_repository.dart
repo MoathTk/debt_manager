@@ -208,6 +208,17 @@ class TransactionRepository {
     return (result.first['total'] as num?)?.toDouble() ?? 0.0;
   }
 
+  Future<List<model.Transaction>> getPaymentsByDebtId(String debtId) async {
+    final db = await _dbHelper.database;
+    final result = await db.query(
+      'transactions',
+      where: 'debt_id = ? AND type = 1 AND is_deleted = 0',
+      whereArgs: [debtId],
+      orderBy: 'date ASC',
+    );
+    return result.map((map) => model.Transaction.fromMap(map)).toList();
+  }
+
   Future<Map<String, double>> getTotalsByDateRange(
     String startDate, String endDate,
   ) async {

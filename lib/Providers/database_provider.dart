@@ -89,6 +89,15 @@ final debtsWithRemainingProvider =
       return repo.getDebtsWithRemaining(customerId);
     });
 
+final paymentsByDebtProvider =
+    FutureProvider.family<List<model.Transaction>, String>((
+      ref,
+      debtId,
+    ) async {
+      final repo = ref.watch(transactionRepositoryProvider);
+      return repo.getPaymentsByDebtId(debtId);
+    });
+
 final pendingRemindersProvider = FutureProvider<List<DebtReminder>>((
   ref,
 ) async {
