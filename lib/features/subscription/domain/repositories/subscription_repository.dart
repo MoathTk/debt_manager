@@ -26,11 +26,11 @@ abstract class SubscriptionRepository {
   Future<void> saveLocal(Subscription sub, String userId);
 
   /// Write subscription to Firestore (source of truth).
-  Future<void> saveRemote(String uid, Subscription sub, {String userName, String userPhone});
+  Future<void> saveRemote(String uid, Subscription sub);
 
   /// Delete local cache (e.g., on sign-out or DB reset).
   Future<void> deleteLocal();
 
-  /// Delete remote subscription from Firestore (both user doc and admin mirror).
+  /// Delete remote subscription from Firestore.
   Future<void> deleteRemote(String uid);
 }

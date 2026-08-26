@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:local_debt_management/Providers/admin_provider.dart';
 import 'package:local_debt_management/l10n/app_localizations.dart';
 import 'user_profile_header.dart';
 import 'sync_section.dart';
 import 'language_picker.dart';
 import 'theme_picker.dart';
-import 'admin_section.dart';
 import 'drawer_footer.dart';
 import '../update/update_check_tile.dart';
 
@@ -20,7 +18,6 @@ class SettingsDrawer extends ConsumerWidget {
     final screenWidth = MediaQuery.of(context).size.width;
     final cs = Theme.of(context).colorScheme;
     final tt = Theme.of(context).textTheme;
-    final isAdmin = ref.watch(isAdminProvider).valueOrNull ?? false;
 
     return Drawer(
       width: screenWidth * 0.85,
@@ -66,8 +63,6 @@ class SettingsDrawer extends ConsumerWidget {
                     ),
                   ),
                   const SizedBox(height: 32),
-                  if (isAdmin) const AdminSection(),
-                  if (isAdmin) const SizedBox(height: 32),
                   const SizedBox(height: 16),
                   const UpdateCheckTile(),
                 ],

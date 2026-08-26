@@ -46,14 +46,14 @@ class SubscriptionRepositoryImpl implements SubscriptionRepository {
   /// Converts domain entity → data model, then saves to Firestore.
   /// Throws [SubscriptionRemoteException] if write fails.
   @override
-  Future<void> saveRemote(String uid, Subscription sub, {String userName = '', String userPhone = ''}) async {
+  Future<void> saveRemote(String uid, Subscription sub) async {
     final model = SubscriptionModel(
       plan: sub.plan,
       expiresAt: sub.expiresAt,
       activatedAt: sub.activatedAt,
       isActive: sub.isActive,
     );
-    await _remote.save(uid, model, userName: userName, userPhone: userPhone);
+    await _remote.save(uid, model);
   }
 
   /// Throws [SubscriptionLocalException] if delete fails.
