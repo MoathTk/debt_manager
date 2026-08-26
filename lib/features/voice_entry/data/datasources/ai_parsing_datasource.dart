@@ -11,6 +11,7 @@
 library;
 
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import '../../domain/entities/voice_parsed_debt.dart';
 import '../../domain/exceptions/voice_entry_exception.dart';
@@ -24,7 +25,11 @@ class AiParsingDatasource {
   static const _transcribeModel = 'gpt-transcribe';
 
   AiParsingDatasource({required this.apiKey, http.Client? client})
-    : _client = client ?? http.Client();
+    : _client = client ?? http.Client() {
+    if (apiKey.isEmpty) {
+      throw ArgumentError('OPENAI_API_KEY is not configured');
+    }
+  }
 
   Future<String> transcribeAudio(String filePath) async {
     try {
@@ -45,9 +50,8 @@ class AiParsingDatasource {
       final response = await http.Response.fromStream(streamed);
 
       if (response.statusCode != 200) {
-        throw AiParsingException(
-          'Transcription failed (${response.statusCode}): ${response.body}',
-        );
+        debugPrint('OpenAI transcription error ${response.statusCode}: ${response.body}');
+        throw AiParsingException('Transcription failed (${response.statusCode})');
       }
 
       final data = jsonDecode(response.body);
@@ -87,9 +91,8 @@ class AiParsingDatasource {
           .timeout(const Duration(seconds: 15));
 
       if (response.statusCode != 200) {
-        throw AiParsingException(
-          'API returned status ${response.statusCode}: ${response.body}',
-        );
+        debugPrint('OpenAI API error ${response.statusCode}: ${response.body}');
+        throw AiParsingException('API returned status ${response.statusCode}');
       }
 
       final data = jsonDecode(response.body);
@@ -277,9 +280,8 @@ Transcript: $transcript
           .timeout(const Duration(seconds: 15));
 
       if (response.statusCode != 200) {
-        throw AiParsingException(
-          'API returned status ${response.statusCode}: ${response.body}',
-        );
+        debugPrint('OpenAI command API error ${response.statusCode}: ${response.body}');
+        throw AiParsingException('API returned status ${response.statusCode}');
       }
 
       final data = jsonDecode(response.body);

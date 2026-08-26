@@ -8,6 +8,7 @@ library;
 import 'dart:async';
 import 'dart:io';
 import 'dart:math';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:record/record.dart';
 import 'package:local_debt_management/services/connectivity_service.dart';
@@ -43,15 +44,6 @@ class VoiceEntryNotifier extends StateNotifier<VoiceEntryState> {
     : super(const VoiceEntryState());
 
   Future<void> startRecording() async {
-    const apiKey = String.fromEnvironment('OPENAI_API_KEY');
-    if (apiKey.isEmpty) {
-      state = state.copyWith(
-        status: VoiceEntryStatus.error,
-        error: 'api_key_not_configured',
-      );
-      return;
-    }
-
     try {
       if (!await _recorder.hasPermission()) {
         state = state.copyWith(
@@ -116,7 +108,9 @@ class VoiceEntryNotifier extends StateNotifier<VoiceEntryState> {
     String? path;
     try {
       path = await _recorder.stop();
-    } catch (_) {}
+    } catch (e) {
+      debugPrint('Recorder stop error: $e');
+    }
 
     if (!mounted) return;
 
@@ -171,6 +165,7 @@ class VoiceEntryNotifier extends StateNotifier<VoiceEntryState> {
 
     try {
       final transcript = await _transcribeAudio(filePath);
+      _deleteTempFile(filePath);
       if (!mounted) return;
       state = state.copyWith(transcript: transcript);
       await _runParsing(transcript);
@@ -181,11 +176,12 @@ class VoiceEntryNotifier extends StateNotifier<VoiceEntryState> {
           error: e.message,
         );
       }
-    } catch (e) {
+    } catch (e, stack) {
+      debugPrint('Voice entry _processAudio error: $e\n$stack');
       if (mounted) {
         state = state.copyWith(
           status: VoiceEntryStatus.error,
-          error: e.toString(),
+          error: 'An unexpected error occurred. Please try again.',
         );
       }
     }
@@ -211,11 +207,12 @@ class VoiceEntryNotifier extends StateNotifier<VoiceEntryState> {
           error: e.message,
         );
       }
-    } catch (e) {
+    } catch (e, stack) {
+      debugPrint('Voice entry _runParsing error: $e\n$stack');
       if (mounted) {
         state = state.copyWith(
           status: VoiceEntryStatus.error,
-          error: e.toString(),
+          error: 'An unexpected error occurred. Please try again.',
         );
       }
     }
@@ -225,12 +222,24 @@ class VoiceEntryNotifier extends StateNotifier<VoiceEntryState> {
     _ampSub?.cancel();
     _ampSub = null;
     _recorder.stop();
+    _deleteTempFile(state.recordedFilePath);
     state = const VoiceEntryState();
+  }
+
+  void _deleteTempFile(String? path) {
+    if (path == null) return;
+    try {
+      final file = File(path);
+      if (file.existsSync()) file.deleteSync();
+    } catch (e) {
+      debugPrint('Failed to delete temp recording: $e');
+    }
   }
 
   @override
   void dispose() {
     _ampSub?.cancel();
+    _deleteTempFile(state.recordedFilePath);
     _recorder.dispose();
     super.dispose();
   }
