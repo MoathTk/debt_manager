@@ -4,10 +4,18 @@ import '../Providers/database_provider.dart';
 import '../core/theme/app_colors.dart';
 import '../data/models/transaction.dart' as model;
 import '../l10n/app_localizations.dart';
+import 'debt_detail_dialog.dart';
 
 class AllTransactionsTile extends ConsumerWidget {
   final model.Transaction transaction;
-  const AllTransactionsTile({super.key, required this.transaction});
+  final double? remaining;
+  final VoidCallback? onTap;
+  const AllTransactionsTile({
+    super.key,
+    required this.transaction,
+    this.remaining,
+    this.onTap,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -27,7 +35,7 @@ class AllTransactionsTile extends ConsumerWidget {
     final name =
         ref.watch(customerByIdProvider(t.customerId)).value?.name ?? '\u2014';
 
-    return Container(
+    final tile = Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: cs.surface,
@@ -104,6 +112,22 @@ class AllTransactionsTile extends ConsumerWidget {
           ),
         ],
       ),
+    );
+
+    if (!isDebt) return tile;
+
+    return GestureDetector(
+      onTap: onTap ??
+          () => showDebtDetailDialog(
+                context,
+                debtId: t.id,
+                amount: t.amount,
+                remaining: remaining ?? t.amount,
+                paid: t.amount - (remaining ?? t.amount),
+                note: t.note,
+                date: t.date,
+              ),
+      child: tile,
     );
   }
 }

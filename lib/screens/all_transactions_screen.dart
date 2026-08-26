@@ -129,12 +129,35 @@ class _State extends ConsumerState<AllTransactionsScreen> {
                 Expanded(child: _empty(l10n.noResults))
               else
                 Expanded(
-                  child: ListView.separated(
-                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
-                    itemCount: f.length,
-                    separatorBuilder: (_, __) => const SizedBox(height: 6),
-                    itemBuilder: (_, i) =>
-                        AllTransactionsTile(transaction: f[i]),
+                  child: Builder(
+                    builder: (context) {
+                      final paymentsByDebt = <String, double>{};
+                      for (final t in txns) {
+                        if (t.isPayment && t.debtId != null) {
+                          paymentsByDebt[t.debtId!] =
+                              (paymentsByDebt[t.debtId] ?? 0) + t.amount;
+                        }
+                      }
+                      final remainingMap = <String, double>{};
+                      for (final t in txns) {
+                        if (t.isDebt) {
+                          remainingMap[t.id] =
+                              t.amount - (paymentsByDebt[t.id] ?? 0);
+                        }
+                      }
+                      return ListView.separated(
+                        padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+                        itemCount: f.length,
+                        separatorBuilder: (_, __) =>
+                            const SizedBox(height: 6),
+                        itemBuilder: (_, i) => AllTransactionsTile(
+                          transaction: f[i],
+                          remaining: f[i].isDebt
+                              ? remainingMap[f[i].id]
+                              : null,
+                        ),
+                      );
+                    },
                   ),
                 ),
             ],

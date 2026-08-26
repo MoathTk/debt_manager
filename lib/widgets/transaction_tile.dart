@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../core/theme/app_colors.dart';
 import '../data/models/transaction.dart' as model;
 import '../l10n/app_localizations.dart';
+import 'debt_detail_dialog.dart';
 
 /// Single transaction row with type icon, amount, date, and optional note.
 String _fmt(double n) {
@@ -15,7 +16,13 @@ String _fmt(double n) {
 class TransactionTile extends StatelessWidget {
   final model.Transaction transaction;
   final double? remaining;
-  const TransactionTile({super.key, required this.transaction, this.remaining});
+  final VoidCallback? onTap;
+  const TransactionTile({
+    super.key,
+    required this.transaction,
+    this.remaining,
+    this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -26,36 +33,57 @@ class TransactionTile extends StatelessWidget {
     final bg = isDebt ? appColors.debtBg : appColors.paymentBg;
     final formatted = _fmt(transaction.amount);
 
+    final tile = Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: theme.colorScheme.outlineVariant.withValues(alpha: 0.3),
+        ),
+      ),
+      child: Row(
+        children: [
+          _Icon(isDebt: isDebt, color: color, bg: bg),
+          const SizedBox(width: 14),
+          Expanded(
+            child: _Info(
+              txn: transaction,
+              isDebt: isDebt,
+              remaining: remaining,
+            ),
+          ),
+          _Amt(
+            formatted: formatted,
+            isDebt: isDebt,
+            color: color,
+            date: transaction.date,
+          ),
+        ],
+      ),
+    );
+
+    if (!isDebt) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+        child: tile,
+      );
+    }
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-      child: Container(
-        padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(
-          color: theme.colorScheme.surface,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: theme.colorScheme.outlineVariant.withValues(alpha: 0.3),
-          ),
-        ),
-        child: Row(
-          children: [
-            _Icon(isDebt: isDebt, color: color, bg: bg),
-            const SizedBox(width: 14),
-            Expanded(
-              child: _Info(
-                txn: transaction,
-                isDebt: isDebt,
-                remaining: remaining,
-              ),
-            ),
-            _Amt(
-              formatted: formatted,
-              isDebt: isDebt,
-              color: color,
-              date: transaction.date,
-            ),
-          ],
-        ),
+      child: GestureDetector(
+        onTap: onTap ??
+            () => showDebtDetailDialog(
+                  context,
+                  debtId: transaction.id,
+                  amount: transaction.amount,
+                  remaining: remaining ?? transaction.amount,
+                  paid: transaction.amount - (remaining ?? transaction.amount),
+                  note: transaction.note,
+                  date: transaction.date,
+                ),
+        child: tile,
       ),
     );
   }
