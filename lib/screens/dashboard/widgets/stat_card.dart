@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'animated_counter.dart';
-import '../utils/number_formatter.dart';
-import '../l10n/app_localizations.dart';
+import '../../../utils/number_formatter.dart';
+import '../../../l10n/app_localizations.dart';
 
 /// Premium stat card for the dashboard grid.
 ///

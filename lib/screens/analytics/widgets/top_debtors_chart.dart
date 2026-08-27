@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../Providers/database_provider.dart';
-import '../core/theme/app_colors.dart';
-import '../l10n/app_localizations.dart';
+import '../../../Providers/database_provider.dart';
+import '../../../core/theme/app_colors.dart';
+import '../../../l10n/app_localizations.dart';
 
 class TopDebtorsChart extends ConsumerWidget {
   const TopDebtorsChart({super.key});

@@ -5,7 +5,7 @@ import 'package:local_debt_management/features/customers/presentation/providers/
 import 'package:local_debt_management/features/debts/domain/entities/transaction.dart'
     as model;
 import 'package:local_debt_management/l10n/app_localizations.dart';
-import 'package:local_debt_management/widgets/info_row.dart';
+import 'info_row.dart';
 import '../../domain/entities/debt_reminder.dart';
 
 String fmt(double n) {

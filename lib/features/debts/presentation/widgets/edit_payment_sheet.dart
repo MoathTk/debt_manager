@@ -9,7 +9,7 @@ import 'package:local_debt_management/Providers/mutations.dart';
 import 'package:local_debt_management/Providers/sync_provider.dart';
 import 'package:local_debt_management/features/subscription/presentation/widgets/mutation_guard.dart';
 import 'amount_input_formatter.dart';
-import 'package:local_debt_management/widgets/app_snackbar.dart';
+import 'package:local_debt_management/core/widgets/app_snackbar.dart';
 
 /// Bottom sheet for editing or deleting an existing payment.
 void showEditPaymentSheet(

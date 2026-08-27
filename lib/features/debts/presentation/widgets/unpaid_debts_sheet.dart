@@ -5,7 +5,7 @@ import 'package:local_debt_management/features/reminders/domain/entities/debt_re
 import 'package:local_debt_management/l10n/app_localizations.dart';
 import 'package:local_debt_management/Providers/database_provider.dart';
 import 'debt_detail_dialog.dart';
-import 'package:local_debt_management/widgets/empty_state.dart';
+import 'package:local_debt_management/core/widgets/empty_state.dart';
 
 String _fmt(double n) {
   final s = n % 1 == 0 ? n.toStringAsFixed(0) : n.toStringAsFixed(2);

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../l10n/app_localizations.dart';
-import '../features/subscription/presentation/widgets/mutation_guard.dart';
+import 'package:local_debt_management/l10n/app_localizations.dart';
+import 'package:local_debt_management/features/subscription/presentation/widgets/mutation_guard.dart';
 import 'package:local_debt_management/features/debts/presentation/widgets/add_debt_sheet/add_debt_sheet.dart';
 import 'package:local_debt_management/features/debts/presentation/widgets/record_payment_sheet.dart';
 import 'package:local_debt_management/features/debts/presentation/widgets/records_list_sheet.dart';

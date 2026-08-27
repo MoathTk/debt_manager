@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:local_debt_management/features/subscription/presentation/widgets/mutation_guard.dart';
 import 'package:local_debt_management/core/drawer/side_drawer.dart';
-import 'package:local_debt_management/widgets/sync_status_indicator.dart';
+import 'package:local_debt_management/core/widgets/sync_status_indicator.dart';
 import '../l10n/app_localizations.dart';
 import '../Providers/database_provider.dart';
 import '../Providers/sync_provider.dart';

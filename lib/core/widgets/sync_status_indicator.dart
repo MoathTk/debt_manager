@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../Providers/sync_provider.dart';
+import '../../Providers/sync_provider.dart';
 
 class SyncStatusIndicator extends ConsumerWidget {
   const SyncStatusIndicator({super.key});

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../utils/number_formatter.dart';
-import '../l10n/app_localizations.dart';
+import '../../../utils/number_formatter.dart';
+import '../../../l10n/app_localizations.dart';
 
 class PeriodMiniCard extends StatelessWidget {
   final String label;

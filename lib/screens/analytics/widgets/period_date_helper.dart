@@ -1,4 +1,4 @@
-import '../l10n/app_localizations.dart';
+import '../../../l10n/app_localizations.dart';
 import 'period_chips.dart';
 
 /// Date calculation helpers for period navigation.
