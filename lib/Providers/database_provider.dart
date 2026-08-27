@@ -36,11 +36,8 @@ final transactionsProvider = FutureProvider<List<model.Transaction>>((
   return repo.getAll(ownerId: ownerId.isEmpty ? null : ownerId);
 });
 
-final transactionsByCustomerProvider =
-    FutureProvider.family<List<model.Transaction>, String>((
-      ref,
-      customerId,
-    ) async {
+final transactionsByCustomerProvider = FutureProvider.autoDispose
+    .family<List<model.Transaction>, String>((ref, customerId) async {
       final repo = ref.watch(transactionRepositoryProvider);
       final customerRepo = ref.watch(customerRepositoryProvider);
       final ownerId = ref.watch(_ownerIdProvider);
@@ -61,17 +58,14 @@ final customerBalanceProvider = FutureProvider.family<double, String>((
   return repo.getCustomerBalance(customerId);
 });
 
-final debtsWithRemainingProvider =
-    FutureProvider.family<List<Map<String, dynamic>>, String>((
-      ref,
-      customerId,
-    ) async {
+final debtsWithRemainingProvider = FutureProvider.autoDispose
+    .family<List<Map<String, dynamic>>, String>((ref, customerId) async {
       final repo = ref.watch(transactionRepositoryProvider);
       return repo.getDebtsWithRemaining(customerId);
     });
 
-final paymentsByDebtProvider =
-    FutureProvider.family<List<model.Transaction>, String>((ref, debtId) async {
+final paymentsByDebtProvider = FutureProvider.autoDispose
+    .family<List<model.Transaction>, String>((ref, debtId) async {
       final repo = ref.watch(transactionRepositoryProvider);
       return repo.getPaymentsByDebtId(debtId);
     });
@@ -126,16 +120,15 @@ final periodicDataProvider =
       return repo.getPeriodicData(isWeekly: isWeekly);
     });
 
-final topDebtorsProvider = FutureProvider<List<Map<String, dynamic>>>((
-  ref,
-) async {
-  ref.watch(dashboardStatsProvider);
-  final repo = ref.read(transactionRepositoryProvider);
-  return repo.getTopDebtors(5);
-});
+final topDebtorsProvider =
+    FutureProvider.autoDispose<List<Map<String, dynamic>>>((ref) async {
+      ref.watch(dashboardStatsProvider);
+      final repo = ref.read(transactionRepositoryProvider);
+      return repo.getTopDebtors(5);
+    });
 
-final totalsByDateRangeProvider =
-    FutureProvider.family<Map<String, double>, String>((ref, key) async {
+final totalsByDateRangeProvider = FutureProvider.autoDispose
+    .family<Map<String, double>, String>((ref, key) async {
       ref.watch(dashboardStatsProvider);
       final parts = key.split('|');
       if (parts.length != 2 || parts[0].isEmpty || parts[1].isEmpty) {
