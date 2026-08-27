@@ -23,8 +23,9 @@ import '../../../voice_entry/data/datasources/ai_parsing_datasource.dart'
     as voice_entry;
 import '../../../../Providers/database_provider.dart';
 import '../../../../Providers/mutations.dart';
-import '../../../../data/repositories/customer_repository.dart';
-import '../../../../data/models/customer.dart';
+import 'package:local_debt_management/features/customers/domain/entities/customer.dart';
+import 'package:local_debt_management/features/customers/domain/repositories/customer_repository.dart';
+import 'package:local_debt_management/features/customers/presentation/providers/customer_actions.dart';
 import '../../../../data/repositories/transaction_repository.dart';
 
 final voiceCommandProvider =

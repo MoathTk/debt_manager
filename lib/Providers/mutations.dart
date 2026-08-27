@@ -1,5 +1,4 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../data/models/customer.dart';
 import '../data/models/transaction.dart' as model;
 import '../data/models/debt_reminder.dart';
 import '../utils/sync_id.dart';
@@ -35,11 +34,6 @@ class DashboardStats {
 // ============================================================================
 // INVALIDATION HELPERS
 // ============================================================================
-
-void _invalidateCustomers(ProviderContainer container) {
-  container.invalidate(customersProvider);
-  container.invalidate(dashboardStatsProvider);
-}
 
 void _invalidateTransactions(ProviderContainer container, String customerId) {
   container.invalidate(transactionsProvider);
@@ -122,70 +116,6 @@ Future<void> deleteRemindersBatch(
 ) async {
   final repo = container.read(debtReminderRepositoryProvider);
   await repo.deleteBatch(ids);
-  _invalidateReminders(container);
-  container.read(syncProvider.notifier).schedulePush();
-}
-
-// ============================================================================
-// CUSTOMER MUTATIONS
-// ============================================================================
-
-Future<void> addCustomer(
-  ProviderContainer container, {
-  required String name,
-  String? phone,
-}) async {
-  final repo = container.read(customerRepositoryProvider);
-  final now = DateTime.now().toIso8601String();
-  await repo.insert(
-    Customer(
-      id: generateId(),
-      name: name,
-      phone: phone,
-      createdAt: now,
-      ownerId: _getOwnerId(container),
-      updatedAt: now,
-    ),
-  );
-  _invalidateCustomers(container);
-  container.read(syncProvider.notifier).schedulePush();
-}
-
-Future<void> updateCustomer(
-  ProviderContainer container, {
-  required Customer customer,
-  required String name,
-  String? phone,
-}) async {
-  final repo = container.read(customerRepositoryProvider);
-  await repo.update(
-    Customer(
-      id: customer.id,
-      name: name,
-      phone: phone,
-      createdAt: customer.createdAt,
-      ownerId: customer.ownerId,
-      updatedAt: DateTime.now().toIso8601String(),
-    ),
-  );
-  container.invalidate(customersProvider);
-  container.invalidate(customerByIdProvider(customer.id));
-  container.invalidate(dashboardStatsProvider);
-  container.read(syncProvider.notifier).schedulePush();
-}
-
-Future<void> deleteCustomer(
-  ProviderContainer container,
-  String customerId,
-) async {
-  final customerRepo = container.read(customerRepositoryProvider);
-  final txRepo = container.read(transactionRepositoryProvider);
-  final reminderRepo = container.read(debtReminderRepositoryProvider);
-  await customerRepo.delete(customerId);
-  await txRepo.deleteByCustomerId(customerId);
-  await reminderRepo.deleteByCustomerId(customerId);
-  _invalidateCustomers(container);
-  _invalidateTransactions(container, customerId);
   _invalidateReminders(container);
   container.read(syncProvider.notifier).schedulePush();
 }

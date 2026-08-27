@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../l10n/app_localizations.dart';
-import '../Providers/database_provider.dart';
-import '../widgets/customerTile/customer_tile.dart';
-import '../widgets/empty_state.dart';
+import 'package:local_debt_management/features/subscription/presentation/widgets/mutation_guard.dart';
+import 'package:local_debt_management/l10n/app_localizations.dart';
+import 'package:local_debt_management/widgets/empty_state.dart';
+import '../providers/customer_providers.dart';
 import '../widgets/add_customer_sheet.dart';
-import '../features/subscription/presentation/widgets/mutation_guard.dart';
+import '../widgets/customer_tile/customer_tile.dart';
 import 'customer_detail_screen.dart';
 
 /// Customers list screen with search and add functionality.

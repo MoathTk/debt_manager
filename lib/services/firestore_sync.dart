@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:local_debt_management/features/customers/data/models/customer_model.dart';
 import '../data/database_helper.dart';
-import '../data/models/customer.dart';
 import '../data/models/transaction.dart' as model;
 import '../data/models/debt_reminder.dart';
 
@@ -49,7 +49,7 @@ class FirestoreSync {
 
   // ======================== PUBLIC UPSERT (for snapshots) ========================
 
-  Future<void> upsertCustomers(List<Customer> records) async {
+  Future<void> upsertCustomers(List<CustomerModel> records) async {
     if (records.isEmpty) return;
     await _CustomerSyncRepo(_db).upsertFromCloud(records);
   }
@@ -195,10 +195,10 @@ class _CustomerSyncRepo {
   final DatabaseHelper _db;
   _CustomerSyncRepo(this._db);
 
-  Future<List<Customer>> getUnsynced() async {
+  Future<List<CustomerModel>> getUnsynced() async {
     final db = await _db.database;
     final result = await db.query('customers', where: 'is_synced = 0');
-    return result.map((m) => Customer.fromMap(m)).toList();
+    return result.map((m) => CustomerModel.fromMap(m)).toList();
   }
 
   Future<void> markSynced(List<String> ids) async {
@@ -213,7 +213,7 @@ class _CustomerSyncRepo {
     );
   }
 
-  Future<void> upsertFromCloud(List<Customer> records) async {
+  Future<void> upsertFromCloud(List<CustomerModel> records) async {
     final db = await _db.database;
     for (final c in records) {
       final existing = await _getById(c.id);
@@ -229,7 +229,7 @@ class _CustomerSyncRepo {
     }
   }
 
-  Future<Customer?> _getById(String id) async {
+  Future<CustomerModel?> _getById(String id) async {
     final db = await _db.database;
     final result = await db.query(
       'customers',
@@ -237,7 +237,7 @@ class _CustomerSyncRepo {
       whereArgs: [id],
     );
     if (result.isEmpty) return null;
-    return Customer.fromMap(result.first);
+    return CustomerModel.fromMap(result.first);
   }
 }
 

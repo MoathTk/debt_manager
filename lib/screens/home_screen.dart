@@ -12,7 +12,7 @@ import '../services/update_service.dart';
 import '../widgets/update/update_dialog.dart';
 
 import 'dashboard_screen.dart';
-import 'customers_screen.dart';
+import 'package:local_debt_management/features/customers/presentation/screens/customers_screen.dart';
 import 'reminders_screen.dart';
 
 /// Main shell screen with bottom navigation bar and settings drawer.

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../l10n/app_localizations.dart';
-import '../../Providers/database_provider.dart';
-import 'gradient_avatar.dart';
-import 'customer_info.dart';
-import 'balance_badge.dart';
+import 'package:local_debt_management/Providers/database_provider.dart';
+import 'package:local_debt_management/l10n/app_localizations.dart';
 import 'badge_states.dart';
+import 'balance_badge.dart';
+import 'customer_info.dart';
+import 'gradient_avatar.dart';
 
 /// Modern customer tile with premium card design.
 class CustomerTile extends ConsumerWidget {

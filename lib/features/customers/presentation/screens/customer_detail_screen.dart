@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../l10n/app_localizations.dart';
-import '../Providers/database_provider.dart';
+import 'package:local_debt_management/Providers/database_provider.dart';
+import 'package:local_debt_management/features/subscription/presentation/widgets/mutation_guard.dart';
+import 'package:local_debt_management/l10n/app_localizations.dart';
+import 'package:local_debt_management/widgets/action_bar.dart';
+import 'package:local_debt_management/widgets/balance_card.dart';
+import 'package:local_debt_management/widgets/empty_state.dart';
+import 'package:local_debt_management/widgets/transaction_tile.dart';
+import '../providers/customer_providers.dart';
 import '../widgets/customer_header.dart';
-import '../widgets/balance_card.dart';
-import '../widgets/transaction_tile.dart';
-import '../widgets/empty_state.dart';
-import '../widgets/action_bar.dart';
 import '../widgets/edit_customer_sheet.dart';
-import '../features/subscription/presentation/widgets/mutation_guard.dart';
 
 /// Customer detail screen showing profile, balance, and transaction history.
 class CustomerDetailScreen extends ConsumerWidget {

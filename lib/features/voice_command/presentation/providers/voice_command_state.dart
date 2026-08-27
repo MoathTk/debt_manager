@@ -7,7 +7,7 @@
 /// ---------------------------------------------------------------------------
 library;
 
-import '../../../../data/models/customer.dart';
+import 'package:local_debt_management/features/customers/domain/entities/customer.dart';
 import '../../../../data/models/transaction.dart';
 import '../../domain/entities/voice_command.dart';
 

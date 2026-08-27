@@ -1,20 +1,18 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:local_debt_management/features/customers/presentation/providers/customer_providers.dart';
 import '../data/database_helper.dart';
-import '../data/repositories/customer_repository.dart';
 import '../data/repositories/transaction_repository.dart';
 import '../data/repositories/debt_reminder_repository.dart';
-import '../data/models/customer.dart';
 import '../data/models/transaction.dart' as model;
 import '../data/models/debt_reminder.dart';
 import '../services/auth_service.dart';
 import 'mutations.dart';
 
+export 'package:local_debt_management/features/customers/presentation/providers/customer_providers.dart'
+    show customerRepositoryProvider, customersProvider, customerByIdProvider;
+
 final databaseProvider = Provider<DatabaseHelper>((ref) {
   return DatabaseHelper.instance;
-});
-
-final customerRepositoryProvider = Provider<CustomerRepository>((ref) {
-  return CustomerRepository();
 });
 
 final transactionRepositoryProvider = Provider<TransactionRepository>((ref) {
@@ -28,23 +26,6 @@ final debtReminderRepositoryProvider = Provider<DebtReminderRepository>((ref) {
 final _ownerIdProvider = Provider<String>((ref) {
   final user = ref.watch(authStateProvider).valueOrNull;
   return user?.uid ?? '';
-});
-
-final customersProvider = FutureProvider<List<Customer>>((ref) async {
-  final repo = ref.watch(customerRepositoryProvider);
-  final ownerId = ref.watch(_ownerIdProvider);
-  return repo.getAll(ownerId: ownerId.isEmpty ? null : ownerId);
-});
-
-final customerByIdProvider =
-    FutureProvider.family<Customer?, String>((ref, id) async {
-  final repo = ref.watch(customerRepositoryProvider);
-  final ownerId = ref.watch(_ownerIdProvider);
-  final customer = await repo.getById(id);
-  if (customer != null && ownerId.isNotEmpty && customer.ownerId != ownerId) {
-    return null;
-  }
-  return customer;
 });
 
 final transactionsProvider = FutureProvider<List<model.Transaction>>((

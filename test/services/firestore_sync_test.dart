@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:local_debt_management/data/database_helper.dart';
-import 'package:local_debt_management/data/models/customer.dart';
+import 'package:local_debt_management/features/customers/data/models/customer_model.dart';
 import 'package:local_debt_management/data/models/transaction.dart' as model;
 import 'package:local_debt_management/data/models/debt_reminder.dart';
 
@@ -65,7 +65,7 @@ void main() {
 
   group('Model sync fields', () {
     test('Customer toMap includes is_deleted', () {
-      final c = Customer(
+      final c = CustomerModel(
         id: 'c1', name: 'Test', createdAt: '2025-01-01',
         ownerId: _uid, isSynced: true, isDeleted: true,
       );
@@ -76,7 +76,7 @@ void main() {
     });
 
     test('Customer fromMap reads is_deleted', () {
-      final c = Customer.fromMap({
+      final c = CustomerModel.fromMap({
         'id': 'c1', 'name': 'Test', 'created_at': '2025-01-01',
         'owner_id': _uid, 'is_synced': 1, 'is_deleted': 1,
         'updated_at': '2025-06-01',
@@ -258,7 +258,7 @@ void main() {
 
   group('Upsert from cloud', () {
     test('insert new record from cloud', () async {
-      final map = Customer(
+      final map = CustomerModel(
         id: 'cloud-c1', name: 'Cloud Customer',
         createdAt: '2025-06-01', ownerId: _uid,
         updatedAt: '2025-06-01T00:00:00.000',

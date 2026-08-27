@@ -12,7 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:local_debt_management/l10n/app_localizations.dart';
 import 'package:local_debt_management/Providers/mutations.dart';
-import 'package:local_debt_management/widgets/add_customer_sheet.dart';
+import 'package:local_debt_management/features/customers/presentation/widgets/add_customer_sheet.dart';
 import '../providers/voice_command_provider.dart';
 import '../providers/voice_command_state.dart';
 import '../../../../widgets/add_debt_sheet/recording_indicator.dart';

@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../data/models/customer.dart';
+import 'package:local_debt_management/features/customers/data/models/customer_model.dart';
 import '../data/models/transaction.dart' as model;
 import '../data/models/debt_reminder.dart';
 import '../services/auth_service.dart';
@@ -91,7 +91,7 @@ class SyncNotifier extends StateNotifier<SyncState> {
         .snapshots()
         .listen(
       (snap) async {
-        final records = snap.docs.map((d) => Customer.fromMap(d.data())).toList();
+        final records = snap.docs.map((d) => CustomerModel.fromMap(d.data())).toList();
         await _firestoreSync.upsertCustomers(records);
         _ref.invalidate(customersProvider);
         for (final c in records) {

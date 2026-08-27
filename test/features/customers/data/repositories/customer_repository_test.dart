@@ -2,8 +2,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:uuid/uuid.dart';
 import 'package:local_debt_management/data/database_helper.dart';
-import 'package:local_debt_management/data/models/customer.dart';
-import 'package:local_debt_management/data/repositories/customer_repository.dart';
+import 'package:local_debt_management/features/customers/domain/entities/customer.dart';
+import 'package:local_debt_management/features/customers/data/datasources/customer_local_datasource.dart';
+import 'package:local_debt_management/features/customers/data/repositories/customer_repository_impl.dart';
 
 const _uuid = Uuid();
 
@@ -67,11 +68,11 @@ Future<void> _setupDb() async {
 }
 
 void main() {
-  late CustomerRepository repo;
+  late CustomerRepositoryImpl repo;
 
   setUp(() async {
     await _setupDb();
-    repo = CustomerRepository();
+    repo = CustomerRepositoryImpl(datasource: CustomerLocalDatasource());
   });
 
   tearDown(() async {
@@ -80,12 +81,14 @@ void main() {
   });
 
   group('insert & getById', () {
-    test('insert returns valid id', () async {
+    test('insert returns normally', () async {
       final id = _uuid.v4();
-      final rowId = await repo.insert(
-        Customer(id: id, name: 'Ahmed', createdAt: '2025-01-01'),
+      await expectLater(
+        repo.insert(
+          Customer(id: id, name: 'Ahmed', createdAt: '2025-01-01'),
+        ),
+        returnsNormally,
       );
-      expect(rowId, greaterThan(0));
     });
 
     test('getById returns correct customer', () async {

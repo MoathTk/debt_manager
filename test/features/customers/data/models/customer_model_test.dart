@@ -1,10 +1,11 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:local_debt_management/data/models/customer.dart';
+import 'package:local_debt_management/features/customers/domain/entities/customer.dart';
+import 'package:local_debt_management/features/customers/data/models/customer_model.dart';
 
 void main() {
-  group('Customer', () {
+  group('CustomerModel', () {
     test('toMap includes all fields', () {
-      final c = Customer(
+      final c = CustomerModel(
         id: 'uuid-10', name: 'Ahmed', phone: '07801234567',
         createdAt: '2025-01-01T00:00:00.000', ownerId: 'user-1',
       );
@@ -18,7 +19,7 @@ void main() {
     });
 
     test('toMap with null optional fields', () {
-      final c = Customer(id: 'uuid-12', name: 'Ali', createdAt: '2025-01-01');
+      final c = CustomerModel(id: 'uuid-12', name: 'Ali', createdAt: '2025-01-01');
       final map = c.toMap();
       expect(map['id'], 'uuid-12');
       expect(map['phone'], null);
@@ -26,11 +27,11 @@ void main() {
     });
 
     test('fromMap round-trip', () {
-      final original = Customer(
+      final original = CustomerModel(
         id: 'uuid-sara', name: 'Sara', phone: '07901234567',
         createdAt: '2025-06-15', ownerId: 'user-2',
       );
-      final restored = Customer.fromMap(original.toMap());
+      final restored = CustomerModel.fromMap(original.toMap());
       expect(restored.id, original.id);
       expect(restored.name, original.name);
       expect(restored.phone, original.phone);
@@ -43,12 +44,21 @@ void main() {
         'id': 'uuid-1', 'name': 'NoPhone', 'phone': null,
         'created_at': '2025-01-01',
       };
-      final c = Customer.fromMap(map);
+      final c = CustomerModel.fromMap(map);
       expect(c.phone, null);
     });
 
+    test('toEntity/fromEntity round-trip', () {
+      final entity = Customer(
+        id: 'uuid-e', name: 'Entity', phone: '07800000000',
+        createdAt: '2025-06-15', ownerId: 'user-2',
+      );
+      final model = CustomerModel.fromEntity(entity);
+      expect(model.toEntity(), entity);
+    });
+
     test('copyWith replaces only specified fields', () {
-      final c = Customer(
+      final c = CustomerModel(
         id: 'uuid-1', name: 'Old', createdAt: '2025-01-01',
         ownerId: 'user-1',
       );
@@ -57,7 +67,9 @@ void main() {
       expect(updated.id, 'uuid-1');
       expect(updated.ownerId, 'user-1');
     });
+  });
 
+  group('Customer entity', () {
     test('toString contains key fields', () {
       final c = Customer(id: 'uuid-1', name: 'Test', createdAt: '2025-01-01');
       expect(c.toString(), contains('name: Test'));

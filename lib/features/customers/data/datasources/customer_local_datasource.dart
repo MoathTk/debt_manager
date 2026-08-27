@@ -1,33 +1,52 @@
-import '../database_helper.dart';
-import '../models/customer.dart';
+/// CUSTOMERS FEATURE — DATA LAYER: LOCAL DATA SOURCE
+///
+/// Raw SQLite access to the `customers` table. This class is the only
+/// one that knows query strings and column names; higher layers work
+/// with [CustomerModel] and never touch SQL.
+///
+/// Soft deletes: rows are flagged `is_deleted = 1` and filtered out,
+/// so synced devices can pull the tombstone instead of resurrecting
+/// a deleted customer.
+/// ---------------------------------------------------------------------------
+library;
 
-class CustomerRepository {
-  final DatabaseHelper _dbHelper = DatabaseHelper.instance;
+import '../../../../data/database_helper.dart';
+import '../models/customer_model.dart';
 
-  Future<int> insert(Customer customer) async {
+class CustomerLocalDatasource {
+  final DatabaseHelper _dbHelper;
+
+  CustomerLocalDatasource({DatabaseHelper? dbHelper})
+    : _dbHelper = dbHelper ?? DatabaseHelper.instance;
+
+  Future<void> insert(CustomerModel customer) async {
     final db = await _dbHelper.database;
-    return await db.insert('customers', customer.toMap());
+    await db.insert('customers', customer.toMap());
   }
 
-  Future<int> update(Customer customer) async {
+  Future<void> update(CustomerModel customer) async {
     final db = await _dbHelper.database;
-    return await db.update(
-      'customers', customer.toMap(),
-      where: 'id = ?', whereArgs: [customer.id],
+    await db.update(
+      'customers',
+      customer.toMap(),
+      where: 'id = ?',
+      whereArgs: [customer.id],
     );
   }
 
-  Future<int> delete(String id) async {
+  /// Soft-delete a customer row.
+  Future<void> delete(String id) async {
     final db = await _dbHelper.database;
     final now = DateTime.now().toIso8601String();
-    return await db.update(
+    await db.update(
       'customers',
       {'is_deleted': 1, 'is_synced': 0, 'updated_at': now},
-      where: 'id = ?', whereArgs: [id],
+      where: 'id = ?',
+      whereArgs: [id],
     );
   }
 
-  Future<List<Customer>> getAll({String? ownerId}) async {
+  Future<List<CustomerModel>> getAll({String? ownerId}) async {
     final db = await _dbHelper.database;
     final conditions = ['is_deleted = 0'];
     final args = <dynamic>[];
@@ -41,19 +60,21 @@ class CustomerRepository {
       whereArgs: args,
       orderBy: 'created_at DESC',
     );
-    return result.map((map) => Customer.fromMap(map)).toList();
+    return result.map(CustomerModel.fromMap).toList();
   }
 
-  Future<Customer?> getById(String id) async {
+  Future<CustomerModel?> getById(String id) async {
     final db = await _dbHelper.database;
     final result = await db.query(
-      'customers', where: 'id = ? AND is_deleted = 0', whereArgs: [id],
+      'customers',
+      where: 'id = ? AND is_deleted = 0',
+      whereArgs: [id],
     );
     if (result.isEmpty) return null;
-    return Customer.fromMap(result.first);
+    return CustomerModel.fromMap(result.first);
   }
 
-  Future<List<Customer>> search(String query, {String? ownerId}) async {
+  Future<List<CustomerModel>> search(String query, {String? ownerId}) async {
     final db = await _dbHelper.database;
     final escaped = query.replaceAll('%', '\\%').replaceAll('_', '\\_');
     final conditions = [
@@ -71,7 +92,7 @@ class CustomerRepository {
       whereArgs: args,
       orderBy: 'created_at DESC',
     );
-    return result.map((map) => Customer.fromMap(map)).toList();
+    return result.map(CustomerModel.fromMap).toList();
   }
 
   Future<int> getCustomerCount({String? ownerId}) async {
@@ -89,10 +110,12 @@ class CustomerRepository {
     return result.first['count'] as int;
   }
 
-  Future<List<Customer>> getUnsynced() async {
+  // ---- offline→online push helpers (mirror of the legacy repository) ----
+
+  Future<List<CustomerModel>> getUnsynced() async {
     final db = await _dbHelper.database;
     final result = await db.query('customers', where: 'is_synced = 0');
-    return result.map((map) => Customer.fromMap(map)).toList();
+    return result.map(CustomerModel.fromMap).toList();
   }
 
   Future<void> markSynced(List<String> ids) async {
@@ -100,29 +123,37 @@ class CustomerRepository {
     final db = await _dbHelper.database;
     final placeholders = ids.map((_) => '?').join(',');
     await db.update(
-      'customers', {'is_synced': 1},
-      where: 'id IN ($placeholders)', whereArgs: ids,
+      'customers',
+      {'is_synced': 1},
+      where: 'id IN ($placeholders)',
+      whereArgs: ids,
     );
   }
 
-  Future<void> upsertFromCloud(List<Customer> records) async {
+  /// Newest-wins upsert of cloud records; only applies when the incoming
+  /// record is newer than what we already store locally.
+  Future<void> upsertFromCloud(List<CustomerModel> records) async {
     final db = await _dbHelper.database;
     for (final c in records) {
       final existingResult = await db.query(
-        'customers', where: 'id = ?', whereArgs: [c.id],
+        'customers',
+        where: 'id = ?',
+        whereArgs: [c.id],
       );
       if (existingResult.isEmpty) {
         final map = c.toMap();
         map['is_synced'] = 1;
         await db.insert('customers', map);
       } else {
-        final existing = Customer.fromMap(existingResult.first);
+        final existing = CustomerModel.fromMap(existingResult.first);
         if (c.updatedAt.compareTo(existing.updatedAt) > 0) {
           final map = c.toMap();
           map['is_synced'] = 1;
           await db.update(
-            'customers', map,
-            where: 'id = ?', whereArgs: [c.id],
+            'customers',
+            map,
+            where: 'id = ?',
+            whereArgs: [c.id],
           );
         }
       }

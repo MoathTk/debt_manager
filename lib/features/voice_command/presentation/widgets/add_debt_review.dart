@@ -9,7 +9,7 @@ library;
 
 import 'package:flutter/material.dart';
 import 'package:local_debt_management/l10n/app_localizations.dart';
-import 'package:local_debt_management/data/models/customer.dart';
+import 'package:local_debt_management/features/customers/domain/entities/customer.dart';
 import '../../domain/entities/voice_command.dart';
 import 'add_debt_customer_section.dart';
 import 'review_items_header.dart';

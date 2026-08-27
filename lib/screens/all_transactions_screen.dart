@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../l10n/app_localizations.dart';
 import '../Providers/database_provider.dart';
-import '../data/models/customer.dart';
+import 'package:local_debt_management/features/customers/domain/entities/customer.dart';
 import '../data/models/transaction.dart' as model;
 import '../widgets/transaction_search_bar.dart';
 import '../widgets/transaction_filter_bar.dart';
