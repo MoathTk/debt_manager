@@ -2,7 +2,8 @@
 ///
 /// Pure presentation — reads error/loading from provider.
 /// Delegates pin submission to AuthNotifier.
-/// Keeps internal obscureText toggle and pin dots.
+/// PIN digits are entered through a custom in-app keypad, so no system
+/// keyboard pops up during PIN steps (the setup name field still uses one).
 /// ---------------------------------------------------------------------------
 library;
 
@@ -11,16 +12,18 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:local_debt_management/l10n/app_localizations.dart';
 import '../providers/auth_provider.dart';
+import '../widgets/pin/pin_dots.dart';
+import '../widgets/pin/pin_error_banner.dart';
+import '../widgets/pin/pin_keypad.dart';
+import '../widgets/pin/pin_name_field.dart';
+import '../widgets/pin/pin_submit_key.dart';
 
 enum PinMode { setup, entry }
 
 class PinScreen extends ConsumerStatefulWidget {
   final PinMode mode;
 
-  const PinScreen({
-    super.key,
-    required this.mode,
-  });
+  const PinScreen({super.key, required this.mode});
 
   @override
   ConsumerState<PinScreen> createState() => _PinScreenState();
@@ -31,10 +34,13 @@ class _PinScreenState extends ConsumerState<PinScreen> {
   final _pinController = TextEditingController();
   final _confirmController = TextEditingController();
   final _nameFocus = FocusNode();
-  final _pinFocus = FocusNode();
-  final _confirmFocus = FocusNode();
   bool _isConfirmStep = false;
-  bool _obscureText = true;
+  bool _mismatchError = false;
+
+  bool get _isSetup => widget.mode == PinMode.setup;
+
+  TextEditingController get _currentController =>
+      _isSetup && _isConfirmStep ? _confirmController : _pinController;
 
   @override
   void dispose() {
@@ -42,32 +48,66 @@ class _PinScreenState extends ConsumerState<PinScreen> {
     _pinController.dispose();
     _confirmController.dispose();
     _nameFocus.dispose();
-    _pinFocus.dispose();
-    _confirmFocus.dispose();
     super.dispose();
   }
 
-  bool get _isSetup => widget.mode == PinMode.setup;
+  // ---------------------------------------------------------------------------
+  // INPUT — driven by the in-app keypad
+  // ---------------------------------------------------------------------------
+
+  void _onDigit(String d) {
+    final c = _currentController;
+    if (c.text.length >= 6) return;
+    if (ref.read(authProvider).error != null) {
+      ref.read(authProvider.notifier).resetError();
+    }
+    setState(() {
+      _mismatchError = false;
+      c.text = '${c.text}$d';
+      c.selection = TextSelection.collapsed(offset: c.text.length);
+    });
+    if (c.text.length == 6) _submit();
+  }
+
+  void _onBackspace() {
+    final c = _currentController;
+    if (c.text.isEmpty) return;
+    setState(() {
+      _mismatchError = false;
+      c.text = c.text.substring(0, c.text.length - 1);
+      c.selection = TextSelection.collapsed(offset: c.text.length);
+    });
+  }
+
+  void _onClear() {
+    setState(() {
+      _mismatchError = false;
+      _currentController.clear();
+    });
+  }
+
+  // ---------------------------------------------------------------------------
+  // SUBMISSION — same flow the old screen used
+  // ---------------------------------------------------------------------------
 
   void _submit() {
     if (_isSetup && !_isConfirmStep) {
-      final pin = _pinController.text.trim();
-      if (pin.length < 4) return;
+      if (_pinController.text.trim().length < 4) return;
       setState(() {
         _isConfirmStep = true;
+        _mismatchError = false;
         _confirmController.clear();
-        _obscureText = true;
       });
-      _confirmFocus.requestFocus();
       return;
     }
 
-    final pin = _isSetup
-        ? _confirmController.text.trim()
-        : _pinController.text.trim();
+    final pin = _currentController.text.trim();
     if (pin.length < 4) return;
 
-    if (_isSetup && pin != _pinController.text.trim()) return;
+    if (_isSetup && pin != _pinController.text.trim()) {
+      setState(() => _mismatchError = true);
+      return;
+    }
 
     ref.read(authProvider.notifier).submitPin(pin);
   }
@@ -77,21 +117,32 @@ class _PinScreenState extends ConsumerState<PinScreen> {
       return _nameController.text.trim().isNotEmpty &&
           _pinController.text.length >= 4;
     }
-    final len = (_isSetup && _isConfirmStep
-            ? _confirmController
-            : _pinController)
-        .text
-        .length;
-    return len >= 4;
+    final len = _currentController.text.length;
+    if (len < 4) return false;
+    if (_isSetup) return _currentController.text == _pinController.text.trim();
+    return true;
   }
+
+  void _goBackToCreate() {
+    setState(() {
+      _isConfirmStep = false;
+      _mismatchError = false;
+      _confirmController.clear();
+    });
+  }
+
+  // ---------------------------------------------------------------------------
+  // BUILD
+  // ---------------------------------------------------------------------------
 
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
-    final l10n = AppLocalizations.of(context)!;
     final tt = Theme.of(context).textTheme;
+    final l10n = AppLocalizations.of(context)!;
     final authState = ref.watch(authProvider);
 
+    final isNameStep = _isSetup && !_isConfirmStep;
     final title = _isSetup
         ? (_isConfirmStep ? l10n.confirmPin : l10n.pinSetupTitle)
         : l10n.pinEntryTitle;
@@ -99,140 +150,74 @@ class _PinScreenState extends ConsumerState<PinScreen> {
         ? (_isConfirmStep ? l10n.pinSetupSubtitle : l10n.profileSetupSubtitle)
         : l10n.pinEntrySubtitle;
 
-    final currentController =
-        _isSetup && _isConfirmStep ? _confirmController : _pinController;
-    final currentFocus =
-        _isSetup && _isConfirmStep ? _confirmFocus : _pinFocus;
-    final pinLength = currentController.text.length;
+    final displayError = _mismatchError
+        ? l10n.pinMismatch
+        : (authState.error == 'incorrect_pin'
+              ? l10n.incorrectPin
+              : authState.error);
 
     return Scaffold(
       body: Container(
         width: double.infinity,
         height: double.infinity,
         decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              cs.primary.withValues(alpha: 0.06),
-              cs.surface,
-            ],
-          ),
+          // gradient: LinearGradient(
+          //   begin: Alignment.topCenter,
+          //   end: Alignment.bottomCenter,
+          //   colors: [cs.primary.withValues(alpha: 0.06), cs.surface],
+          // ),
         ),
         child: SafeArea(
           child: LayoutBuilder(
             builder: (context, constraints) {
-              return SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 24),
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(
-                    minHeight: constraints.maxHeight,
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      if (_isConfirmStep)
-                        Align(
-                          alignment: Alignment.centerLeft,
-                          child: IconButton(
-                            onPressed: () => setState(() {
-                              _isConfirmStep = false;
-                              _confirmController.clear();
-                            }),
-                            icon: Icon(
-                              Icons.arrow_back_ios_new_rounded,
-                              size: 20,
-                              color: cs.onSurface,
+              return CallbackShortcuts(
+                bindings: isNameStep ? const {} : _keypadShortcuts,
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.symmetric(horizontal: 28),
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      minHeight: constraints.maxHeight,
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        if (_isConfirmStep)
+                          Align(
+                            alignment: Alignment.centerLeft,
+                            child: IconButton(
+                              onPressed: _goBackToCreate,
+                              icon: Icon(
+                                Icons.arrow_back_ios_new_rounded,
+                                size: 20,
+                                color: cs.onSurface,
+                              ),
                             ),
+                          )
+                        else
+                          const SizedBox(height: 8),
+                        const SizedBox(height: 12),
+                        //PinLogo(isSetup: _isSetup),
+                        const SizedBox(height: 24),
+                        Text(
+                          title,
+                          style: tt.headlineSmall?.copyWith(
+                            fontWeight: FontWeight.w700,
                           ),
-                        )
-                      else
+                        ),
                         const SizedBox(height: 8),
-                      const SizedBox(height: 16),
-                      Container(
-                        width: 72,
-                        height: 72,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          gradient: LinearGradient(
-                            colors: [
-                              cs.primary,
-                              cs.primary.withValues(alpha: 0.7),
-                            ],
+                        Text(
+                          subtitle,
+                          style: tt.bodyMedium?.copyWith(
+                            color: cs.onSurfaceVariant,
                           ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: cs.primary.withValues(alpha: 0.25),
-                              blurRadius: 20,
-                              offset: const Offset(0, 8),
-                            ),
-                          ],
+                          textAlign: TextAlign.center,
                         ),
-                        child: Icon(
-                          _isSetup
-                              ? Icons.shield_rounded
-                              : Icons.lock_rounded,
-                          size: 34,
-                          color: Colors.white,
-                        ),
-                      ),
-                      const SizedBox(height: 28),
-                      Text(
-                        title,
-                        style: tt.headlineSmall?.copyWith(
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      Text(
-                        subtitle,
-                        style: tt.bodyMedium?.copyWith(
-                          color: cs.onSurfaceVariant,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 36),
-                      if (_isSetup && !_isConfirmStep) ...[
-                        SizedBox(
-                          width: double.infinity,
-                          height: 54,
-                          child: TextField(
+                        const SizedBox(height: 28),
+                        if (isNameStep) ...[
+                          PinNameField(
                             controller: _nameController,
                             focusNode: _nameFocus,
-                            textCapitalization: TextCapitalization.words,
-                            style: tt.bodyLarge?.copyWith(
-                              color: cs.onSurface,
-                            ),
-                            textAlign: TextAlign.center,
-                            decoration: InputDecoration(
-                              hintText: l10n.nameHint,
-                              hintStyle: tt.bodyMedium?.copyWith(
-                                color: cs.onSurfaceVariant
-                                    .withValues(alpha: 0.4),
-                              ),
-                              prefixIcon: Icon(
-                                Icons.person_outline_rounded,
-                                size: 20,
-                                color: cs.onSurfaceVariant,
-                              ),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(14),
-                                borderSide: BorderSide(
-                                  color:
-                                      cs.outline.withValues(alpha: 0.2),
-                                ),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(14),
-                                borderSide: BorderSide(
-                                  color: cs.primary,
-                                  width: 1.5,
-                                ),
-                              ),
-                              filled: true,
-                              fillColor: cs.surfaceContainerHighest
-                                  .withValues(alpha: 0.4),
-                            ),
+                            hint: l10n.nameHint,
                             onChanged: (v) {
                               ref
                                   .read(authProvider.notifier)
@@ -240,167 +225,33 @@ class _PinScreenState extends ConsumerState<PinScreen> {
                               setState(() {});
                             },
                           ),
-                        ),
-                        const SizedBox(height: 16),
-                      ],
-                      _PinDots(
-                        length: pinLength,
-                        maxLength: 6,
-                        hasError: authState.error != null,
-                      ),
-                      const SizedBox(height: 16),
-                      SizedBox(
-                        width: double.infinity,
-                        height: 54,
-                        child: TextField(
-                          controller: currentController,
-                          focusNode: currentFocus,
-                          obscureText: _obscureText,
-                          obscuringCharacter: '\u2022',
-                          keyboardType: TextInputType.number,
+                          const SizedBox(height: 24),
+                        ],
+                        PinDots(
+                          value: _currentController.text,
                           maxLength: 6,
-                          style: tt.headlineSmall?.copyWith(
-                            letterSpacing: 12,
-                            fontWeight: FontWeight.w700,
-                            color: cs.onSurface,
-                          ),
-                          textAlign: TextAlign.center,
-                          inputFormatters: [
-                            FilteringTextInputFormatter.digitsOnly,
-                            LengthLimitingTextInputFormatter(6),
-                          ],
-                          decoration: InputDecoration(
-                            counterText: '',
-                            hintText: l10n.pinHint,
-                            hintStyle: tt.bodySmall?.copyWith(
-                              color: cs.onSurfaceVariant.withValues(alpha: 0.4),
-                            ),
-                            suffixIcon: currentController.text.isNotEmpty
-                                ? IconButton(
-                                    onPressed: () => setState(
-                                        () => _obscureText = !_obscureText),
-                                    icon: Icon(
-                                      _obscureText
-                                          ? Icons.visibility_off_rounded
-                                          : Icons.visibility_rounded,
-                                      size: 20,
-                                      color: cs.onSurfaceVariant
-                                          .withValues(alpha: 0.6),
-                                    ),
-                                  )
-                                : null,
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(14),
-                              borderSide: BorderSide(
-                                color: cs.outline.withValues(alpha: 0.2),
-                              ),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(14),
-                              borderSide: BorderSide(
-                                color: cs.primary,
-                                width: 1.5,
-                              ),
-                            ),
-                            filled: true,
-                            fillColor:
-                                cs.surfaceContainerHighest.withValues(alpha: 0.4),
-                          ),
-                          onChanged: (v) => setState(() {}),
+                          hasError: displayError != null,
                         ),
-                      ),
-                      if (authState.error != null) ...[
-                        const SizedBox(height: 12),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 14, vertical: 10),
-                          decoration: BoxDecoration(
-                            color: cs.errorContainer.withValues(alpha: 0.6),
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(Icons.error_outline_rounded,
-                                  size: 16, color: cs.error),
-                              const SizedBox(width: 6),
-                              Text(
-                                authState.error!,
-                                style:
-                                    tt.bodySmall?.copyWith(color: cs.error),
-                              ),
-                            ],
+                        const SizedBox(height: 20),
+                        if (displayError != null) ...[
+                          PinErrorBanner(message: displayError),
+                          const SizedBox(height: 8),
+                        ],
+                        const SizedBox(height: 24),
+                        PinKeypad(
+                          onDigit: _onDigit,
+                          onBackspace: _onBackspace,
+                          onClear: _onClear,
+                          bottomLeft: PinSubmitKey(
+                            loading: authState.loading,
+                            enabled: _canSubmit,
+                            isNext: isNameStep,
+                            onPressed: _submit,
                           ),
                         ),
+                        const SizedBox(height: 24),
                       ],
-                      const SizedBox(height: 24),
-                      if (authState.loading)
-                        SizedBox(
-                          width: 54,
-                          height: 54,
-                          child: Card(
-                            elevation: 0,
-                            color: cs.primaryContainer,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsets.all(14),
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2.5,
-                                color: cs.primary,
-                              ),
-                            ),
-                          ),
-                        )
-                      else
-                        SizedBox(
-                          width: double.infinity,
-                          height: 54,
-                          child: ElevatedButton(
-                            onPressed: _canSubmit ? _submit : null,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: cs.primary,
-                              foregroundColor: Colors.white,
-                              disabledBackgroundColor:
-                                  cs.primary.withValues(alpha: 0.3),
-                              disabledForegroundColor:
-                                  Colors.white.withValues(alpha: 0.5),
-                              elevation: _canSubmit ? 2 : 0,
-                              shadowColor: cs.primary.withValues(alpha: 0.3),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(14),
-                              ),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(
-                                  _isSetup && !_isConfirmStep
-                                      ? Icons.arrow_forward_rounded
-                                      : Icons.check_circle_outline_rounded,
-                                  size: 20,
-                                  color: Colors.white,
-                                ),
-                                const SizedBox(width: 8),
-                                Text(
-                                  _isSetup
-                                      ? (_isConfirmStep
-                                          ? l10n.confirmPin
-                                          : l10n.createPin)
-                                      : l10n.enterPin,
-                                  style: tt.titleMedium?.copyWith(
-                                    fontWeight: FontWeight.w700,
-                                    color: Colors.white,
-                                    letterSpacing: 0.5,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      const SizedBox(height: 48),
-                    ],
+                    ),
                   ),
                 ),
               );
@@ -410,60 +261,32 @@ class _PinScreenState extends ConsumerState<PinScreen> {
       ),
     );
   }
-}
 
-class _PinDots extends StatelessWidget {
-  final int length;
-  final int maxLength;
-  final bool hasError;
-
-  const _PinDots({
-    required this.length,
-    required this.maxLength,
-    this.hasError = false,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
-
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: List.generate(maxLength, (i) {
-        final filled = i < length;
-        return AnimatedContainer(
-          duration: const Duration(milliseconds: 150),
-          margin: const EdgeInsets.symmetric(horizontal: 5),
-          width: 14,
-          height: 14,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: filled
-                ? hasError
-                    ? cs.error
-                    : cs.primary
-                : cs.outline.withValues(alpha: 0.2),
-            border: Border.all(
-              color: filled
-                  ? hasError
-                      ? cs.error
-                      : cs.primary
-                  : cs.outline.withValues(alpha: 0.2),
-              width: 1.5,
-            ),
-            boxShadow: filled
-                ? [
-                    BoxShadow(
-                      color: (hasError ? cs.error : cs.primary)
-                          .withValues(alpha: 0.3),
-                      blurRadius: 6,
-                      spreadRadius: 1,
-                    ),
-                  ]
-                : null,
-          ),
-        );
-      }),
-    );
+  /// Physical keyboard support for the PIN steps: digits, backspace, enter.
+  Map<ShortcutActivator, VoidCallback> get _keypadShortcuts {
+    return <ShortcutActivator, VoidCallback>{
+      const SingleActivator(LogicalKeyboardKey.digit1): () => _onDigit('1'),
+      const SingleActivator(LogicalKeyboardKey.digit2): () => _onDigit('2'),
+      const SingleActivator(LogicalKeyboardKey.digit3): () => _onDigit('3'),
+      const SingleActivator(LogicalKeyboardKey.digit4): () => _onDigit('4'),
+      const SingleActivator(LogicalKeyboardKey.digit5): () => _onDigit('5'),
+      const SingleActivator(LogicalKeyboardKey.digit6): () => _onDigit('6'),
+      const SingleActivator(LogicalKeyboardKey.digit7): () => _onDigit('7'),
+      const SingleActivator(LogicalKeyboardKey.digit8): () => _onDigit('8'),
+      const SingleActivator(LogicalKeyboardKey.digit9): () => _onDigit('9'),
+      const SingleActivator(LogicalKeyboardKey.digit0): () => _onDigit('0'),
+      const SingleActivator(LogicalKeyboardKey.numpad1): () => _onDigit('1'),
+      const SingleActivator(LogicalKeyboardKey.numpad2): () => _onDigit('2'),
+      const SingleActivator(LogicalKeyboardKey.numpad3): () => _onDigit('3'),
+      const SingleActivator(LogicalKeyboardKey.numpad4): () => _onDigit('4'),
+      const SingleActivator(LogicalKeyboardKey.numpad5): () => _onDigit('5'),
+      const SingleActivator(LogicalKeyboardKey.numpad6): () => _onDigit('6'),
+      const SingleActivator(LogicalKeyboardKey.numpad7): () => _onDigit('7'),
+      const SingleActivator(LogicalKeyboardKey.numpad8): () => _onDigit('8'),
+      const SingleActivator(LogicalKeyboardKey.numpad9): () => _onDigit('9'),
+      const SingleActivator(LogicalKeyboardKey.numpad0): () => _onDigit('0'),
+      const SingleActivator(LogicalKeyboardKey.backspace): _onBackspace,
+      const SingleActivator(LogicalKeyboardKey.enter): () => _submit(),
+    };
   }
 }
