@@ -11,7 +11,7 @@ import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:record/record.dart';
-import 'package:local_debt_management/services/connectivity_service.dart';
+import 'package:local_debt_management/core/services/connectivity_service.dart';
 import '../../domain/exceptions/voice_entry_exception.dart';
 import '../../domain/usecases/transcribe_audio.dart';
 import '../../domain/usecases/parse_voice_transcript.dart';
@@ -95,10 +95,10 @@ class VoiceEntryNotifier extends StateNotifier<VoiceEntryState> {
     _ampSub = _recorder
         .onAmplitudeChanged(const Duration(milliseconds: 200))
         .listen((amp) {
-      if (!mounted || !state.isRecording) return;
-      final normalized = pow(10, amp.current / 20).clamp(0.0, 1.0);
-      state = state.copyWith(soundLevel: normalized.toDouble());
-    });
+          if (!mounted || !state.isRecording) return;
+          final normalized = pow(10, amp.current / 20).clamp(0.0, 1.0);
+          state = state.copyWith(soundLevel: normalized.toDouble());
+        });
   }
 
   Future<void> stopRecording() async {

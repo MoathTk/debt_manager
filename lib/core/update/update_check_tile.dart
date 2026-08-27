@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:local_debt_management/l10n/app_localizations.dart';
-import 'package:local_debt_management/services/update_service.dart';
+import 'package:local_debt_management/core/services/update_service.dart';
 import 'update_dialog.dart';
 
 class UpdateCheckTile extends StatefulWidget {

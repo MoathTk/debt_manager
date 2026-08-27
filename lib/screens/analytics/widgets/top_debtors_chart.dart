@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../Providers/database_provider.dart';
+import '../../../core/sharedProviders/database_provider.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../l10n/app_localizations.dart';
 
@@ -81,7 +81,9 @@ class _Row extends StatelessWidget {
         ? amount.toStringAsFixed(0)
         : amount.toStringAsFixed(2);
     final display = formatted.replaceAllMapped(
-      RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (m) => '${m[1]},');
+      RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+      (m) => '${m[1]},',
+    );
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
       child: Column(

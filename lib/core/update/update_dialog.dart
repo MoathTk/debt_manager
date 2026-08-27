@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:local_debt_management/l10n/app_localizations.dart';
-import 'package:local_debt_management/services/update_service.dart';
+import 'package:local_debt_management/core/services/update_service.dart';
 import 'update_dialog_header.dart';
 import 'update_dialog_content.dart';
 import 'update_dialog_actions.dart';
@@ -27,9 +27,10 @@ class _UpdateDialogState extends State<UpdateDialog>
       vsync: this,
       duration: const Duration(milliseconds: 1400),
     )..repeat(reverse: true);
-    _pulseAnim = Tween(begin: 0.92, end: 1.0).animate(
-      CurvedAnimation(parent: _pulseCtrl, curve: Curves.easeInOut),
-    );
+    _pulseAnim = Tween(
+      begin: 0.92,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _pulseCtrl, curve: Curves.easeInOut));
   }
 
   @override
@@ -54,7 +55,8 @@ class _UpdateDialogState extends State<UpdateDialog>
           if (mounted) setState(() => _progress = p);
         },
         onInstalling: () {
-          if (mounted) setState(() => _contentState = UpdateContentState.installing);
+          if (mounted)
+            setState(() => _contentState = UpdateContentState.installing);
         },
       );
       if (!mounted) return;
@@ -81,7 +83,10 @@ class _UpdateDialogState extends State<UpdateDialog>
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            UpdateDialogHeader(pulse: _pulseAnim, forceUpdate: widget.info.forceUpdate),
+            UpdateDialogHeader(
+              pulse: _pulseAnim,
+              forceUpdate: widget.info.forceUpdate,
+            ),
             Padding(
               padding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
               child: AnimatedSwitcher(
@@ -93,7 +98,9 @@ class _UpdateDialogState extends State<UpdateDialog>
                   latestVersion: widget.info.latestVersion,
                   releaseNotes: widget.info.releaseNotes,
                   progress: _progress,
-                  onRetry: _contentState == UpdateContentState.error ? _startDownload : null,
+                  onRetry: _contentState == UpdateContentState.error
+                      ? _startDownload
+                      : null,
                 ),
               ),
             ),

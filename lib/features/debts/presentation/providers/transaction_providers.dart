@@ -16,7 +16,7 @@
 library;
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:local_debt_management/services/auth_service.dart';
+import 'package:local_debt_management/core/services/auth_service.dart';
 import '../../../../features/customers/presentation/providers/customer_providers.dart';
 import '../../data/repositories/transaction_repository_impl.dart';
 import '../../domain/entities/transaction.dart';

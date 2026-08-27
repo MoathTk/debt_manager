@@ -1,7 +1,7 @@
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:firebase_auth_mocks/firebase_auth_mocks.dart';
-import 'package:local_debt_management/services/auth_service.dart';
+import 'package:local_debt_management/core/services/auth_service.dart';
 
 /// In-memory fake for the flutter_secure_storage platform channel.
 /// The plugin talks to Android Keystore / iOS Keychain via a method channel,

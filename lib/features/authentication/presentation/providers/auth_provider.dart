@@ -9,11 +9,11 @@ library;
 
 import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:local_debt_management/Providers/database_provider.dart';
-import 'package:local_debt_management/Providers/sync_provider.dart';
+import 'package:local_debt_management/core/sharedProviders/database_provider.dart';
+import 'package:local_debt_management/core/sharedProviders/sync_provider.dart';
 import 'package:local_debt_management/features/subscription/presentation/providers/subscription_provider.dart';
 import 'package:local_debt_management/data/database_helper.dart';
-import 'package:local_debt_management/services/clock_integrity_service.dart';
+import 'package:local_debt_management/core/services/clock_integrity_service.dart';
 import '../../domain/usecases/send_otp.dart';
 import '../../domain/usecases/verify_otp.dart';
 import '../../domain/usecases/check_has_pin.dart';
@@ -23,8 +23,7 @@ import '../../domain/usecases/get_user_profile.dart';
 import '../../data/providers/auth_providers.dart';
 import 'auth_state.dart';
 
-final authProvider =
-    StateNotifierProvider.autoDispose<AuthNotifier, AuthState>(
+final authProvider = StateNotifierProvider.autoDispose<AuthNotifier, AuthState>(
   (ref) {
     final authRepo = ref.read(authRepositoryProvider);
     final pinRepo = ref.read(pinRepositoryProvider);
@@ -67,27 +66,23 @@ class AuthNotifier extends StateNotifier<AuthState> {
     required Future<void> Function(String uid) clearPin,
     required Future<void> Function() signOutRepo,
     required Ref ref,
-  })  : _sendOtp = sendOtp,
-        _verifyOtp = verifyOtp,
-        _checkHasPin = checkHasPin,
-        _setUpPin = setUpPin,
-        _validatePin = validatePin,
-        _getUserProfile = getUserProfile,
-        _clearPin = clearPin,
-        _signOutRepo = signOutRepo,
-        _ref = ref,
-        super(const AuthState());
+  }) : _sendOtp = sendOtp,
+       _verifyOtp = verifyOtp,
+       _checkHasPin = checkHasPin,
+       _setUpPin = setUpPin,
+       _validatePin = validatePin,
+       _getUserProfile = getUserProfile,
+       _clearPin = clearPin,
+       _signOutRepo = signOutRepo,
+       _ref = ref,
+       super(const AuthState());
 
   // ---------------------------------------------------------------------------
   // INIT — called by AuthGate when a user signs in
   // ---------------------------------------------------------------------------
 
   Future<void> initForUser(String uid) async {
-    state = state.copyWith(
-      userId: uid,
-      loading: true,
-      clearError: true,
-    );
+    state = state.copyWith(userId: uid, loading: true, clearError: true);
 
     try {
       final hasPin = await _checkHasPin(uid);
@@ -104,10 +99,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
       );
     } catch (e) {
       if (!mounted) return;
-      state = state.copyWith(
-        loading: false,
-        step: AuthStep.pinSetup,
-      );
+      state = state.copyWith(loading: false, step: AuthStep.pinSetup);
     }
   }
 
@@ -116,11 +108,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
   // ---------------------------------------------------------------------------
 
   Future<void> sendOtp(String phone) async {
-    state = state.copyWith(
-      phoneNumber: phone,
-      loading: true,
-      clearError: true,
-    );
+    state = state.copyWith(phoneNumber: phone, loading: true, clearError: true);
 
     await _sendOtp(
       phoneNumber: phone,
@@ -139,10 +127,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
       },
       verificationFailed: (msg) {
         if (!mounted) return;
-        state = state.copyWith(
-          loading: false,
-          error: msg,
-        );
+        state = state.copyWith(loading: false, error: msg);
       },
       autoVerify: (_) {},
       timeout: (vid) {
@@ -173,10 +158,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
     state = state.copyWith(loading: true, clearError: true);
 
     try {
-      await _verifyOtp(
-        verificationId: _pendingVerificationId!,
-        smsCode: code,
-      );
+      await _verifyOtp(verificationId: _pendingVerificationId!, smsCode: code);
       // Auth state stream will trigger AuthGate rebuild
     } catch (e) {
       if (!mounted) return;
@@ -210,7 +192,9 @@ class AuthNotifier extends StateNotifier<AuthState> {
           uid: uid,
           pin: pin,
           name: state.userName ?? '',
-          phone: state.isPinSetupStep ? state.phoneNumber : (state.userPhone ?? ''),
+          phone: state.isPinSetupStep
+              ? state.phoneNumber
+              : (state.userPhone ?? ''),
         );
         if (!mounted) return;
         state = state.copyWith(
@@ -223,23 +207,14 @@ class AuthNotifier extends StateNotifier<AuthState> {
         if (!mounted) return;
 
         if (valid) {
-          state = state.copyWith(
-            loading: false,
-            step: AuthStep.complete,
-          );
+          state = state.copyWith(loading: false, step: AuthStep.complete);
         } else {
-          state = state.copyWith(
-            loading: false,
-            error: 'incorrect_pin',
-          );
+          state = state.copyWith(loading: false, error: 'incorrect_pin');
         }
       }
     } catch (e) {
       if (!mounted) return;
-      state = state.copyWith(
-        loading: false,
-        error: e.toString(),
-      );
+      state = state.copyWith(loading: false, error: e.toString());
     }
   }
 

@@ -15,7 +15,7 @@
 library;
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:local_debt_management/services/auth_service.dart';
+import 'package:local_debt_management/core/services/auth_service.dart';
 import '../../../../utils/sync_id.dart';
 import '../../data/repositories/customer_repository_impl.dart';
 import '../../domain/entities/customer.dart';
@@ -45,8 +45,10 @@ final customersProvider = FutureProvider<List<Customer>>((ref) async {
 });
 
 /// A single customer; returns null when not found or owned by someone else.
-final customerByIdProvider =
-    FutureProvider.family<Customer?, String>((ref, id) async {
+final customerByIdProvider = FutureProvider.family<Customer?, String>((
+  ref,
+  id,
+) async {
   final repo = ref.watch(customerRepositoryProvider);
   final ownerId = ref.watch(_ownerIdProvider);
   final customer = await repo.getById(id);
@@ -71,7 +73,10 @@ final searchCustomersUseCaseProvider = Provider<SearchCustomers>((ref) {
 });
 
 final addCustomerUseCaseProvider = Provider<AddCustomer>((ref) {
-  return AddCustomer(ref.watch(customerRepositoryProvider), createId: generateId);
+  return AddCustomer(
+    ref.watch(customerRepositoryProvider),
+    createId: generateId,
+  );
 });
 
 final updateCustomerUseCaseProvider = Provider<UpdateCustomer>((ref) {

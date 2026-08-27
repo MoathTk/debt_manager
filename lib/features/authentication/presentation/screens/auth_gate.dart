@@ -11,7 +11,7 @@ library;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:local_debt_management/data/database_helper.dart';
-import 'package:local_debt_management/Providers/sync_provider.dart';
+import 'package:local_debt_management/core/sharedProviders/sync_provider.dart';
 import 'package:local_debt_management/features/subscription/presentation/screens/subscription_check_screen.dart';
 import '../providers/auth_provider.dart';
 import '../../data/providers/auth_providers.dart';

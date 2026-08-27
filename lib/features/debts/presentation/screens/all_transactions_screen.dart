@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:local_debt_management/l10n/app_localizations.dart';
-import 'package:local_debt_management/Providers/database_provider.dart';
+import 'package:local_debt_management/core/sharedProviders/database_provider.dart';
 import 'package:local_debt_management/features/customers/domain/entities/customer.dart';
 import 'package:local_debt_management/features/debts/domain/entities/transaction.dart'
     as model;

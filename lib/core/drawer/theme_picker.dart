@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:local_debt_management/Providers/theme_provider.dart';
+import 'package:local_debt_management/core/sharedProviders/theme_provider.dart';
 import 'package:local_debt_management/l10n/app_localizations.dart';
 
 class ThemePicker extends ConsumerWidget {
@@ -58,7 +58,9 @@ class ThemePicker extends ConsumerWidget {
             height: 48,
             child: SegmentedButton<ThemeMode>(
               style: SegmentedButton.styleFrom(
-                side: BorderSide(color: cs.outlineVariant.withValues( alpha: .5)),
+                side: BorderSide(
+                  color: cs.outlineVariant.withValues(alpha: .5),
+                ),
               ),
               segments: const [
                 ButtonSegment(

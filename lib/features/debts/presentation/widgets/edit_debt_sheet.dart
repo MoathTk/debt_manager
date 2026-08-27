@@ -4,8 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:local_debt_management/l10n/app_localizations.dart';
 import 'package:local_debt_management/features/debts/domain/entities/transaction.dart'
     as model;
-import 'package:local_debt_management/Providers/database_provider.dart';
-import 'package:local_debt_management/Providers/mutations.dart';
+import 'package:local_debt_management/core/sharedProviders/database_provider.dart';
+import 'package:local_debt_management/core/sharedProviders/mutations.dart';
 import 'package:local_debt_management/features/subscription/presentation/widgets/mutation_guard.dart';
 import 'amount_input_formatter.dart';
 import 'package:local_debt_management/core/widgets/app_snackbar.dart';

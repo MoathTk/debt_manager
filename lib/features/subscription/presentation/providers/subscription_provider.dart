@@ -4,10 +4,10 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:local_debt_management/data/database_helper.dart';
-import 'package:local_debt_management/services/auth_service.dart';
-import 'package:local_debt_management/services/clock_integrity_service.dart';
-import 'package:local_debt_management/services/connectivity_service.dart';
-import 'package:local_debt_management/services/trusted_time.dart';
+import 'package:local_debt_management/core/services/auth_service.dart';
+import 'package:local_debt_management/core/services/clock_integrity_service.dart';
+import 'package:local_debt_management/core/services/connectivity_service.dart';
+import 'package:local_debt_management/core/services/trusted_time.dart';
 import '../../domain/entities/subscription.dart';
 import '../../domain/usecases/check_subscription.dart';
 import '../../domain/usecases/activate_trial.dart';
@@ -137,7 +137,6 @@ class SubscriptionNotifier extends StateNotifier<SubscriptionState> {
       state = state.copyWith(isLoading: false, error: e.toString());
     }
   }
-
 }
 
 final subscriptionProvider =

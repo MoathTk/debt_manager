@@ -16,7 +16,7 @@
 library;
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:local_debt_management/services/auth_service.dart';
+import 'package:local_debt_management/core/services/auth_service.dart';
 import '../../data/repositories/debt_reminder_repository_impl.dart';
 import '../../domain/entities/debt_reminder.dart';
 import '../../domain/repositories/debt_reminder_repository.dart';
@@ -45,7 +45,9 @@ final allRemindersProvider = FutureProvider<List<DebtReminder>>((ref) async {
 });
 
 /// Pending (not-yet-completed) reminders, nearest date first.
-final pendingRemindersProvider = FutureProvider<List<DebtReminder>>((ref) async {
+final pendingRemindersProvider = FutureProvider<List<DebtReminder>>((
+  ref,
+) async {
   final repo = ref.watch(debtReminderRepositoryProvider);
   final ownerId = ref.watch(_ownerIdProvider);
   return repo.getPending(ownerId: ownerId.isEmpty ? null : ownerId);
@@ -86,6 +88,8 @@ final deleteReminderUseCaseProvider = Provider<DeleteReminder>((ref) {
   return DeleteReminder(ref.watch(debtReminderRepositoryProvider));
 });
 
-final deleteRemindersBatchUseCaseProvider = Provider<DeleteRemindersBatch>((ref) {
+final deleteRemindersBatchUseCaseProvider = Provider<DeleteRemindersBatch>((
+  ref,
+) {
   return DeleteRemindersBatch(ref.watch(debtReminderRepositoryProvider));
 });

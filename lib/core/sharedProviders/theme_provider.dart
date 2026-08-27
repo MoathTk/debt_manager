@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../core/theme/app_colors.dart';
+import '../theme/app_colors.dart';
 
 /// Theme provider managing light/dark mode toggle.
 final themeProvider = StateNotifierProvider<ThemeNotifier, ThemeMode>((ref) {
@@ -66,7 +66,10 @@ ThemeData get lightTheme {
     extensions: const [AppColors.light],
     textTheme: const TextTheme().copyWith(
       headlineLarge: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
-      headlineMedium: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+      headlineMedium: const TextStyle(
+        fontSize: 28,
+        fontWeight: FontWeight.bold,
+      ),
       titleLarge: const TextStyle(fontSize: 22, fontWeight: FontWeight.w600),
       titleMedium: const TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
       bodyLarge: const TextStyle(fontSize: 18),
@@ -180,7 +183,10 @@ ThemeData get darkTheme {
     extensions: const [AppColors.dark],
     textTheme: const TextTheme().copyWith(
       headlineLarge: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
-      headlineMedium: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+      headlineMedium: const TextStyle(
+        fontSize: 28,
+        fontWeight: FontWeight.bold,
+      ),
       titleLarge: const TextStyle(fontSize: 22, fontWeight: FontWeight.w600),
       titleMedium: const TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
       bodyLarge: const TextStyle(fontSize: 18),

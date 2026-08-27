@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:local_debt_management/l10n/app_localizations.dart';
-import 'package:local_debt_management/Providers/mutations.dart';
+import 'package:local_debt_management/core/sharedProviders/mutations.dart';
 import 'package:local_debt_management/features/subscription/presentation/widgets/mutation_guard.dart';
 import 'package:local_debt_management/features/voice_entry/presentation/providers/voice_entry_provider.dart';
 import 'package:local_debt_management/features/voice_entry/domain/entities/voice_parsed_debt.dart';

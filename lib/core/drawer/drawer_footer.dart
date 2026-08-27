@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:local_debt_management/l10n/app_localizations.dart';
-import 'package:local_debt_management/services/auth_service.dart';
+import 'package:local_debt_management/core/services/auth_service.dart';
 
 class DrawerFooter extends ConsumerStatefulWidget {
   const DrawerFooter({super.key, required this.onClose});

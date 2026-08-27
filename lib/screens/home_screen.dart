@@ -4,11 +4,11 @@ import 'package:local_debt_management/features/subscription/presentation/widgets
 import 'package:local_debt_management/core/drawer/side_drawer.dart';
 import 'package:local_debt_management/core/widgets/sync_status_indicator.dart';
 import '../l10n/app_localizations.dart';
-import '../Providers/database_provider.dart';
-import '../Providers/sync_provider.dart';
+import '../core/sharedProviders/database_provider.dart';
+import '../core/sharedProviders/sync_provider.dart';
 import '../features/subscription/presentation/widgets/subscription_status_icon.dart';
 import '../features/voice_command/presentation/widgets/voice_command_sheet.dart';
-import '../services/update_service.dart';
+import '../core/services/update_service.dart';
 import '../core/update/update_dialog.dart';
 
 import 'dashboard_screen.dart';

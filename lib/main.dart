@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'Providers/theme_provider.dart';
-import 'Providers/locale_provider.dart';
+import 'core/sharedProviders/theme_provider.dart';
+import 'core/sharedProviders/locale_provider.dart';
 import 'l10n/app_localizations.dart';
-import 'services/clock_integrity_service.dart';
-import 'services/online_status_service.dart';
+import 'core/services/clock_integrity_service.dart';
+import 'core/services/online_status_service.dart';
 import 'features/authentication/presentation/screens/auth_gate.dart';
 
 void main() async {

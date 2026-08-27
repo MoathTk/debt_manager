@@ -4,7 +4,7 @@ import 'package:local_debt_management/features/debts/data/models/transaction_mod
     as model;
 import 'package:local_debt_management/features/reminders/data/datasources/debt_reminder_local_datasource.dart';
 import 'package:local_debt_management/features/reminders/data/models/debt_reminder_model.dart';
-import '../data/database_helper.dart';
+import '../../data/database_helper.dart';
 
 class FirestoreSync {
   final _db = DatabaseHelper.instance;

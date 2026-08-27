@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:local_debt_management/Providers/mutations.dart';
+import 'package:local_debt_management/core/sharedProviders/mutations.dart';
 
 void main() {
   group('DashboardStats', () {

@@ -10,7 +10,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:local_debt_management/features/customers/presentation/providers/customer_providers.dart';
 import 'package:local_debt_management/features/debts/presentation/providers/transaction_providers.dart';
 import 'package:local_debt_management/features/reminders/presentation/providers/debt_reminder_providers.dart';
-import '../data/database_helper.dart';
+import '../../data/database_helper.dart';
 import '../services/auth_service.dart';
 import 'mutations.dart';
 
@@ -72,12 +72,13 @@ final dashboardStatsProvider = FutureProvider<DashboardStats>((ref) async {
 });
 
 final periodicDataProvider =
-    FutureProvider.family<List<Map<String, dynamic>>, bool>(
-      (ref, isWeekly) async {
-        final repo = ref.watch(transactionRepositoryProvider);
-        return repo.getPeriodicData(isWeekly: isWeekly);
-      },
-    );
+    FutureProvider.family<List<Map<String, dynamic>>, bool>((
+      ref,
+      isWeekly,
+    ) async {
+      final repo = ref.watch(transactionRepositoryProvider);
+      return repo.getPeriodicData(isWeekly: isWeekly);
+    });
 
 final topDebtorsProvider =
     FutureProvider.autoDispose<List<Map<String, dynamic>>>((ref) async {

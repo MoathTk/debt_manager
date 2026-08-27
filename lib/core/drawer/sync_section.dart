@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:local_debt_management/Providers/sync_provider.dart';
+import 'package:local_debt_management/core/sharedProviders/sync_provider.dart';
 import 'package:local_debt_management/l10n/app_localizations.dart';
 
 class SyncSection extends ConsumerWidget {
@@ -52,11 +52,13 @@ class SyncSection extends ConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Row(children: [
-                Icon(statusIcon, size: 20, color: cs.onSurfaceVariant),
-                const SizedBox(width: 12),
-                Expanded(child: Text(statusText, style: tt.titleMedium)),
-              ]),
+              Row(
+                children: [
+                  Icon(statusIcon, size: 20, color: cs.onSurfaceVariant),
+                  const SizedBox(width: 12),
+                  Expanded(child: Text(statusText, style: tt.titleMedium)),
+                ],
+              ),
               const SizedBox(height: 8),
               if (syncState.unsyncedCount > 0)
                 Padding(

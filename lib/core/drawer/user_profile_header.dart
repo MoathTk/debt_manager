@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:local_debt_management/services/auth_service.dart';
+import 'package:local_debt_management/core/services/auth_service.dart';
 import 'package:local_debt_management/features/authentication/data/repositories/pin_repository_impl.dart';
 
 class UserProfileHeader extends ConsumerWidget {

@@ -22,9 +22,9 @@
 /// ---------------------------------------------------------------------------
 library;
 
-import 'package:local_debt_management/services/clock_integrity_service.dart';
-import 'package:local_debt_management/services/connectivity_service.dart';
-import 'package:local_debt_management/services/trusted_time.dart';
+import 'package:local_debt_management/core/services/clock_integrity_service.dart';
+import 'package:local_debt_management/core/services/connectivity_service.dart';
+import 'package:local_debt_management/core/services/trusted_time.dart';
 import '../entities/subscription.dart';
 import '../exceptions/subscription_exception.dart';
 import '../repositories/subscription_repository.dart';

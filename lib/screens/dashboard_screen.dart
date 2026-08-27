@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../l10n/app_localizations.dart';
-import '../Providers/database_provider.dart';
-import '../Providers/mutations.dart';
+import '../core/sharedProviders/database_provider.dart';
+import '../core/sharedProviders/mutations.dart';
 import '../core/theme/app_colors.dart';
 import 'dashboard/widgets/stat_card.dart';
 import 'package:local_debt_management/features/debts/presentation/widgets/recent_transactions_list.dart';

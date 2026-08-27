@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:local_debt_management/Providers/database_provider.dart';
+import 'package:local_debt_management/core/sharedProviders/database_provider.dart';
 import 'package:local_debt_management/l10n/app_localizations.dart';
 import 'badge_states.dart';
 import 'balance_badge.dart';

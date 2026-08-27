@@ -9,9 +9,9 @@
 library;
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:local_debt_management/Providers/database_provider.dart';
-import 'package:local_debt_management/Providers/sync_provider.dart';
-import 'package:local_debt_management/services/auth_service.dart';
+import 'package:local_debt_management/core/sharedProviders/database_provider.dart';
+import 'package:local_debt_management/core/sharedProviders/sync_provider.dart';
+import 'package:local_debt_management/core/services/auth_service.dart';
 import '../../domain/entities/customer.dart';
 import 'customer_providers.dart';
 

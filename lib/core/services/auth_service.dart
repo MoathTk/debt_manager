@@ -6,12 +6,12 @@ library;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:local_debt_management/Providers/database_provider.dart';
-import 'package:local_debt_management/Providers/sync_provider.dart';
+import 'package:local_debt_management/core/sharedProviders/database_provider.dart';
+import 'package:local_debt_management/core/sharedProviders/sync_provider.dart';
 import 'package:local_debt_management/features/subscription/presentation/providers/subscription_provider.dart';
 import 'package:local_debt_management/data/database_helper.dart';
-import 'package:local_debt_management/services/clock_integrity_service.dart';
-import 'package:local_debt_management/services/online_status_service.dart';
+import 'package:local_debt_management/core/services/clock_integrity_service.dart';
+import 'package:local_debt_management/core/services/online_status_service.dart';
 import 'package:local_debt_management/features/authentication/data/repositories/pin_repository_impl.dart';
 
 export 'package:local_debt_management/features/authentication/data/providers/auth_providers.dart'

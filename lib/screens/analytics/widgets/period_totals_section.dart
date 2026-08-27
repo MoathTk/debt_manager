@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../l10n/app_localizations.dart';
-import '../../../Providers/database_provider.dart';
+import '../../../core/sharedProviders/database_provider.dart';
 import 'period_chips.dart';
 import 'period_navigator.dart';
 import 'period_mini_card.dart';

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:local_debt_management/Providers/database_provider.dart';
+import 'package:local_debt_management/core/sharedProviders/database_provider.dart';
 import 'package:local_debt_management/core/theme/app_colors.dart';
 import 'package:local_debt_management/features/debts/domain/entities/transaction.dart'
     as model;
