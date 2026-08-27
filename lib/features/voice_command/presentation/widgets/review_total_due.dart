@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:local_debt_management/core/theme/app_colors.dart';
 import 'package:local_debt_management/l10n/app_localizations.dart';
-import 'package:local_debt_management/widgets/amount_input_formatter.dart';
+import 'package:local_debt_management/features/debts/presentation/widgets/amount_input_formatter.dart';
 
 class TotalSection extends StatelessWidget {
   final AppLocalizations l10n;
@@ -89,7 +89,11 @@ class DueRow extends StatelessWidget {
               color: appColors.customer.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(8),
             ),
-            child: Icon(Icons.calendar_today_rounded, size: 16, color: appColors.customer),
+            child: Icon(
+              Icons.calendar_today_rounded,
+              size: 16,
+              color: appColors.customer,
+            ),
           ),
           const SizedBox(width: 10),
           Column(

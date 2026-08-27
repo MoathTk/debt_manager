@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../l10n/app_localizations.dart';
 import '../features/subscription/presentation/widgets/mutation_guard.dart';
-import 'add_debt_sheet/add_debt_sheet.dart';
-import 'record_payment_sheet.dart';
-import 'records_list_sheet.dart';
+import 'package:local_debt_management/features/debts/presentation/widgets/add_debt_sheet/add_debt_sheet.dart';
+import 'package:local_debt_management/features/debts/presentation/widgets/record_payment_sheet.dart';
+import 'package:local_debt_management/features/debts/presentation/widgets/records_list_sheet.dart';
 
 /// Gold segmented action bar with three action buttons.
 class ActionBar extends ConsumerWidget {
@@ -30,9 +30,7 @@ class ActionBar extends ConsumerWidget {
               offset: const Offset(0, -3),
             ),
           ],
-          border: Border.all(
-            color: cs.outlineVariant.withValues(alpha: 0.4),
-          ),
+          border: Border.all(color: cs.outlineVariant.withValues(alpha: 0.4)),
         ),
         child: Row(
           children: [

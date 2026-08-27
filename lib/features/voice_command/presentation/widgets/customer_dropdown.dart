@@ -33,9 +33,7 @@ class CustomerDropdown extends StatelessWidget {
         decoration: BoxDecoration(
           color: cs.surfaceContainerHighest.withValues(alpha: 0.4),
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(
-            color: cs.outlineVariant.withValues(alpha: 0.4),
-          ),
+          border: Border.all(color: cs.outlineVariant.withValues(alpha: 0.4)),
         ),
         child: Row(
           children: [
@@ -45,7 +43,11 @@ class CustomerDropdown extends StatelessWidget {
                 color: cs.primaryContainer.withValues(alpha: 0.5),
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: Icon(Icons.person_search_rounded, size: 18, color: cs.primary),
+              child: Icon(
+                Icons.person_search_rounded,
+                size: 18,
+                color: cs.primary,
+              ),
             ),
             const SizedBox(width: 12),
             Expanded(
@@ -53,7 +55,9 @@ class CustomerDropdown extends StatelessWidget {
                 selected?.name ?? l10n.customerName,
                 style: TextStyle(
                   fontSize: 14,
-                  fontWeight: selected != null ? FontWeight.w600 : FontWeight.w400,
+                  fontWeight: selected != null
+                      ? FontWeight.w600
+                      : FontWeight.w400,
                   color: selected != null ? cs.onSurface : cs.onSurfaceVariant,
                 ),
                 overflow: TextOverflow.ellipsis,

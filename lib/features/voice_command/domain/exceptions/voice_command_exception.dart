@@ -28,9 +28,7 @@ class ApiKeyNotConfiguredException extends VoiceCommandException {
 
 /// No internet connection available.
 class NoInternetException extends VoiceCommandException {
-  const NoInternetException([
-    super.message = 'No internet connection',
-  ]);
+  const NoInternetException([super.message = 'No internet connection']);
 }
 
 /// Transcription returned empty or no speech was detected.

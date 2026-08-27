@@ -6,7 +6,7 @@ library;
 import 'package:flutter/material.dart';
 import 'package:local_debt_management/core/theme/app_colors.dart';
 import 'package:local_debt_management/features/customers/domain/entities/customer.dart';
-import 'package:local_debt_management/widgets/amount_input_formatter.dart';
+import 'package:local_debt_management/features/debts/presentation/widgets/amount_input_formatter.dart';
 
 class CustomerTile extends StatelessWidget {
   final Customer customer;
@@ -83,7 +83,9 @@ class CustomerTile extends StatelessWidget {
                       customer.name,
                       style: TextStyle(
                         fontSize: 14,
-                        fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
+                        fontWeight: isSelected
+                            ? FontWeight.w700
+                            : FontWeight.w600,
                         color: cs.onSurface,
                         letterSpacing: -0.1,
                       ),
@@ -91,8 +93,13 @@ class CustomerTile extends StatelessWidget {
                     const SizedBox(height: 2),
                     Row(
                       children: [
-                        if (customer.phone != null && customer.phone!.isNotEmpty) ...[
-                          Icon(Icons.phone_rounded, size: 11, color: cs.onSurfaceVariant.withValues(alpha: 0.6)),
+                        if (customer.phone != null &&
+                            customer.phone!.isNotEmpty) ...[
+                          Icon(
+                            Icons.phone_rounded,
+                            size: 11,
+                            color: cs.onSurfaceVariant.withValues(alpha: 0.6),
+                          ),
                           const SizedBox(width: 4),
                           Text(
                             customer.phone!,
@@ -110,7 +117,10 @@ class CustomerTile extends StatelessWidget {
               if (!isLoading) ...[
                 if (debtCount > 0)
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 3,
+                    ),
                     decoration: BoxDecoration(
                       color: _hasBalance
                           ? appColors.debt.withValues(alpha: 0.1)

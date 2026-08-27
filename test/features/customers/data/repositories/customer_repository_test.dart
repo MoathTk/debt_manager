@@ -84,9 +84,7 @@ void main() {
     test('insert returns normally', () async {
       final id = _uuid.v4();
       await expectLater(
-        repo.insert(
-          Customer(id: id, name: 'Ahmed', createdAt: '2025-01-01'),
-        ),
+        repo.insert(Customer(id: id, name: 'Ahmed', createdAt: '2025-01-01')),
         returnsNormally,
       );
     });
@@ -94,7 +92,12 @@ void main() {
     test('getById returns correct customer', () async {
       final id = _uuid.v4();
       await repo.insert(
-        Customer(id: id, name: 'Sara', phone: '07801234567', createdAt: '2025-06-15'),
+        Customer(
+          id: id,
+          name: 'Sara',
+          phone: '07801234567',
+          createdAt: '2025-06-15',
+        ),
       );
       final c = await repo.getById(id);
       expect(c, isNotNull);
@@ -109,8 +112,12 @@ void main() {
 
   group('getAll', () {
     test('returns all customers ordered by created_at DESC', () async {
-      await repo.insert(Customer(id: _uuid.v4(), name: 'Oldest', createdAt: '2025-01-01'));
-      await repo.insert(Customer(id: _uuid.v4(), name: 'Newest', createdAt: '2025-06-15'));
+      await repo.insert(
+        Customer(id: _uuid.v4(), name: 'Oldest', createdAt: '2025-01-01'),
+      );
+      await repo.insert(
+        Customer(id: _uuid.v4(), name: 'Newest', createdAt: '2025-06-15'),
+      );
       final all = await repo.getAll();
       expect(all.length, 2);
       expect(all.first.name, 'Newest');
@@ -123,7 +130,9 @@ void main() {
       await repo.insert(
         Customer(id: id, name: 'OldName', createdAt: '2025-01-01'),
       );
-      await repo.update(Customer(id: id, name: 'NewName', createdAt: '2025-01-01'));
+      await repo.update(
+        Customer(id: id, name: 'NewName', createdAt: '2025-01-01'),
+      );
       final c = await repo.getById(id);
       expect(c!.name, 'NewName');
     });
@@ -142,35 +151,60 @@ void main() {
 
   group('search', () {
     test('finds by name substring', () async {
-      await repo.insert(Customer(id: _uuid.v4(), name: 'Ahmed Ali', createdAt: '2025-01-01'));
-      await repo.insert(Customer(id: _uuid.v4(), name: 'Sara Mohammed', createdAt: '2025-01-01'));
+      await repo.insert(
+        Customer(id: _uuid.v4(), name: 'Ahmed Ali', createdAt: '2025-01-01'),
+      );
+      await repo.insert(
+        Customer(
+          id: _uuid.v4(),
+          name: 'Sara Mohammed',
+          createdAt: '2025-01-01',
+        ),
+      );
       final results = await repo.search('Ahmed');
       expect(results.length, 1);
       expect(results.first.name, 'Ahmed Ali');
     });
 
     test('finds by phone substring', () async {
-      await repo.insert(Customer(id: _uuid.v4(), name: 'Test', phone: '07801234567', createdAt: '2025-01-01'));
+      await repo.insert(
+        Customer(
+          id: _uuid.v4(),
+          name: 'Test',
+          phone: '07801234567',
+          createdAt: '2025-01-01',
+        ),
+      );
       final results = await repo.search('1234');
       expect(results.length, 1);
     });
 
     test('returns empty for no match', () async {
-      await repo.insert(Customer(id: _uuid.v4(), name: 'Ali', createdAt: '2025-01-01'));
+      await repo.insert(
+        Customer(id: _uuid.v4(), name: 'Ali', createdAt: '2025-01-01'),
+      );
       expect(await repo.search('zzz'), isEmpty);
     });
 
     test('LIKE wildcard chars are escaped — no false positives', () async {
-      await repo.insert(Customer(id: _uuid.v4(), name: 'A', createdAt: '2025-01-01'));
-      await repo.insert(Customer(id: _uuid.v4(), name: 'AB', createdAt: '2025-01-01'));
+      await repo.insert(
+        Customer(id: _uuid.v4(), name: 'A', createdAt: '2025-01-01'),
+      );
+      await repo.insert(
+        Customer(id: _uuid.v4(), name: 'AB', createdAt: '2025-01-01'),
+      );
       // Search for literal '%' should not match everything
       final results = await repo.search('%');
       expect(results, isEmpty);
     });
 
     test('underscore is escaped', () async {
-      await repo.insert(Customer(id: _uuid.v4(), name: 'A_B', createdAt: '2025-01-01'));
-      await repo.insert(Customer(id: _uuid.v4(), name: 'AXB', createdAt: '2025-01-01'));
+      await repo.insert(
+        Customer(id: _uuid.v4(), name: 'A_B', createdAt: '2025-01-01'),
+      );
+      await repo.insert(
+        Customer(id: _uuid.v4(), name: 'AXB', createdAt: '2025-01-01'),
+      );
       final results = await repo.search('_');
       expect(results.length, 1);
       expect(results.first.name, 'A_B');
@@ -180,8 +214,12 @@ void main() {
   group('getCustomerCount', () {
     test('returns correct count', () async {
       expect(await repo.getCustomerCount(), 0);
-      await repo.insert(Customer(id: _uuid.v4(), name: 'A', createdAt: '2025-01-01'));
-      await repo.insert(Customer(id: _uuid.v4(), name: 'B', createdAt: '2025-01-01'));
+      await repo.insert(
+        Customer(id: _uuid.v4(), name: 'A', createdAt: '2025-01-01'),
+      );
+      await repo.insert(
+        Customer(id: _uuid.v4(), name: 'B', createdAt: '2025-01-01'),
+      );
       expect(await repo.getCustomerCount(), 2);
     });
   });

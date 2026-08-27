@@ -15,7 +15,7 @@ import 'package:local_debt_management/Providers/mutations.dart';
 import 'package:local_debt_management/features/customers/presentation/widgets/add_customer_sheet.dart';
 import '../providers/voice_command_provider.dart';
 import '../providers/voice_command_state.dart';
-import '../../../../widgets/add_debt_sheet/recording_indicator.dart';
+import 'package:local_debt_management/features/debts/presentation/widgets/add_debt_sheet/recording_indicator.dart';
 import 'add_debt_review.dart';
 import 'add_customer_review.dart';
 import 'delete_debt_review.dart';
@@ -57,7 +57,12 @@ class _VoiceCommandSheetState extends ConsumerState<VoiceCommandSheet> {
       onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
       behavior: HitTestBehavior.opaque,
       child: Padding(
-        padding: EdgeInsets.fromLTRB(16, 0, 16, MediaQuery.of(context).viewInsets.bottom + 12),
+        padding: EdgeInsets.fromLTRB(
+          16,
+          0,
+          16,
+          MediaQuery.of(context).viewInsets.bottom + 12,
+        ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -121,7 +126,12 @@ class _VoiceCommandSheetState extends ConsumerState<VoiceCommandSheet> {
           borderRadius: BorderRadius.circular(16),
           border: Border.all(color: cs.error.withValues(alpha: 0.15)),
         ),
-        child: _ErrorState(l10n: l10n, cs: cs, error: state.error, onRetry: () => notifier.reRecord()),
+        child: _ErrorState(
+          l10n: l10n,
+          cs: cs,
+          error: state.error,
+          onRetry: () => notifier.reRecord(),
+        ),
       );
     }
     if (state.isReady && state.command != null) {
@@ -187,20 +197,20 @@ class _VoiceCommandSheetState extends ConsumerState<VoiceCommandSheet> {
       );
     }
     if (state.command!.isRecordPayment) {
-        return RecordPaymentReview(
-          command: state.command!,
-          matchedCustomers: state.matchedCustomers,
-          selectedCustomer: state.selectedCustomer,
-          remainingDebts: state.remainingDebts,
-          selectedDebtId: state.selectedDebtId,
-          paymentWarning: state.paymentWarning,
-          maxPayment: state.maxPayment,
-          onCustomerSelected: (c) => notifier.selectCustomer(c),
-          onDebtSelected: (id, max) => notifier.selectDebt(id, max),
-          onAmountChanged: (a) => notifier.updateAmount(a),
-          onConfirm: () => _savePayment(notifier, l10n),
-          onReRecord: () => notifier.reRecord(),
-        );
+      return RecordPaymentReview(
+        command: state.command!,
+        matchedCustomers: state.matchedCustomers,
+        selectedCustomer: state.selectedCustomer,
+        remainingDebts: state.remainingDebts,
+        selectedDebtId: state.selectedDebtId,
+        paymentWarning: state.paymentWarning,
+        maxPayment: state.maxPayment,
+        onCustomerSelected: (c) => notifier.selectCustomer(c),
+        onDebtSelected: (id, max) => notifier.selectDebt(id, max),
+        onAmountChanged: (a) => notifier.updateAmount(a),
+        onConfirm: () => _savePayment(notifier, l10n),
+        onReRecord: () => notifier.reRecord(),
+      );
     }
     if (state.command!.isAddCustomer) {
       return AddCustomerReview(
@@ -240,7 +250,11 @@ class _VoiceCommandSheetState extends ConsumerState<VoiceCommandSheet> {
         color: cs.surfaceContainerHighest.withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(16),
       ),
-      child: _UnknownAction(l10n: l10n, cs: cs, onRetry: () => notifier.reRecord()),
+      child: _UnknownAction(
+        l10n: l10n,
+        cs: cs,
+        onRetry: () => notifier.reRecord(),
+      ),
     );
   }
 
@@ -252,10 +266,10 @@ class _VoiceCommandSheetState extends ConsumerState<VoiceCommandSheet> {
     final text = state.isTranscribing
         ? l10n.listening
         : state.isParsing
-            ? l10n.parsingVoice
-            : state.isCustomerMatching
-                ? l10n.searchCustomers
-                : '';
+        ? l10n.parsingVoice
+        : state.isCustomerMatching
+        ? l10n.searchCustomers
+        : '';
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       decoration: BoxDecoration(
@@ -268,7 +282,10 @@ class _VoiceCommandSheetState extends ConsumerState<VoiceCommandSheet> {
           SizedBox(
             width: 18,
             height: 18,
-            child: CircularProgressIndicator(strokeWidth: 2.5, color: cs.primary),
+            child: CircularProgressIndicator(
+              strokeWidth: 2.5,
+              color: cs.primary,
+            ),
           ),
           const SizedBox(width: 10),
           Text(
@@ -303,15 +320,15 @@ class _VoiceCommandSheetState extends ConsumerState<VoiceCommandSheet> {
       if (mounted) {
         notifier.reset();
         Navigator.of(context).pop();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(l10n.acceptAndSave)),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(l10n.acceptAndSave)));
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(l10n.serverError)),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(l10n.serverError)));
       }
     }
   }
@@ -326,13 +343,13 @@ class _VoiceCommandSheetState extends ConsumerState<VoiceCommandSheet> {
       if (success) {
         notifier.reset();
         Navigator.of(context).pop();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(l10n.paymentSuccess)),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(l10n.paymentSuccess)));
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(l10n.serverError)),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(l10n.serverError)));
       }
     }
   }
@@ -350,20 +367,20 @@ class _VoiceCommandSheetState extends ConsumerState<VoiceCommandSheet> {
         if (success) {
           notifier.reset();
           Navigator.of(context).pop();
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(l10n.customerCreated)),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(l10n.customerCreated)));
         } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(l10n.serverError)),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(l10n.serverError)));
         }
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(l10n.serverError)),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(l10n.serverError)));
       }
     }
   }
@@ -378,13 +395,13 @@ class _VoiceCommandSheetState extends ConsumerState<VoiceCommandSheet> {
       if (success) {
         notifier.reset();
         Navigator.of(context).pop();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(l10n.debtDeleted)),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(l10n.debtDeleted)));
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(l10n.errorSaving)),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(l10n.errorSaving)));
       }
     }
   }
@@ -435,11 +452,19 @@ class _MicArea extends StatelessWidget {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(Icons.graphic_eq_rounded, size: 18, color: cs.onSurfaceVariant),
+                Icon(
+                  Icons.graphic_eq_rounded,
+                  size: 18,
+                  color: cs.onSurfaceVariant,
+                ),
                 const SizedBox(width: 8),
                 Text(
                   l10n.speakNow,
-                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: cs.onSurfaceVariant),
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    color: cs.onSurfaceVariant,
+                  ),
                 ),
               ],
             ),
@@ -471,8 +496,22 @@ class _PulsingMic extends StatelessWidget {
         alignment: Alignment.center,
         children: [
           if (isRecording) ...[
-            Container(width: 80, height: 80, decoration: BoxDecoration(shape: BoxShape.circle, color: cs.error.withValues(alpha: 0.08))),
-            Container(width: 64, height: 64, decoration: BoxDecoration(shape: BoxShape.circle, color: cs.error.withValues(alpha: 0.15))),
+            Container(
+              width: 80,
+              height: 80,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: cs.error.withValues(alpha: 0.08),
+              ),
+            ),
+            Container(
+              width: 64,
+              height: 64,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: cs.error.withValues(alpha: 0.15),
+              ),
+            ),
           ],
           AnimatedContainer(
             duration: const Duration(milliseconds: 300),
@@ -485,15 +524,33 @@ class _PulsingMic extends StatelessWidget {
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
-              boxShadow: [BoxShadow(color: activeColor.withValues(alpha: 0.35), blurRadius: isRecording ? 20 : 12, spreadRadius: isRecording ? 4 : 1)],
+              boxShadow: [
+                BoxShadow(
+                  color: activeColor.withValues(alpha: 0.35),
+                  blurRadius: isRecording ? 20 : 12,
+                  spreadRadius: isRecording ? 4 : 1,
+                ),
+              ],
             ),
             child: IconButton(
               onPressed: isProcessing ? null : onPressed,
               icon: isProcessing
-                  ? SizedBox(width: 24, height: 24, child: CircularProgressIndicator(strokeWidth: 2.5, color: cs.onPrimary))
+                  ? SizedBox(
+                      width: 24,
+                      height: 24,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2.5,
+                        color: cs.onPrimary,
+                      ),
+                    )
                   : AnimatedSwitcher(
                       duration: const Duration(milliseconds: 200),
-                      child: Icon(isRecording ? Icons.mic : Icons.mic_none_rounded, key: ValueKey(isRecording), color: cs.onPrimary, size: 26),
+                      child: Icon(
+                        isRecording ? Icons.mic : Icons.mic_none_rounded,
+                        key: ValueKey(isRecording),
+                        color: cs.onPrimary,
+                        size: 26,
+                      ),
                     ),
             ),
           ),
@@ -545,9 +602,15 @@ class _ErrorState extends StatelessWidget {
           child: Icon(Icons.error_outline_rounded, size: 28, color: cs.error),
         ),
         const SizedBox(height: 14),
-        Text(_mapError(error, l10n),
-            textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: cs.onSurface)),
+        Text(
+          _mapError(error, l10n),
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+            color: cs.onSurface,
+          ),
+        ),
         const SizedBox(height: 16),
         SizedBox(
           width: double.infinity,
@@ -555,11 +618,16 @@ class _ErrorState extends StatelessWidget {
           child: OutlinedButton.icon(
             onPressed: onRetry,
             style: OutlinedButton.styleFrom(
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(14),
+              ),
               side: BorderSide(color: cs.error.withValues(alpha: 0.4)),
             ),
             icon: const Icon(Icons.refresh_rounded, size: 18),
-            label: Text(l10n.retry, style: const TextStyle(fontWeight: FontWeight.w600)),
+            label: Text(
+              l10n.retry,
+              style: const TextStyle(fontWeight: FontWeight.w600),
+            ),
           ),
         ),
       ],
@@ -589,12 +657,22 @@ class _UnknownAction extends StatelessWidget {
             shape: BoxShape.circle,
             color: cs.surfaceContainerHighest,
           ),
-          child: Icon(Icons.help_outline_rounded, size: 28, color: cs.onSurfaceVariant),
+          child: Icon(
+            Icons.help_outline_rounded,
+            size: 28,
+            color: cs.onSurfaceVariant,
+          ),
         ),
         const SizedBox(height: 14),
-        Text(l10n.voiceInputError,
-            textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: cs.onSurface)),
+        Text(
+          l10n.voiceInputError,
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+            color: cs.onSurface,
+          ),
+        ),
         const SizedBox(height: 16),
         SizedBox(
           width: double.infinity,
@@ -602,10 +680,15 @@ class _UnknownAction extends StatelessWidget {
           child: OutlinedButton.icon(
             onPressed: onRetry,
             style: OutlinedButton.styleFrom(
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(14),
+              ),
             ),
             icon: const Icon(Icons.mic_rounded, size: 18),
-            label: Text(l10n.reRecord, style: const TextStyle(fontWeight: FontWeight.w600)),
+            label: Text(
+              l10n.reRecord,
+              style: const TextStyle(fontWeight: FontWeight.w600),
+            ),
           ),
         ),
       ],

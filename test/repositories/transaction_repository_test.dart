@@ -2,8 +2,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:uuid/uuid.dart';
 import 'package:local_debt_management/data/database_helper.dart';
-import 'package:local_debt_management/data/models/transaction.dart' as model;
-import 'package:local_debt_management/data/repositories/transaction_repository.dart';
+import 'package:local_debt_management/features/debts/domain/entities/transaction.dart'
+    as model;
+import 'package:local_debt_management/features/debts/data/repositories/transaction_repository_impl.dart';
 
 const _uuid = Uuid();
 
@@ -72,12 +73,12 @@ Future<String> _addCustomer(var repo) async {
 }
 
 void main() {
-  late TransactionRepository repo;
+  late TransactionRepositoryImpl repo;
 
   setUp(() async {
     _cid = 0;
     await _setupDb();
-    repo = TransactionRepository();
+    repo = TransactionRepositoryImpl();
   });
 
   tearDown(() async {
@@ -85,19 +86,41 @@ void main() {
     await db.close();
   });
 
-  Future<String> insertDebt(String custId, double amount, {String date = '2025-06-01'}) async {
+  Future<String> insertDebt(
+    String custId,
+    double amount, {
+    String date = '2025-06-01',
+  }) async {
     final id = _uuid.v4();
-    await repo.insert(model.Transaction(
-      id: id, customerId: custId, amount: amount, type: model.Transaction.debt, date: date,
-    ));
+    await repo.insert(
+      model.Transaction(
+        id: id,
+        customerId: custId,
+        amount: amount,
+        type: model.Transaction.debt,
+        date: date,
+      ),
+    );
     return id;
   }
 
-  Future<String> insertPayment(String custId, double amount, {String? debtId, String date = '2025-06-01'}) async {
+  Future<String> insertPayment(
+    String custId,
+    double amount, {
+    String? debtId,
+    String date = '2025-06-01',
+  }) async {
     final id = _uuid.v4();
-    await repo.insert(model.Transaction(
-      id: id, customerId: custId, amount: amount, type: model.Transaction.payment, date: date, debtId: debtId,
-    ));
+    await repo.insert(
+      model.Transaction(
+        id: id,
+        customerId: custId,
+        amount: amount,
+        type: model.Transaction.payment,
+        date: date,
+        debtId: debtId,
+      ),
+    );
     return id;
   }
 
@@ -235,13 +258,19 @@ void main() {
       await insertDebt(cid, 100, date: '2025-06-01');
       await insertDebt(cid, 200, date: '2025-07-01');
       await insertPayment(cid, 50, date: '2025-06-15');
-      final totals = await repo.getTotalsByDateRange('2025-06-01', '2025-06-30');
+      final totals = await repo.getTotalsByDateRange(
+        '2025-06-01',
+        '2025-06-30',
+      );
       expect(totals['debts'], 100);
       expect(totals['payments'], 50);
     });
 
     test('returns 0 for empty range', () async {
-      final totals = await repo.getTotalsByDateRange('2030-01-01', '2030-12-31');
+      final totals = await repo.getTotalsByDateRange(
+        '2030-01-01',
+        '2030-12-31',
+      );
       expect(totals['debts'], 0.0);
       expect(totals['payments'], 0.0);
     });

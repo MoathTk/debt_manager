@@ -14,9 +14,9 @@ import 'package:local_debt_management/core/theme/app_colors.dart';
 import 'package:local_debt_management/l10n/app_localizations.dart';
 import 'package:local_debt_management/features/customers/domain/entities/customer.dart';
 import 'package:local_debt_management/features/customers/presentation/screens/customer_detail_screen.dart';
-import 'package:local_debt_management/widgets/balance_card.dart';
-import 'package:local_debt_management/widgets/debt_selector_tile.dart';
-import 'package:local_debt_management/widgets/amount_input_formatter.dart';
+import 'package:local_debt_management/features/debts/presentation/widgets/balance_card.dart';
+import 'package:local_debt_management/features/debts/presentation/widgets/debt_selector_tile.dart';
+import 'package:local_debt_management/features/debts/presentation/widgets/amount_input_formatter.dart';
 import 'customer_match_chip.dart';
 
 class ViewBalanceReview extends StatefulWidget {
@@ -190,32 +190,27 @@ class _BalanceSection extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 6),
-          ...debts!.map(
-            (d) {
-              final id = d['id'] as String;
-              final remaining = (d['remaining'] as num).toDouble();
-              return DebtSelectorTile(
-                id: id,
-                amount: (d['amount'] as num).toDouble(),
-                remaining: remaining,
-                note: d['note'] as String?,
-                date: d['date'] as String?,
-                isSelected: selectedId == id,
-                onTap: onDebtSelected != null
-                    ? () => onDebtSelected!(id, remaining)
-                    : () {},
-              );
-            },
-          ),
+          ...debts!.map((d) {
+            final id = d['id'] as String;
+            final remaining = (d['remaining'] as num).toDouble();
+            return DebtSelectorTile(
+              id: id,
+              amount: (d['amount'] as num).toDouble(),
+              remaining: remaining,
+              note: d['note'] as String?,
+              date: d['date'] as String?,
+              isSelected: selectedId == id,
+              onTap: onDebtSelected != null
+                  ? () => onDebtSelected!(id, remaining)
+                  : () {},
+            );
+          }),
         ],
         if (debts != null && debts!.isEmpty) ...[
           const SizedBox(height: 8),
           Text(
             l10n.noOutstandingDebts,
-            style: TextStyle(
-              fontSize: 13,
-              color: cs.onSurfaceVariant,
-            ),
+            style: TextStyle(fontSize: 13, color: cs.onSurfaceVariant),
           ),
         ],
       ],
@@ -259,7 +254,8 @@ class _InlinePaymentState extends ConsumerState<_InlinePayment> {
   @override
   void didUpdateWidget(covariant _InlinePayment oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.maxPayment != oldWidget.maxPayment && widget.maxPayment != null) {
+    if (widget.maxPayment != oldWidget.maxPayment &&
+        widget.maxPayment != null) {
       final text = formatAmount(widget.maxPayment!);
       _controller.text = text;
       _controller.selection = TextSelection.collapsed(offset: text.length);
@@ -301,8 +297,7 @@ class _InlinePaymentState extends ConsumerState<_InlinePayment> {
                 : null,
             suffixIconConstraints: const BoxConstraints(maxWidth: 120),
             filled: true,
-            fillColor:
-                widget.cs.surfaceContainerHighest.withValues(alpha: 0.4),
+            fillColor: widget.cs.surfaceContainerHighest.withValues(alpha: 0.4),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
               borderSide: BorderSide.none,
@@ -311,8 +306,10 @@ class _InlinePaymentState extends ConsumerState<_InlinePayment> {
               borderRadius: BorderRadius.circular(16),
               borderSide: BorderSide(color: widget.cs.primary, width: 2),
             ),
-            contentPadding:
-                const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 18,
+              vertical: 18,
+            ),
           ),
           onChanged: (v) => widget.onAmountChanged?.call(parseAmount(v) ?? 0),
         ),

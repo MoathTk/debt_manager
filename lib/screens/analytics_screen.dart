@@ -5,7 +5,7 @@ import '../Providers/database_provider.dart';
 import '../Providers/mutations.dart';
 import '../widgets/collection_progress_ring.dart';
 import '../widgets/time_range_selector.dart';
-import '../widgets/debt_payment_ratio_chart.dart';
+import 'package:local_debt_management/features/debts/presentation/widgets/debt_payment_ratio_chart.dart';
 import '../widgets/top_debtors_chart.dart';
 import '../widgets/period_totals_section.dart';
 
@@ -22,8 +22,10 @@ class _AnalyticsState extends ConsumerState<AnalyticsScreen> {
     final l10n = AppLocalizations.of(context)!;
     final statsAsync = ref.watch(dashboardStatsProvider);
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.analytics),backgroundColor: Colors.transparent,
-      elevation: 0,
+      appBar: AppBar(
+        title: Text(l10n.analytics),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(1),
           child: Container(
@@ -33,7 +35,8 @@ class _AnalyticsState extends ConsumerState<AnalyticsScreen> {
               context,
             ).colorScheme.outlineVariant.withValues(alpha: 0.4),
           ),
-        ),),
+        ),
+      ),
       body: statsAsync.when(
         data: (s) => _body(l10n, s),
         loading: () => const Center(child: CircularProgressIndicator()),

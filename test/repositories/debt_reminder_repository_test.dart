@@ -63,7 +63,11 @@ Future<String> _addCustomer() async {
   _cid++;
   final id = _uuid.v4();
   final db = await DatabaseHelper.instance.database;
-  await db.insert('customers', {'id': id, 'name': 'C$_cid', 'created_at': '2025-01-01'});
+  await db.insert('customers', {
+    'id': id,
+    'name': 'C$_cid',
+    'created_at': '2025-01-01',
+  });
   return id;
 }
 
@@ -85,7 +89,11 @@ void main() {
     test('insert returns valid id', () async {
       final cid = await _addCustomer();
       final id = await repo.insert(
-        DebtReminder(id: _uuid.v4(), customerId: cid, reminderDate: '2025-06-01'),
+        DebtReminder(
+          id: _uuid.v4(),
+          customerId: cid,
+          reminderDate: '2025-06-01',
+        ),
       );
       expect(id, greaterThan(0));
     });
@@ -94,7 +102,12 @@ void main() {
       final cid = await _addCustomer();
       final uuid = _uuid.v4();
       await repo.insert(
-        DebtReminder(id: uuid, customerId: cid, reminderDate: '2025-06-01', message: 'test'),
+        DebtReminder(
+          id: uuid,
+          customerId: cid,
+          reminderDate: '2025-06-01',
+          message: 'test',
+        ),
       );
       final r = await repo.getById(uuid);
       expect(r, isNotNull);
@@ -110,8 +123,20 @@ void main() {
   group('getAll', () {
     test('returns all ordered by reminder_date ASC', () async {
       final cid = await _addCustomer();
-      await repo.insert(DebtReminder(id: _uuid.v4(), customerId: cid, reminderDate: '2025-07-01'));
-      await repo.insert(DebtReminder(id: _uuid.v4(), customerId: cid, reminderDate: '2025-06-01'));
+      await repo.insert(
+        DebtReminder(
+          id: _uuid.v4(),
+          customerId: cid,
+          reminderDate: '2025-07-01',
+        ),
+      );
+      await repo.insert(
+        DebtReminder(
+          id: _uuid.v4(),
+          customerId: cid,
+          reminderDate: '2025-06-01',
+        ),
+      );
       final all = await repo.getAll();
       expect(all.length, 2);
       expect(all.first.reminderDate, '2025-06-01');
@@ -122,8 +147,20 @@ void main() {
     test('returns only reminders for given customer', () async {
       final cid1 = await _addCustomer();
       final cid2 = await _addCustomer();
-      await repo.insert(DebtReminder(id: _uuid.v4(), customerId: cid1, reminderDate: '2025-06-01'));
-      await repo.insert(DebtReminder(id: _uuid.v4(), customerId: cid2, reminderDate: '2025-06-01'));
+      await repo.insert(
+        DebtReminder(
+          id: _uuid.v4(),
+          customerId: cid1,
+          reminderDate: '2025-06-01',
+        ),
+      );
+      await repo.insert(
+        DebtReminder(
+          id: _uuid.v4(),
+          customerId: cid2,
+          reminderDate: '2025-06-01',
+        ),
+      );
       final results = await repo.getByCustomer(cid1);
       expect(results.length, 1);
     });
@@ -132,16 +169,44 @@ void main() {
   group('getPending & getCompleted', () {
     test('getPending returns only uncompleted', () async {
       final cid = await _addCustomer();
-      await repo.insert(DebtReminder(id: _uuid.v4(), customerId: cid, reminderDate: '2025-06-01', isCompleted: 0));
-      await repo.insert(DebtReminder(id: _uuid.v4(), customerId: cid, reminderDate: '2025-06-02', isCompleted: 1));
+      await repo.insert(
+        DebtReminder(
+          id: _uuid.v4(),
+          customerId: cid,
+          reminderDate: '2025-06-01',
+          isCompleted: 0,
+        ),
+      );
+      await repo.insert(
+        DebtReminder(
+          id: _uuid.v4(),
+          customerId: cid,
+          reminderDate: '2025-06-02',
+          isCompleted: 1,
+        ),
+      );
       final pending = await repo.getPending();
       expect(pending.length, 1);
     });
 
     test('getCompleted returns only completed', () async {
       final cid = await _addCustomer();
-      await repo.insert(DebtReminder(id: _uuid.v4(), customerId: cid, reminderDate: '2025-06-01', isCompleted: 0));
-      await repo.insert(DebtReminder(id: _uuid.v4(), customerId: cid, reminderDate: '2025-06-02', isCompleted: 1));
+      await repo.insert(
+        DebtReminder(
+          id: _uuid.v4(),
+          customerId: cid,
+          reminderDate: '2025-06-01',
+          isCompleted: 0,
+        ),
+      );
+      await repo.insert(
+        DebtReminder(
+          id: _uuid.v4(),
+          customerId: cid,
+          reminderDate: '2025-06-02',
+          isCompleted: 1,
+        ),
+      );
       final completed = await repo.getCompleted();
       expect(completed.length, 1);
     });
@@ -163,7 +228,12 @@ void main() {
       final cid = await _addCustomer();
       final uuid = _uuid.v4();
       await repo.insert(
-        DebtReminder(id: uuid, customerId: cid, reminderDate: '2025-06-01', isCompleted: 1),
+        DebtReminder(
+          id: uuid,
+          customerId: cid,
+          reminderDate: '2025-06-01',
+          isCompleted: 1,
+        ),
       );
       await repo.markPending(uuid);
       final r = await repo.getById(uuid);
@@ -174,24 +244,61 @@ void main() {
   group('getDueToday', () {
     test('returns reminders due on or before the given date', () async {
       final cid = await _addCustomer();
-      await repo.insert(DebtReminder(id: _uuid.v4(), customerId: cid, reminderDate: '2025-06-01'));
-      await repo.insert(DebtReminder(id: _uuid.v4(), customerId: cid, reminderDate: '2025-06-15'));
-      await repo.insert(DebtReminder(id: _uuid.v4(), customerId: cid, reminderDate: '2025-06-30'));
+      await repo.insert(
+        DebtReminder(
+          id: _uuid.v4(),
+          customerId: cid,
+          reminderDate: '2025-06-01',
+        ),
+      );
+      await repo.insert(
+        DebtReminder(
+          id: _uuid.v4(),
+          customerId: cid,
+          reminderDate: '2025-06-15',
+        ),
+      );
+      await repo.insert(
+        DebtReminder(
+          id: _uuid.v4(),
+          customerId: cid,
+          reminderDate: '2025-06-30',
+        ),
+      );
       final due = await repo.getDueToday(date: '2025-06-15');
       expect(due.length, 2);
     });
 
     test('excludes completed reminders', () async {
       final cid = await _addCustomer();
-      await repo.insert(DebtReminder(id: _uuid.v4(), customerId: cid, reminderDate: '2025-06-01'));
-      await repo.insert(DebtReminder(id: _uuid.v4(), customerId: cid, reminderDate: '2025-06-01', isCompleted: 1));
+      await repo.insert(
+        DebtReminder(
+          id: _uuid.v4(),
+          customerId: cid,
+          reminderDate: '2025-06-01',
+        ),
+      );
+      await repo.insert(
+        DebtReminder(
+          id: _uuid.v4(),
+          customerId: cid,
+          reminderDate: '2025-06-01',
+          isCompleted: 1,
+        ),
+      );
       final due = await repo.getDueToday(date: '2025-06-15');
       expect(due.length, 1);
     });
 
     test('returns empty when no reminders due', () async {
       final cid = await _addCustomer();
-      await repo.insert(DebtReminder(id: _uuid.v4(), customerId: cid, reminderDate: '2025-12-31'));
+      await repo.insert(
+        DebtReminder(
+          id: _uuid.v4(),
+          customerId: cid,
+          reminderDate: '2025-12-31',
+        ),
+      );
       final due = await repo.getDueToday(date: '2025-06-01');
       expect(due, isEmpty);
     });
@@ -200,8 +307,21 @@ void main() {
   group('getPendingCount', () {
     test('counts only pending', () async {
       final cid = await _addCustomer();
-      await repo.insert(DebtReminder(id: _uuid.v4(), customerId: cid, reminderDate: '2025-06-01'));
-      await repo.insert(DebtReminder(id: _uuid.v4(), customerId: cid, reminderDate: '2025-06-01', isCompleted: 1));
+      await repo.insert(
+        DebtReminder(
+          id: _uuid.v4(),
+          customerId: cid,
+          reminderDate: '2025-06-01',
+        ),
+      );
+      await repo.insert(
+        DebtReminder(
+          id: _uuid.v4(),
+          customerId: cid,
+          reminderDate: '2025-06-01',
+          isCompleted: 1,
+        ),
+      );
       expect(await repo.getPendingCount(), 1);
     });
   });
@@ -211,8 +331,12 @@ void main() {
       final cid = await _addCustomer();
       final id1 = _uuid.v4();
       final id2 = _uuid.v4();
-      await repo.insert(DebtReminder(id: id1, customerId: cid, reminderDate: '2025-06-01'));
-      await repo.insert(DebtReminder(id: id2, customerId: cid, reminderDate: '2025-06-02'));
+      await repo.insert(
+        DebtReminder(id: id1, customerId: cid, reminderDate: '2025-06-01'),
+      );
+      await repo.insert(
+        DebtReminder(id: id2, customerId: cid, reminderDate: '2025-06-02'),
+      );
       await repo.deleteBatch([id1, id2]);
       expect(await repo.getById(id1), null);
       expect(await repo.getById(id2), null);
@@ -231,15 +355,42 @@ void main() {
       final txId2 = _uuid.v4();
       await db.insert('transactions', {
         'id': txId1,
-        'customer_id': cid, 'amount': 100, 'type': 0, 'date': '2025-06-01',
+        'customer_id': cid,
+        'amount': 100,
+        'type': 0,
+        'date': '2025-06-01',
       });
       await db.insert('transactions', {
         'id': txId2,
-        'customer_id': cid, 'amount': 200, 'type': 0, 'date': '2025-06-02',
+        'customer_id': cid,
+        'amount': 200,
+        'type': 0,
+        'date': '2025-06-02',
       });
-      await repo.insert(DebtReminder(id: _uuid.v4(), customerId: cid, debtId: txId1, reminderDate: '2025-06-01'));
-      await repo.insert(DebtReminder(id: _uuid.v4(), customerId: cid, debtId: txId1, reminderDate: '2025-07-01'));
-      await repo.insert(DebtReminder(id: _uuid.v4(), customerId: cid, debtId: txId2, reminderDate: '2025-06-01'));
+      await repo.insert(
+        DebtReminder(
+          id: _uuid.v4(),
+          customerId: cid,
+          debtId: txId1,
+          reminderDate: '2025-06-01',
+        ),
+      );
+      await repo.insert(
+        DebtReminder(
+          id: _uuid.v4(),
+          customerId: cid,
+          debtId: txId1,
+          reminderDate: '2025-07-01',
+        ),
+      );
+      await repo.insert(
+        DebtReminder(
+          id: _uuid.v4(),
+          customerId: cid,
+          debtId: txId2,
+          reminderDate: '2025-06-01',
+        ),
+      );
       await repo.deleteByDebtId(txId1);
       final remaining = await repo.getAll();
       expect(remaining.length, 1);

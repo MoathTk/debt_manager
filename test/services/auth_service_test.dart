@@ -14,26 +14,26 @@ void _mockSecureStorageChannel() {
   TestWidgetsFlutterBinding.ensureInitialized();
   TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
       .setMockMethodCallHandler(channel, (call) async {
-    switch (call.method) {
-      case 'read':
-        return _secureStorage[call.arguments['key']];
-      case 'write':
-        _secureStorage[call.arguments['key']] = call.arguments['value'];
-        return true;
-      case 'delete':
-        _secureStorage.remove(call.arguments['key']);
-        return true;
-      case 'deleteAll':
-        _secureStorage.clear();
-        return true;
-      case 'containsKey':
-        return _secureStorage.containsKey(call.arguments['key']);
-      case 'readAll':
-        return Map<String, String>.from(_secureStorage);
-      default:
-        return null;
-    }
-  });
+        switch (call.method) {
+          case 'read':
+            return _secureStorage[call.arguments['key']];
+          case 'write':
+            _secureStorage[call.arguments['key']] = call.arguments['value'];
+            return true;
+          case 'delete':
+            _secureStorage.remove(call.arguments['key']);
+            return true;
+          case 'deleteAll':
+            _secureStorage.clear();
+            return true;
+          case 'containsKey':
+            return _secureStorage.containsKey(call.arguments['key']);
+          case 'readAll':
+            return Map<String, String>.from(_secureStorage);
+          default:
+            return null;
+        }
+      });
 }
 
 void main() {

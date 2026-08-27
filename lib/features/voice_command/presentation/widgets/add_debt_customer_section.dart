@@ -59,11 +59,7 @@ class CustomerSection extends StatelessWidget {
             onAddCustomer: onAddCustomer,
           )
         else
-          AddCustomerOnly(
-            l10n: l10n,
-            cs: cs,
-            onAddCustomer: onAddCustomer,
-          ),
+          AddCustomerOnly(l10n: l10n, cs: cs, onAddCustomer: onAddCustomer),
       ],
     );
   }

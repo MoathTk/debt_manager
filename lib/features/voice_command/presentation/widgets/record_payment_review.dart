@@ -12,8 +12,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:local_debt_management/core/theme/app_colors.dart';
 import 'package:local_debt_management/l10n/app_localizations.dart';
 import 'package:local_debt_management/features/customers/domain/entities/customer.dart';
-import 'package:local_debt_management/widgets/debt_selector_tile.dart';
-import 'package:local_debt_management/widgets/amount_input_formatter.dart';
+import 'package:local_debt_management/features/debts/presentation/widgets/debt_selector_tile.dart';
+import 'package:local_debt_management/features/debts/presentation/widgets/amount_input_formatter.dart';
 import '../../domain/entities/voice_command.dart';
 import '../providers/voice_command_provider.dart';
 import 'customer_match_chip.dart';
@@ -85,14 +85,25 @@ class RecordPaymentReview extends StatelessWidget {
           ],
           if (selectedDebtId != null) ...[
             const SizedBox(height: 10),
-            _AmountRow(l10n: l10n, cs: cs, amount: command.totalAmount, maxAmount: maxPayment, onChanged: onAmountChanged),
+            _AmountRow(
+              l10n: l10n,
+              cs: cs,
+              amount: command.totalAmount,
+              maxAmount: maxPayment,
+              onChanged: onAmountChanged,
+            ),
             if (paymentWarning != null) ...[
               const SizedBox(height: 8),
               _PaymentWarning(l10n: l10n, cs: cs, maxAmount: maxPayment),
             ],
           ],
           const SizedBox(height: 12),
-          _Actions(l10n: l10n, onReRecord: onReRecord, onConfirm: onConfirm, enabled: selectedDebtId != null && command.totalAmount > 0),
+          _Actions(
+            l10n: l10n,
+            onReRecord: onReRecord,
+            onConfirm: onConfirm,
+            enabled: selectedDebtId != null && command.totalAmount > 0,
+          ),
         ],
       ),
     );
@@ -277,15 +288,31 @@ class _AmountRowState extends ConsumerState<_AmountRow> {
         suffixIcon: widget.maxAmount != null
             ? Padding(
                 padding: const EdgeInsets.only(right: 14),
-                child: Text('${widget.l10n.remaining}: ${widget.maxAmount!.toInt()}', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: cs.onSurfaceVariant)),
+                child: Text(
+                  '${widget.l10n.remaining}: ${widget.maxAmount!.toInt()}',
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: cs.onSurfaceVariant,
+                  ),
+                ),
               )
             : null,
         suffixIconConstraints: const BoxConstraints(maxWidth: 120),
         filled: true,
         fillColor: cs.surfaceContainerHighest.withValues(alpha: 0.4),
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
-        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide(color: cs.primary, width: 2)),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: BorderSide.none,
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: BorderSide(color: cs.primary, width: 2),
+        ),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 18,
+          vertical: 18,
+        ),
       ),
       onChanged: (v) => widget.onChanged(parseAmount(v) ?? 0),
     );
@@ -354,7 +381,9 @@ class _Actions extends StatelessWidget {
           child: OutlinedButton.icon(
             onPressed: onReRecord,
             style: OutlinedButton.styleFrom(
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
               side: BorderSide(
                 color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
               ),
@@ -379,9 +408,13 @@ class _Actions extends StatelessWidget {
               foregroundColor: enabled
                   ? theme.colorScheme.onPrimary
                   : theme.colorScheme.onSurfaceVariant,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
               elevation: enabled ? 2 : 0,
-              shadowColor: enabled ? theme.colorScheme.primary.withValues(alpha: 0.4) : null,
+              shadowColor: enabled
+                  ? theme.colorScheme.primary.withValues(alpha: 0.4)
+                  : null,
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -389,7 +422,9 @@ class _Actions extends StatelessWidget {
                 Icon(
                   Icons.check_circle_rounded,
                   size: 22,
-                  color: enabled ? theme.colorScheme.onPrimary : theme.colorScheme.onSurfaceVariant,
+                  color: enabled
+                      ? theme.colorScheme.onPrimary
+                      : theme.colorScheme.onSurfaceVariant,
                 ),
                 const SizedBox(width: 8),
                 Text(
@@ -398,7 +433,9 @@ class _Actions extends StatelessWidget {
                     fontSize: 17,
                     fontWeight: FontWeight.w700,
                     letterSpacing: 0.3,
-                    color: enabled ? theme.colorScheme.onPrimary : theme.colorScheme.onSurfaceVariant,
+                    color: enabled
+                        ? theme.colorScheme.onPrimary
+                        : theme.colorScheme.onSurfaceVariant,
                   ),
                 ),
               ],

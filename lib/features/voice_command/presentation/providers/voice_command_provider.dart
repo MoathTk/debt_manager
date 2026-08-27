@@ -26,20 +26,24 @@ import '../../../../Providers/mutations.dart';
 import 'package:local_debt_management/features/customers/domain/entities/customer.dart';
 import 'package:local_debt_management/features/customers/domain/repositories/customer_repository.dart';
 import 'package:local_debt_management/features/customers/presentation/providers/customer_actions.dart';
-import '../../../../data/repositories/transaction_repository.dart';
+import 'package:local_debt_management/features/debts/domain/repositories/transaction_repository.dart';
 
 final voiceCommandProvider =
-    StateNotifierProvider.autoDispose<VoiceCommandNotifier, VoiceCommandState>(
-  (ref) {
-    final datasource = voice_entry.AiParsingDatasource(
-      apiKey: const String.fromEnvironment('OPENAI_API_KEY'),
-    );
-    final repo = VoiceCommandRepositoryImpl(datasource);
-    final customerRepo = ref.read(customerRepositoryProvider);
-    final txRepo = ref.read(transactionRepositoryProvider);
-    return VoiceCommandNotifier(ProcessVoiceCommand(repo), customerRepo, txRepo);
-  },
-);
+    StateNotifierProvider.autoDispose<VoiceCommandNotifier, VoiceCommandState>((
+      ref,
+    ) {
+      final datasource = voice_entry.AiParsingDatasource(
+        apiKey: const String.fromEnvironment('OPENAI_API_KEY'),
+      );
+      final repo = VoiceCommandRepositoryImpl(datasource);
+      final customerRepo = ref.read(customerRepositoryProvider);
+      final txRepo = ref.read(transactionRepositoryProvider);
+      return VoiceCommandNotifier(
+        ProcessVoiceCommand(repo),
+        customerRepo,
+        txRepo,
+      );
+    });
 
 class VoiceCommandNotifier extends StateNotifier<VoiceCommandState> {
   final ProcessVoiceCommand _processCommand;
@@ -49,7 +53,7 @@ class VoiceCommandNotifier extends StateNotifier<VoiceCommandState> {
   StreamSubscription<Amplitude>? _ampSub;
 
   VoiceCommandNotifier(this._processCommand, this._customerRepo, this._txRepo)
-      : super(const VoiceCommandState());
+    : super(const VoiceCommandState());
 
   // ---------------------------------------------------------------------------
   // RECORDING
@@ -118,10 +122,10 @@ class VoiceCommandNotifier extends StateNotifier<VoiceCommandState> {
     _ampSub = _recorder
         .onAmplitudeChanged(const Duration(milliseconds: 200))
         .listen((amp) {
-      if (!mounted || !state.isRecording) return;
-      final normalized = pow(10, amp.current / 20).clamp(0.0, 1.0);
-      state = state.copyWith(soundLevel: normalized.toDouble());
-    });
+          if (!mounted || !state.isRecording) return;
+          final normalized = pow(10, amp.current / 20).clamp(0.0, 1.0);
+          state = state.copyWith(soundLevel: normalized.toDouble());
+        });
   }
 
   Future<void> stopRecording() async {
@@ -245,7 +249,9 @@ class VoiceCommandNotifier extends StateNotifier<VoiceCommandState> {
           selectedCustomer: results.first,
           command: command.copyWith(customerId: results.first.id),
         );
-        if (command.isRecordPayment || command.isViewBalance || command.isDeleteDebt) {
+        if (command.isRecordPayment ||
+            command.isViewBalance ||
+            command.isDeleteDebt) {
           await _fetchRemainingDebts(results.first.id);
         }
         if (command.isViewBalance || command.isViewHistory) {
@@ -452,11 +458,7 @@ class VoiceCommandNotifier extends StateNotifier<VoiceCommandState> {
     state = state.copyWith(status: VoiceCommandStatus.saving);
 
     try {
-      await deleteDebt(
-        container,
-        state.selectedDebtId!,
-        cmd.customerId!,
-      );
+      await deleteDebt(container, state.selectedDebtId!, cmd.customerId!);
       if (mounted) {
         state = state.copyWith(saveSuccess: true);
       }

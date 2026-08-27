@@ -34,7 +34,11 @@ class SearchField extends StatelessWidget {
         prefixIcon: Icon(Icons.search_rounded, color: cs.onSurfaceVariant),
         suffixIcon: ctrl.text.isNotEmpty
             ? IconButton(
-                icon: Icon(Icons.close_rounded, size: 18, color: cs.onSurfaceVariant),
+                icon: Icon(
+                  Icons.close_rounded,
+                  size: 18,
+                  color: cs.onSurfaceVariant,
+                ),
                 onPressed: () {
                   ctrl.clear();
                   onChanged('');
@@ -51,7 +55,10 @@ class SearchField extends StatelessWidget {
           borderRadius: BorderRadius.circular(14),
           borderSide: BorderSide(color: cs.primary, width: 1.5),
         ),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 14,
+        ),
       ),
     );
   }

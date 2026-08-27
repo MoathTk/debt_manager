@@ -6,7 +6,7 @@ library;
 import 'package:flutter/material.dart';
 import 'package:local_debt_management/core/theme/app_colors.dart';
 import 'package:local_debt_management/l10n/app_localizations.dart';
-import 'package:local_debt_management/widgets/amount_input_formatter.dart';
+import 'package:local_debt_management/features/debts/presentation/widgets/amount_input_formatter.dart';
 import '../../domain/entities/voice_command.dart';
 
 class ItemsHeader extends StatelessWidget {

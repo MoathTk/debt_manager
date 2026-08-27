@@ -77,18 +77,34 @@ void main() {
     test('customers table has correct columns', () async {
       final cols = await db.rawQuery('PRAGMA table_info(customers)');
       final names = cols.map((c) => c['name'] as String).toSet();
-      expect(names, containsAll([
-        'id', 'name', 'phone', 'created_at',
-        'owner_id', 'is_synced', 'is_deleted', 'updated_at',
-      ]));
+      expect(
+        names,
+        containsAll([
+          'id',
+          'name',
+          'phone',
+          'created_at',
+          'owner_id',
+          'is_synced',
+          'is_deleted',
+          'updated_at',
+        ]),
+      );
     });
 
     test('transactions table has correct columns', () async {
       final cols = await db.rawQuery('PRAGMA table_info(transactions)');
       final names = cols.map((c) => c['name'] as String).toSet();
-      expect(names, containsAll([
-        'debt_id', 'owner_id', 'is_synced', 'is_deleted', 'updated_at',
-      ]));
+      expect(
+        names,
+        containsAll([
+          'debt_id',
+          'owner_id',
+          'is_synced',
+          'is_deleted',
+          'updated_at',
+        ]),
+      );
     });
 
     test('debt_reminders table has debt_id column', () async {
@@ -107,14 +123,21 @@ void main() {
     test('foreign keys enforce cascade on delete', () async {
       final cid = 'test-cust-1';
       await db.insert('customers', {
-        'id': cid, 'name': 'Test', 'created_at': '2025-01-01',
+        'id': cid,
+        'name': 'Test',
+        'created_at': '2025-01-01',
       });
       await db.insert('transactions', {
-        'id': 'tx-1', 'customer_id': cid, 'amount': 100,
-        'type': 0, 'date': '2025-01-01',
+        'id': 'tx-1',
+        'customer_id': cid,
+        'amount': 100,
+        'type': 0,
+        'date': '2025-01-01',
       });
       await db.insert('debt_reminders', {
-        'id': 'rem-1', 'customer_id': cid, 'reminder_date': '2025-06-01',
+        'id': 'rem-1',
+        'customer_id': cid,
+        'reminder_date': '2025-06-01',
       });
       await db.delete('customers', where: 'id = ?', whereArgs: [cid]);
       final rem = await db.query('debt_reminders');
@@ -124,27 +147,42 @@ void main() {
     test('inserting reminder with debt_id succeeds', () async {
       final cid = 'cust-1';
       await db.insert('customers', {
-        'id': cid, 'name': 'Test', 'created_at': '2025-01-01',
+        'id': cid,
+        'name': 'Test',
+        'created_at': '2025-01-01',
       });
       await db.insert('transactions', {
-        'id': 'tx-1', 'customer_id': cid, 'amount': 100,
-        'type': 0, 'date': '2025-01-01',
+        'id': 'tx-1',
+        'customer_id': cid,
+        'amount': 100,
+        'type': 0,
+        'date': '2025-01-01',
       });
       await db.insert('debt_reminders', {
-        'id': 'rem-1', 'customer_id': cid, 'debt_id': 'tx-1',
+        'id': 'rem-1',
+        'customer_id': cid,
+        'debt_id': 'tx-1',
         'reminder_date': '2025-06-01',
       });
-      final rows = await db.query('debt_reminders', where: 'debt_id = ?', whereArgs: ['tx-1']);
+      final rows = await db.query(
+        'debt_reminders',
+        where: 'debt_id = ?',
+        whereArgs: ['tx-1'],
+      );
       expect(rows.length, 1);
     });
 
     test('inserting reminder without debt_id (null) succeeds', () async {
       final cid = 'cust-2';
       await db.insert('customers', {
-        'id': cid, 'name': 'Test', 'created_at': '2025-01-01',
+        'id': cid,
+        'name': 'Test',
+        'created_at': '2025-01-01',
       });
       await db.insert('debt_reminders', {
-        'id': 'rem-2', 'customer_id': cid, 'reminder_date': '2025-06-01',
+        'id': 'rem-2',
+        'customer_id': cid,
+        'reminder_date': '2025-06-01',
       });
       final rows = await db.query('debt_reminders');
       expect(rows.length, 1);

@@ -4,23 +4,34 @@ import 'package:local_debt_management/data/models/debt_reminder.dart';
 void main() {
   group('DebtReminder', () {
     test('default isCompleted = 0', () {
-      final r = DebtReminder(id: 'uuid-d1', customerId: 'c1', reminderDate: '2025-01-01');
+      final r = DebtReminder(
+        id: 'uuid-d1',
+        customerId: 'c1',
+        reminderDate: '2025-01-01',
+      );
       expect(r.isCompleted, 0);
       expect(r.completed, false);
     });
 
     test('completed getter returns true when isCompleted=1', () {
       final r = DebtReminder(
-        id: 'uuid-d2', customerId: 'c1', reminderDate: '2025-01-01', isCompleted: 1,
+        id: 'uuid-d2',
+        customerId: 'c1',
+        reminderDate: '2025-01-01',
+        isCompleted: 1,
       );
       expect(r.completed, true);
     });
 
     test('toMap includes all fields', () {
       final r = DebtReminder(
-        id: 'uuid-7', customerId: 'c3', debtId: 'd12',
-        reminderDate: '2025-06-20', isCompleted: 1,
-        message: 'follow up', ownerId: 'user-1',
+        id: 'uuid-7',
+        customerId: 'c3',
+        debtId: 'd12',
+        reminderDate: '2025-06-20',
+        isCompleted: 1,
+        message: 'follow up',
+        ownerId: 'user-1',
       );
       final map = r.toMap();
       expect(map['id'], 'uuid-7');
@@ -33,7 +44,11 @@ void main() {
     });
 
     test('toMap null optional fields', () {
-      final r = DebtReminder(id: 'uuid-d3', customerId: 'c1', reminderDate: '2025-01-01');
+      final r = DebtReminder(
+        id: 'uuid-d3',
+        customerId: 'c1',
+        reminderDate: '2025-01-01',
+      );
       final map = r.toMap();
       expect(map['id'], 'uuid-d3');
       expect(map['debt_id'], null);
@@ -42,9 +57,13 @@ void main() {
 
     test('fromMap round-trip', () {
       final original = DebtReminder(
-        id: 'uuid-2', customerId: 'c5', debtId: 'd8',
-        reminderDate: '2025-09-01', isCompleted: 1,
-        message: 'test', ownerId: 'user-2',
+        id: 'uuid-2',
+        customerId: 'c5',
+        debtId: 'd8',
+        reminderDate: '2025-09-01',
+        isCompleted: 1,
+        message: 'test',
+        ownerId: 'user-2',
       );
       final restored = DebtReminder.fromMap(original.toMap());
       expect(restored.id, original.id);
@@ -58,8 +77,10 @@ void main() {
 
     test('fromMap handles missing is_completed (defaults to 0)', () {
       final map = {
-        'id': 'uuid-1', 'customer_id': 'c1',
-        'debt_id': null, 'reminder_date': '2025-01-01',
+        'id': 'uuid-1',
+        'customer_id': 'c1',
+        'debt_id': null,
+        'reminder_date': '2025-01-01',
         'message': null,
       };
       final r = DebtReminder.fromMap(map);
@@ -68,8 +89,11 @@ void main() {
 
     test('copyWith replaces only specified fields', () {
       final r = DebtReminder(
-        id: 'uuid-1', customerId: 'c2',
-        reminderDate: '2025-01-01', message: 'old', ownerId: 'user-1',
+        id: 'uuid-1',
+        customerId: 'c2',
+        reminderDate: '2025-01-01',
+        message: 'old',
+        ownerId: 'user-1',
       );
       final updated = r.copyWith(isCompleted: 1, message: 'new');
       expect(updated.isCompleted, 1);
@@ -80,7 +104,10 @@ void main() {
 
     test('toString contains key fields', () {
       final r = DebtReminder(
-        id: 'uuid-3', customerId: 'c1', debtId: 'd2', reminderDate: '2025-05-05',
+        id: 'uuid-3',
+        customerId: 'c1',
+        debtId: 'd2',
+        reminderDate: '2025-05-05',
       );
       final s = r.toString();
       expect(s, contains('id: uuid-3'));

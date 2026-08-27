@@ -6,8 +6,11 @@ void main() {
   group('CustomerModel', () {
     test('toMap includes all fields', () {
       final c = CustomerModel(
-        id: 'uuid-10', name: 'Ahmed', phone: '07801234567',
-        createdAt: '2025-01-01T00:00:00.000', ownerId: 'user-1',
+        id: 'uuid-10',
+        name: 'Ahmed',
+        phone: '07801234567',
+        createdAt: '2025-01-01T00:00:00.000',
+        ownerId: 'user-1',
       );
       final map = c.toMap();
       expect(map['id'], 'uuid-10');
@@ -19,7 +22,11 @@ void main() {
     });
 
     test('toMap with null optional fields', () {
-      final c = CustomerModel(id: 'uuid-12', name: 'Ali', createdAt: '2025-01-01');
+      final c = CustomerModel(
+        id: 'uuid-12',
+        name: 'Ali',
+        createdAt: '2025-01-01',
+      );
       final map = c.toMap();
       expect(map['id'], 'uuid-12');
       expect(map['phone'], null);
@@ -28,8 +35,11 @@ void main() {
 
     test('fromMap round-trip', () {
       final original = CustomerModel(
-        id: 'uuid-sara', name: 'Sara', phone: '07901234567',
-        createdAt: '2025-06-15', ownerId: 'user-2',
+        id: 'uuid-sara',
+        name: 'Sara',
+        phone: '07901234567',
+        createdAt: '2025-06-15',
+        ownerId: 'user-2',
       );
       final restored = CustomerModel.fromMap(original.toMap());
       expect(restored.id, original.id);
@@ -41,7 +51,9 @@ void main() {
 
     test('fromMap with null phone', () {
       final map = {
-        'id': 'uuid-1', 'name': 'NoPhone', 'phone': null,
+        'id': 'uuid-1',
+        'name': 'NoPhone',
+        'phone': null,
         'created_at': '2025-01-01',
       };
       final c = CustomerModel.fromMap(map);
@@ -50,8 +62,11 @@ void main() {
 
     test('toEntity/fromEntity round-trip', () {
       final entity = Customer(
-        id: 'uuid-e', name: 'Entity', phone: '07800000000',
-        createdAt: '2025-06-15', ownerId: 'user-2',
+        id: 'uuid-e',
+        name: 'Entity',
+        phone: '07800000000',
+        createdAt: '2025-06-15',
+        ownerId: 'user-2',
       );
       final model = CustomerModel.fromEntity(entity);
       expect(model.toEntity(), entity);
@@ -59,7 +74,9 @@ void main() {
 
     test('copyWith replaces only specified fields', () {
       final c = CustomerModel(
-        id: 'uuid-1', name: 'Old', createdAt: '2025-01-01',
+        id: 'uuid-1',
+        name: 'Old',
+        createdAt: '2025-01-01',
         ownerId: 'user-1',
       );
       final updated = c.copyWith(name: 'New');

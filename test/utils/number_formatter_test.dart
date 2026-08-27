@@ -35,11 +35,21 @@ void main() {
 
     test('custom suffixes (English)', () {
       expect(
-        NumberFormatter.compact(1500, billion: 'Billion', million: 'Million', thousand: 'Thousand'),
+        NumberFormatter.compact(
+          1500,
+          billion: 'Billion',
+          million: 'Million',
+          thousand: 'Thousand',
+        ),
         '1.5 Thousand',
       );
       expect(
-        NumberFormatter.compact(2500000, billion: 'Billion', million: 'Million', thousand: 'Thousand'),
+        NumberFormatter.compact(
+          2500000,
+          billion: 'Billion',
+          million: 'Million',
+          thousand: 'Thousand',
+        ),
         '2.5 Million',
       );
     });

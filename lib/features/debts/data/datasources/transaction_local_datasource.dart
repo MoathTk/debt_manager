@@ -1,0 +1,336 @@
+/// DEBTS FEATURE — DATA LAYER: LOCAL DATA SOURCE
+///
+/// Raw SQLite access to the `transactions` table. This class is the only
+/// one that knows query strings and column names; higher layers work
+/// with [TransactionModel] and never touch SQL.
+///
+/// Soft deletes: rows are flagged `is_deleted = 1` and filtered out,
+/// so synced devices can pull the tombstone instead of resurrecting
+/// a deleted transaction.
+///
+/// The offline→online sync helpers live here too — the cloud sync
+/// service talks to the datasource directly, not through the domain
+/// repository interface.
+/// ---------------------------------------------------------------------------
+library;
+
+import '../../../../data/database_helper.dart';
+import '../models/transaction_model.dart';
+
+class TransactionLocalDatasource {
+  final DatabaseHelper _dbHelper;
+
+  TransactionLocalDatasource({DatabaseHelper? dbHelper})
+    : _dbHelper = dbHelper ?? DatabaseHelper.instance;
+
+  Future<int> insert(TransactionModel transaction) async {
+    final db = await _dbHelper.database;
+    return await db.insert('transactions', transaction.toMap());
+  }
+
+  Future<int> update(TransactionModel transaction) async {
+    final db = await _dbHelper.database;
+    return await db.update(
+      'transactions',
+      transaction.toMap(),
+      where: 'id = ?',
+      whereArgs: [transaction.id],
+    );
+  }
+
+  /// Soft-delete a transaction row.
+  Future<int> delete(String id) async {
+    final db = await _dbHelper.database;
+    final now = DateTime.now().toIso8601String();
+    return await db.update(
+      'transactions',
+      {'is_deleted': 1, 'is_synced': 0, 'updated_at': now},
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+  }
+
+  /// Soft-delete every payment attached to a debt.
+  Future<void> deletePaymentsByDebtId(String debtId) async {
+    final db = await _dbHelper.database;
+    final now = DateTime.now().toIso8601String();
+    await db.update(
+      'transactions',
+      {'is_deleted': 1, 'is_synced': 0, 'updated_at': now},
+      where: 'debt_id = ? AND type = 1',
+      whereArgs: [debtId],
+    );
+  }
+
+  /// Soft-delete every transaction attached to a customer.
+  Future<void> deleteByCustomerId(String customerId) async {
+    final db = await _dbHelper.database;
+    final now = DateTime.now().toIso8601String();
+    await db.update(
+      'transactions',
+      {'is_deleted': 1, 'is_synced': 0, 'updated_at': now},
+      where: 'customer_id = ?',
+      whereArgs: [customerId],
+    );
+  }
+
+  Future<List<TransactionModel>> getAll({String? ownerId}) async {
+    final db = await _dbHelper.database;
+    final conditions = ['is_deleted = 0'];
+    final args = <dynamic>[];
+    if (ownerId != null) {
+      conditions.add('owner_id = ?');
+      args.add(ownerId);
+    }
+    final result = await db.query(
+      'transactions',
+      where: conditions.join(' AND '),
+      whereArgs: args,
+      orderBy: 'date DESC',
+    );
+    return result.map(TransactionModel.fromMap).toList();
+  }
+
+  Future<TransactionModel?> getById(String id) async {
+    final db = await _dbHelper.database;
+    final result = await db.query(
+      'transactions',
+      where: 'id = ? AND is_deleted = 0',
+      whereArgs: [id],
+    );
+    if (result.isEmpty) return null;
+    return TransactionModel.fromMap(result.first);
+  }
+
+  Future<List<TransactionModel>> getByCustomer(String customerId) async {
+    final db = await _dbHelper.database;
+    final result = await db.query(
+      'transactions',
+      where: 'customer_id = ? AND is_deleted = 0',
+      whereArgs: [customerId],
+      orderBy: 'date DESC',
+    );
+    return result.map(TransactionModel.fromMap).toList();
+  }
+
+  Future<List<TransactionModel>> getByType(int type) async {
+    final db = await _dbHelper.database;
+    final result = await db.query(
+      'transactions',
+      where: 'type = ? AND is_deleted = 0',
+      whereArgs: [type],
+      orderBy: 'date DESC',
+    );
+    return result.map(TransactionModel.fromMap).toList();
+  }
+
+  Future<List<TransactionModel>> getByDateRange(
+    String startDate,
+    String endDate,
+  ) async {
+    final db = await _dbHelper.database;
+    final result = await db.query(
+      'transactions',
+      where: 'date BETWEEN ? AND ? AND is_deleted = 0',
+      whereArgs: [startDate, endDate],
+      orderBy: 'date DESC',
+    );
+    return result.map(TransactionModel.fromMap).toList();
+  }
+
+  Future<double> getCustomerBalance(String customerId) async {
+    final db = await _dbHelper.database;
+    final result = await db.rawQuery(
+      '''SELECT
+        COALESCE(SUM(CASE WHEN type = 0 THEN amount ELSE 0 END), 0) -
+        COALESCE(SUM(CASE WHEN type = 1 THEN amount ELSE 0 END), 0) as balance
+      FROM transactions WHERE customer_id = ? AND is_deleted = 0''',
+      [customerId],
+    );
+    return (result.first['balance'] as num?)?.toDouble() ?? 0.0;
+  }
+
+  Future<double> getTotalDebts({String? ownerId}) async {
+    final db = await _dbHelper.database;
+    final conditions = ['type = 0', 'is_deleted = 0'];
+    final args = <dynamic>[];
+    if (ownerId != null) {
+      conditions.add('owner_id = ?');
+      args.add(ownerId);
+    }
+    final result = await db.rawQuery(
+      "SELECT COALESCE(SUM(amount), 0) as total FROM transactions WHERE ${conditions.join(' AND ')}",
+      args,
+    );
+    return (result.first['total'] as num?)?.toDouble() ?? 0.0;
+  }
+
+  Future<double> getTotalPayments({String? ownerId}) async {
+    final db = await _dbHelper.database;
+    final conditions = ['type = 1', 'is_deleted = 0'];
+    final args = <dynamic>[];
+    if (ownerId != null) {
+      conditions.add('owner_id = ?');
+      args.add(ownerId);
+    }
+    final result = await db.rawQuery(
+      "SELECT COALESCE(SUM(amount), 0) as total FROM transactions WHERE ${conditions.join(' AND ')}",
+      args,
+    );
+    return (result.first['total'] as num?)?.toDouble() ?? 0.0;
+  }
+
+  Future<int> getTransactionCount({String? ownerId}) async {
+    final db = await _dbHelper.database;
+    final conditions = ['is_deleted = 0'];
+    final args = <dynamic>[];
+    if (ownerId != null) {
+      conditions.add('owner_id = ?');
+      args.add(ownerId);
+    }
+    final result = await db.rawQuery(
+      'SELECT COUNT(*) as count FROM transactions WHERE ${conditions.join(' AND ')}',
+      args,
+    );
+    return result.first['count'] as int;
+  }
+
+  Future<List<Map<String, dynamic>>> getDebtsWithRemaining(
+    String customerId,
+  ) async {
+    final db = await _dbHelper.database;
+    return await db.rawQuery(
+      '''SELECT * FROM (
+        SELECT t.id, t.amount, t.note, t.date,
+          t.amount - COALESCE(
+            (SELECT SUM(p.amount) FROM transactions p WHERE p.debt_id = t.id AND p.is_deleted = 0), 0
+          ) as remaining
+        FROM transactions t
+        WHERE t.customer_id = ? AND t.type = 0 AND t.is_deleted = 0
+      ) sub WHERE sub.remaining > 0 ORDER BY sub.date DESC''',
+      [customerId],
+    );
+  }
+
+  Future<double> getPaymentsForDebt(String debtId) async {
+    final db = await _dbHelper.database;
+    final result = await db.rawQuery(
+      'SELECT COALESCE(SUM(amount), 0) as total FROM transactions WHERE debt_id = ? AND type = 1 AND is_deleted = 0',
+      [debtId],
+    );
+    return (result.first['total'] as num?)?.toDouble() ?? 0.0;
+  }
+
+  Future<List<TransactionModel>> getPaymentsByDebtId(String debtId) async {
+    final db = await _dbHelper.database;
+    final result = await db.query(
+      'transactions',
+      where: 'debt_id = ? AND type = 1 AND is_deleted = 0',
+      whereArgs: [debtId],
+      orderBy: 'date ASC',
+    );
+    return result.map(TransactionModel.fromMap).toList();
+  }
+
+  Future<Map<String, double>> getTotalsByDateRange(
+    String startDate,
+    String endDate,
+  ) async {
+    final db = await _dbHelper.database;
+    final result = await db.rawQuery(
+      '''SELECT
+        COALESCE(SUM(CASE WHEN type = 0 THEN amount ELSE 0 END), 0) as debts,
+        COALESCE(SUM(CASE WHEN type = 1 THEN amount ELSE 0 END), 0) as payments
+      FROM transactions WHERE date BETWEEN ? AND ? AND is_deleted = 0''',
+      [startDate, endDate],
+    );
+    return {
+      'debts': (result.first['debts'] as num?)?.toDouble() ?? 0.0,
+      'payments': (result.first['payments'] as num?)?.toDouble() ?? 0.0,
+    };
+  }
+
+  Future<List<Map<String, dynamic>>> getPeriodicData({
+    bool isWeekly = false,
+  }) async {
+    final db = await _dbHelper.database;
+    final groupExpr = isWeekly
+        ? "strftime('%Y-W%W', date)"
+        : "strftime('%Y-%m', date)";
+    final labelExpr = isWeekly
+        ? "strftime('%W', date)"
+        : "strftime('%m', date)";
+    final result = await db.rawQuery(
+      '''SELECT $groupExpr as period, $labelExpr as label,
+        COALESCE(SUM(CASE WHEN type = 0 THEN amount ELSE 0 END), 0) as debts,
+        COALESCE(SUM(CASE WHEN type = 1 THEN amount ELSE 0 END), 0) as payments
+      FROM transactions WHERE is_deleted = 0
+      GROUP BY period ORDER BY period DESC LIMIT 6''',
+    );
+    return result.reversed.toList();
+  }
+
+  Future<List<Map<String, dynamic>>> getTopDebtors(int limit) async {
+    final db = await _dbHelper.database;
+    return await db.rawQuery(
+      '''SELECT t.customer_id, c.name,
+        COALESCE(SUM(CASE WHEN t.type = 0 THEN t.amount ELSE 0 END), 0) -
+        COALESCE(SUM(CASE WHEN t.type = 1 THEN t.amount ELSE 0 END), 0) as outstanding
+      FROM transactions t JOIN customers c ON c.id = t.customer_id
+      WHERE t.is_deleted = 0 AND c.is_deleted = 0
+      GROUP BY t.customer_id HAVING outstanding > 0
+      ORDER BY outstanding DESC LIMIT ?''',
+      [limit],
+    );
+  }
+
+  // ---- offline→online push helpers (mirror of the legacy repository) ----
+
+  Future<List<TransactionModel>> getUnsynced() async {
+    final db = await _dbHelper.database;
+    final result = await db.query('transactions', where: 'is_synced = 0');
+    return result.map(TransactionModel.fromMap).toList();
+  }
+
+  Future<void> markSynced(List<String> ids) async {
+    if (ids.isEmpty) return;
+    final db = await _dbHelper.database;
+    final placeholders = ids.map((_) => '?').join(',');
+    await db.update(
+      'transactions',
+      {'is_synced': 1},
+      where: 'id IN ($placeholders)',
+      whereArgs: ids,
+    );
+  }
+
+  /// Newest-wins upsert of cloud records; only applies when the incoming
+  /// record is newer than what we already store locally.
+  Future<void> upsertFromCloud(List<TransactionModel> records) async {
+    final db = await _dbHelper.database;
+    for (final t in records) {
+      final existingResult = await db.query(
+        'transactions',
+        where: 'id = ?',
+        whereArgs: [t.id],
+      );
+      if (existingResult.isEmpty) {
+        final map = t.toMap();
+        map['is_synced'] = 1;
+        await db.insert('transactions', map);
+      } else {
+        final existing = TransactionModel.fromMap(existingResult.first);
+        if (t.updatedAt.compareTo(existing.updatedAt) > 0) {
+          final map = t.toMap();
+          map['is_synced'] = 1;
+          await db.update(
+            'transactions',
+            map,
+            where: 'id = ?',
+            whereArgs: [t.id],
+          );
+        }
+      }
+    }
+  }
+}

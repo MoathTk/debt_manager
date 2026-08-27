@@ -1,10 +1,26 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../data/models/transaction.dart' as model;
-import '../data/models/debt_reminder.dart';
+import 'package:local_debt_management/features/debts/domain/entities/transaction.dart';
 import '../utils/sync_id.dart';
 import '../services/auth_service.dart';
 import 'database_provider.dart';
 import 'sync_provider.dart';
+
+// ============================================================================
+// DEBT WRITE ACTIONS
+// ============================================================================
+// The debt mutations (addDebt, recordPayment, updateTransaction,
+// deleteTransaction, deleteDebt, settleDebt) now live in the debts feature —
+// `lib/features/debts/presentation/providers/transaction_actions.dart`. They
+// are re-exported here so legacy callers keep compiling unchanged.
+
+export 'package:local_debt_management/features/debts/presentation/providers/transaction_actions.dart'
+    show
+        addDebt,
+        recordPayment,
+        updateTransaction,
+        deleteTransaction,
+        deleteDebt,
+        settleDebt;
 
 // ============================================================================
 // DATA CLASSES
@@ -32,16 +48,8 @@ class DashboardStats {
 }
 
 // ============================================================================
-// INVALIDATION HELPERS
+// INVALIDATION HELPLERS
 // ============================================================================
-
-void _invalidateTransactions(ProviderContainer container, String customerId) {
-  container.invalidate(transactionsProvider);
-  container.invalidate(transactionsByCustomerProvider(customerId));
-  container.invalidate(customerBalanceProvider(customerId));
-  container.invalidate(debtsWithRemainingProvider(customerId));
-  container.invalidate(dashboardStatsProvider);
-}
 
 void _invalidateReminders(ProviderContainer container) {
   container.invalidate(allRemindersProvider);
@@ -74,11 +82,11 @@ Future<void> markReminderCompleted(
       if (remaining > 0) {
         final now = DateTime.now().toIso8601String();
         await txRepo.insert(
-          model.Transaction(
+          Transaction(
             id: generateId(),
             customerId: debt.customerId,
             amount: remaining,
-            type: model.Transaction.payment,
+            type: Transaction.payment,
             note: note,
             date: now,
             debtId: reminder.debtId,
@@ -86,7 +94,11 @@ Future<void> markReminderCompleted(
             updatedAt: now,
           ),
         );
-        _invalidateTransactions(container, debt.customerId);
+        container.invalidate(transactionsProvider);
+        container.invalidate(transactionsByCustomerProvider(debt.customerId));
+        container.invalidate(customerBalanceProvider(debt.customerId));
+        container.invalidate(debtsWithRemainingProvider(debt.customerId));
+        container.invalidate(dashboardStatsProvider);
         container.invalidate(paymentsByDebtProvider(reminder.debtId!));
       }
     }
@@ -118,188 +130,4 @@ Future<void> deleteRemindersBatch(
   await repo.deleteBatch(ids);
   _invalidateReminders(container);
   container.read(syncProvider.notifier).schedulePush();
-}
-
-// ============================================================================
-// TRANSACTION MUTATIONS
-// ============================================================================
-
-Future<void> addDebt(
-  ProviderContainer container, {
-  required String customerId,
-  required double amount,
-  String? note,
-  DateTime? reminderDate,
-}) async {
-  final repo = container.read(transactionRepositoryProvider);
-  final now = DateTime.now().toIso8601String();
-  final debtId = generateId();
-  final ownerId = _getOwnerId(container);
-  await repo.insert(
-    model.Transaction(
-      id: debtId,
-      customerId: customerId,
-      amount: amount,
-      type: model.Transaction.debt,
-      note: note,
-      date: now,
-      ownerId: ownerId,
-      updatedAt: now,
-    ),
-  );
-  if (reminderDate != null) {
-    final reminderRepo = container.read(debtReminderRepositoryProvider);
-    await reminderRepo.insert(
-      DebtReminder(
-        id: generateId(),
-        customerId: customerId,
-        debtId: debtId,
-        reminderDate: reminderDate.toIso8601String().substring(0, 10),
-        message: note,
-        ownerId: ownerId,
-        updatedAt: now,
-      ),
-    );
-    _invalidateReminders(container);
-  }
-  _invalidateTransactions(container, customerId);
-  container.read(syncProvider.notifier).schedulePush();
-}
-
-Future<void> recordPayment(
-  ProviderContainer container, {
-  required String customerId,
-  required double amount,
-  String? note,
-  String? debtId,
-}) async {
-  final repo = container.read(transactionRepositoryProvider);
-  final now = DateTime.now().toIso8601String();
-  await repo.insert(
-    model.Transaction(
-      id: generateId(),
-      customerId: customerId,
-      amount: amount,
-      type: model.Transaction.payment,
-      note: note,
-      date: now,
-      debtId: debtId,
-      ownerId: _getOwnerId(container),
-      updatedAt: now,
-    ),
-  );
-  _invalidateTransactions(container, customerId);
-  if (debtId != null) {
-    container.invalidate(paymentsByDebtProvider(debtId));
-    await _autoCompleteRemindersIfSettled(container, debtId);
-  }
-  container.read(syncProvider.notifier).schedulePush();
-}
-
-Future<void> deleteTransaction(
-  ProviderContainer container,
-  String transactionId,
-  String customerId,
-) async {
-  final repo = container.read(transactionRepositoryProvider);
-  final txn = await repo.getById(transactionId);
-  await repo.delete(transactionId);
-  _invalidateTransactions(container, customerId);
-  if (txn != null && txn.isPayment && txn.debtId != null) {
-    container.invalidate(paymentsByDebtProvider(txn.debtId!));
-  }
-  container.read(syncProvider.notifier).schedulePush();
-}
-
-/// Cascade-deletes a debt and all its associated payments and reminders.
-Future<void> deleteDebt(
-  ProviderContainer container,
-  String debtId,
-  String customerId,
-) async {
-  final txRepo = container.read(transactionRepositoryProvider);
-  final reminderRepo = container.read(debtReminderRepositoryProvider);
-  await txRepo.delete(debtId);
-  await txRepo.deletePaymentsByDebtId(debtId);
-  await reminderRepo.deleteByDebtId(debtId);
-  _invalidateTransactions(container, customerId);
-  _invalidateReminders(container);
-  container.invalidate(paymentsByDebtProvider(debtId));
-  container.read(syncProvider.notifier).schedulePush();
-}
-
-Future<void> updateTransaction(
-  ProviderContainer container, {
-  required model.Transaction transaction,
-  required double amount,
-  String? note,
-}) async {
-  final repo = container.read(transactionRepositoryProvider);
-  await repo.update(
-    model.Transaction(
-      id: transaction.id,
-      customerId: transaction.customerId,
-      amount: amount,
-      type: transaction.type,
-      note: note,
-      date: transaction.date,
-      debtId: transaction.debtId,
-      ownerId: transaction.ownerId,
-      updatedAt: DateTime.now().toIso8601String(),
-    ),
-  );
-  _invalidateTransactions(container, transaction.customerId);
-  if (transaction.isPayment && transaction.debtId != null) {
-    await _autoCompleteRemindersIfSettled(container, transaction.debtId!);
-  }
-  container.read(syncProvider.notifier).schedulePush();
-}
-
-Future<void> settleDebt(
-  ProviderContainer container, {
-  required String customerId,
-  required String debtId,
-  required double amount,
-  String? note,
-}) async {
-  final repo = container.read(transactionRepositoryProvider);
-  final now = DateTime.now().toIso8601String();
-  await repo.insert(
-    model.Transaction(
-      id: generateId(),
-      customerId: customerId,
-      amount: amount,
-      type: model.Transaction.payment,
-      note: note ?? 'Settle',
-      date: now,
-      debtId: debtId,
-      ownerId: _getOwnerId(container),
-      updatedAt: now,
-    ),
-  );
-  await _autoCompleteRemindersIfSettled(container, debtId);
-  _invalidateTransactions(container, customerId);
-  container.invalidate(paymentsByDebtProvider(debtId));
-  container.read(syncProvider.notifier).schedulePush();
-}
-
-Future<void> _autoCompleteRemindersIfSettled(
-  ProviderContainer container,
-  String debtId,
-) async {
-  final txRepo = container.read(transactionRepositoryProvider);
-  final debt = await txRepo.getById(debtId);
-  if (debt == null) return;
-  final paid = await txRepo.getPaymentsForDebt(debtId);
-  if ((debt.amount - paid) > 0) return;
-  final reminderRepo = container.read(debtReminderRepositoryProvider);
-  final reminders = await reminderRepo.getAll();
-  var changed = false;
-  for (final r in reminders) {
-    if (r.debtId == debtId && !r.completed) {
-      await reminderRepo.markCompleted(r.id);
-      changed = true;
-    }
-  }
-  if (changed) _invalidateReminders(container);
 }

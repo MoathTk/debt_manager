@@ -1,9 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:local_debt_management/features/customers/presentation/providers/customer_providers.dart';
+import 'package:local_debt_management/features/debts/presentation/providers/transaction_providers.dart';
 import '../data/database_helper.dart';
-import '../data/repositories/transaction_repository.dart';
 import '../data/repositories/debt_reminder_repository.dart';
-import '../data/models/transaction.dart' as model;
 import '../data/models/debt_reminder.dart';
 import '../services/auth_service.dart';
 import 'mutations.dart';
@@ -11,12 +10,17 @@ import 'mutations.dart';
 export 'package:local_debt_management/features/customers/presentation/providers/customer_providers.dart'
     show customerRepositoryProvider, customersProvider, customerByIdProvider;
 
+export 'package:local_debt_management/features/debts/presentation/providers/transaction_providers.dart'
+    show
+        transactionRepositoryProvider,
+        transactionsProvider,
+        transactionsByCustomerProvider,
+        customerBalanceProvider,
+        debtsWithRemainingProvider,
+        paymentsByDebtProvider;
+
 final databaseProvider = Provider<DatabaseHelper>((ref) {
   return DatabaseHelper.instance;
-});
-
-final transactionRepositoryProvider = Provider<TransactionRepository>((ref) {
-  return TransactionRepository();
 });
 
 final debtReminderRepositoryProvider = Provider<DebtReminderRepository>((ref) {
@@ -27,48 +31,6 @@ final _ownerIdProvider = Provider<String>((ref) {
   final user = ref.watch(authStateProvider).valueOrNull;
   return user?.uid ?? '';
 });
-
-final transactionsProvider = FutureProvider<List<model.Transaction>>((
-  ref,
-) async {
-  final repo = ref.watch(transactionRepositoryProvider);
-  final ownerId = ref.watch(_ownerIdProvider);
-  return repo.getAll(ownerId: ownerId.isEmpty ? null : ownerId);
-});
-
-final transactionsByCustomerProvider = FutureProvider.autoDispose
-    .family<List<model.Transaction>, String>((ref, customerId) async {
-      final repo = ref.watch(transactionRepositoryProvider);
-      final customerRepo = ref.watch(customerRepositoryProvider);
-      final ownerId = ref.watch(_ownerIdProvider);
-      if (ownerId.isNotEmpty) {
-        final customer = await customerRepo.getById(customerId);
-        if (customer == null || customer.ownerId != ownerId) {
-          return [];
-        }
-      }
-      return repo.getByCustomer(customerId);
-    });
-
-final customerBalanceProvider = FutureProvider.family<double, String>((
-  ref,
-  customerId,
-) async {
-  final repo = ref.watch(transactionRepositoryProvider);
-  return repo.getCustomerBalance(customerId);
-});
-
-final debtsWithRemainingProvider = FutureProvider.autoDispose
-    .family<List<Map<String, dynamic>>, String>((ref, customerId) async {
-      final repo = ref.watch(transactionRepositoryProvider);
-      return repo.getDebtsWithRemaining(customerId);
-    });
-
-final paymentsByDebtProvider = FutureProvider.autoDispose
-    .family<List<model.Transaction>, String>((ref, debtId) async {
-      final repo = ref.watch(transactionRepositoryProvider);
-      return repo.getPaymentsByDebtId(debtId);
-    });
 
 final pendingRemindersProvider = FutureProvider<List<DebtReminder>>((
   ref,

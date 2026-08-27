@@ -55,10 +55,18 @@ Future<Database> setupTestDb() async {
             FOREIGN KEY (debt_id) REFERENCES transactions (id) ON DELETE SET NULL
           )
         ''');
-        await db.execute('CREATE INDEX idx_transactions_customer_id ON transactions (customer_id)');
-        await db.execute('CREATE INDEX idx_transactions_type ON transactions (type)');
-        await db.execute('CREATE INDEX idx_debt_reminders_customer_id ON debt_reminders (customer_id)');
-        await db.execute('CREATE INDEX idx_debt_reminders_date ON debt_reminders (reminder_date)');
+        await db.execute(
+          'CREATE INDEX idx_transactions_customer_id ON transactions (customer_id)',
+        );
+        await db.execute(
+          'CREATE INDEX idx_transactions_type ON transactions (type)',
+        );
+        await db.execute(
+          'CREATE INDEX idx_debt_reminders_customer_id ON debt_reminders (customer_id)',
+        );
+        await db.execute(
+          'CREATE INDEX idx_debt_reminders_date ON debt_reminders (reminder_date)',
+        );
       },
     ),
   );

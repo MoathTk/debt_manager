@@ -11,8 +11,8 @@ import 'package:flutter/material.dart';
 import 'package:local_debt_management/core/theme/app_colors.dart';
 import 'package:local_debt_management/features/customers/domain/entities/customer.dart';
 import 'package:local_debt_management/l10n/app_localizations.dart';
-import 'package:local_debt_management/data/models/transaction.dart';
-import 'package:local_debt_management/widgets/balance_card.dart';
+import 'package:local_debt_management/features/debts/domain/entities/transaction.dart';
+import 'package:local_debt_management/features/debts/presentation/widgets/balance_card.dart';
 import 'customer_match_chip.dart';
 import '../../domain/entities/voice_command.dart';
 
@@ -68,11 +68,7 @@ class ViewHistoryReview extends StatelessWidget {
               BalanceCard(balance: balance!),
             ],
             const SizedBox(height: 12),
-            _HistorySection(
-              l10n: l10n,
-              cs: cs,
-              transactions: transactions,
-            ),
+            _HistorySection(l10n: l10n, cs: cs, transactions: transactions),
           ],
         ],
       ),
@@ -240,9 +236,9 @@ class _HistorySection extends StatelessWidget {
             ),
           )
         else
-          ...transactions.take(10).map(
-            (tx) => _TransactionTile(tx: tx, cs: cs),
-          ),
+          ...transactions
+              .take(10)
+              .map((tx) => _TransactionTile(tx: tx, cs: cs)),
       ],
     );
   }
@@ -298,10 +294,7 @@ class _TransactionTile extends StatelessWidget {
                 if (tx.note?.isNotEmpty == true)
                   Text(
                     tx.note!,
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: cs.onSurfaceVariant,
-                    ),
+                    style: TextStyle(fontSize: 12, color: cs.onSurfaceVariant),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -330,10 +323,7 @@ class _TransactionTile extends StatelessWidget {
               const SizedBox(height: 4),
               Text(
                 tx.date,
-                style: TextStyle(
-                  fontSize: 11,
-                  color: cs.onSurfaceVariant,
-                ),
+                style: TextStyle(fontSize: 11, color: cs.onSurfaceVariant),
               ),
             ],
           ),

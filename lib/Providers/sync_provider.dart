@@ -2,7 +2,8 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:local_debt_management/features/customers/data/models/customer_model.dart';
-import '../data/models/transaction.dart' as model;
+import 'package:local_debt_management/features/debts/data/models/transaction_model.dart'
+    as model;
 import '../data/models/debt_reminder.dart';
 import '../services/auth_service.dart';
 import '../services/firestore_sync.dart';
@@ -89,57 +90,54 @@ class SyncNotifier extends StateNotifier<SyncState> {
     _customersSub = _firestore
         .collection('users/$uid/customers')
         .snapshots()
-        .listen(
-      (snap) async {
-        final records = snap.docs.map((d) => CustomerModel.fromMap(d.data())).toList();
-        await _firestoreSync.upsertCustomers(records);
-        _ref.invalidate(customersProvider);
-        for (final c in records) {
-          _ref.invalidate(customerByIdProvider(c.id));
-        }
-        _refreshUnsyncedCount();
-      },
-      onError: (e) => print('[WS] customers stream error: $e'),
-    );
+        .listen((snap) async {
+          final records = snap.docs
+              .map((d) => CustomerModel.fromMap(d.data()))
+              .toList();
+          await _firestoreSync.upsertCustomers(records);
+          _ref.invalidate(customersProvider);
+          for (final c in records) {
+            _ref.invalidate(customerByIdProvider(c.id));
+          }
+          _refreshUnsyncedCount();
+        }, onError: (e) => print('[WS] customers stream error: $e'));
   }
 
   void _listenTransactions(String uid) {
     _transactionsSub = _firestore
         .collection('users/$uid/transactions')
         .snapshots()
-        .listen(
-      (snap) async {
-        final records = snap.docs.map((d) => model.Transaction.fromMap(d.data())).toList();
-        await _firestoreSync.upsertTransactions(records);
-        _ref.invalidate(transactionsProvider);
-        for (final t in records) {
-          _ref.invalidate(transactionsByCustomerProvider(t.customerId));
-          _ref.invalidate(customerBalanceProvider(t.customerId));
-          _ref.invalidate(debtsWithRemainingProvider(t.customerId));
-        }
-        _ref.invalidate(dashboardStatsProvider);
-        _refreshUnsyncedCount();
-      },
-      onError: (e) => print('[WS] transactions stream error: $e'),
-    );
+        .listen((snap) async {
+          final records = snap.docs
+              .map((d) => model.TransactionModel.fromMap(d.data()))
+              .toList();
+          await _firestoreSync.upsertTransactions(records);
+          _ref.invalidate(transactionsProvider);
+          for (final t in records) {
+            _ref.invalidate(transactionsByCustomerProvider(t.customerId));
+            _ref.invalidate(customerBalanceProvider(t.customerId));
+            _ref.invalidate(debtsWithRemainingProvider(t.customerId));
+          }
+          _ref.invalidate(dashboardStatsProvider);
+          _refreshUnsyncedCount();
+        }, onError: (e) => print('[WS] transactions stream error: $e'));
   }
 
   void _listenReminders(String uid) {
     _remindersSub = _firestore
         .collection('users/$uid/reminders')
         .snapshots()
-        .listen(
-      (snap) async {
-        final records = snap.docs.map((d) => DebtReminder.fromMap(d.data())).toList();
-        await _firestoreSync.upsertReminders(records);
-        _ref.invalidate(allRemindersProvider);
-        _ref.invalidate(pendingRemindersProvider);
-        _ref.invalidate(dueTodayProvider);
-        _ref.invalidate(dashboardStatsProvider);
-        _refreshUnsyncedCount();
-      },
-      onError: (e) => print('[WS] reminders stream error: $e'),
-    );
+        .listen((snap) async {
+          final records = snap.docs
+              .map((d) => DebtReminder.fromMap(d.data()))
+              .toList();
+          await _firestoreSync.upsertReminders(records);
+          _ref.invalidate(allRemindersProvider);
+          _ref.invalidate(pendingRemindersProvider);
+          _ref.invalidate(dueTodayProvider);
+          _ref.invalidate(dashboardStatsProvider);
+          _refreshUnsyncedCount();
+        }, onError: (e) => print('[WS] reminders stream error: $e'));
   }
 
   void _stopListeners() {
@@ -205,10 +203,7 @@ class SyncNotifier extends StateNotifier<SyncState> {
       _retryTimer?.cancel();
       _retryTimer = Timer(delay, () => syncNow());
     } else {
-      state = state.copyWith(
-        status: SyncStatus.error,
-        error: error,
-      );
+      state = state.copyWith(status: SyncStatus.error, error: error);
     }
   }
 

@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter/services.dart';
-import 'package:local_debt_management/widgets/amount_input_formatter.dart';
+import 'package:local_debt_management/features/debts/presentation/widgets/amount_input_formatter.dart';
 
 void main() {
   group('ThousandsSeparatorInputFormatter', () {
@@ -11,7 +11,10 @@ void main() {
       final sel = cursorPos >= 0
           ? TextSelection.collapsed(offset: cursorPos)
           : TextSelection.collapsed(offset: input.length);
-      return formatter.formatEditUpdate(old, TextEditingValue(text: input, selection: sel));
+      return formatter.formatEditUpdate(
+        old,
+        TextEditingValue(text: input, selection: sel),
+      );
     }
 
     test('empty input returns empty', () {

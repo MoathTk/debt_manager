@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../l10n/app_localizations.dart';
-import '../data/models/transaction.dart' as model;
+import 'package:local_debt_management/features/debts/domain/entities/transaction.dart'
+    as model;
 import '../Providers/database_provider.dart';
 import '../data/models/debt_reminder.dart';
 import 'reminder_detail_info.dart';
@@ -91,7 +92,11 @@ class _BodyState extends ConsumerState<_ReminderDetailBody> {
             debtPaid: _debtPaid,
           ),
           const SizedBox(height: 20),
-          _MarkCompletedButton(reminder: r, debtPaid: _debtPaid, debtTxn: _debtTxn),
+          _MarkCompletedButton(
+            reminder: r,
+            debtPaid: _debtPaid,
+            debtTxn: _debtTxn,
+          ),
           const SizedBox(height: 10),
           SizedBox(
             width: double.infinity,
@@ -143,17 +148,16 @@ class _MarkCompletedButton extends StatelessWidget {
       width: double.infinity,
       height: 52,
       child: FilledButton(
-        onPressed: disabled ? null : () => confirmToggle(context, reminder, l10n),
+        onPressed: disabled
+            ? null
+            : () => confirmToggle(context, reminder, l10n),
         style: FilledButton.styleFrom(
           backgroundColor: disabled ? cs.surfaceContainerHighest : null,
           foregroundColor: disabled ? cs.onSurfaceVariant : null,
         ),
         child: Text(
           _debtFullyPaid ? l10n.settled : l10n.markCompleted,
-          style: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w700,
-          ),
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
         ),
       ),
     );

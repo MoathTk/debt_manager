@@ -10,7 +10,7 @@ library;
 import 'package:flutter/material.dart';
 import 'package:local_debt_management/features/customers/domain/entities/customer.dart';
 import 'package:local_debt_management/l10n/app_localizations.dart';
-import 'package:local_debt_management/widgets/debt_selector_tile.dart';
+import 'package:local_debt_management/features/debts/presentation/widgets/debt_selector_tile.dart';
 import 'customer_match_chip.dart';
 import '../../domain/entities/voice_command.dart';
 
@@ -260,7 +260,9 @@ class _DebtList extends StatelessWidget {
         width: double.infinity,
         padding: const EdgeInsets.symmetric(vertical: 16),
         decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
+          color: Theme.of(
+            context,
+          ).colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
           borderRadius: BorderRadius.circular(12),
         ),
         child: Center(
@@ -319,10 +321,10 @@ class _Actions extends StatelessWidget {
           child: OutlinedButton.icon(
             onPressed: isSaving ? null : onReRecord,
             style: OutlinedButton.styleFrom(
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-              side: BorderSide(
-                color: cs.outlineVariant.withValues(alpha: 0.5),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
               ),
+              side: BorderSide(color: cs.outlineVariant.withValues(alpha: 0.5)),
             ),
             icon: const Icon(Icons.mic_rounded, size: 20),
             label: Text(
@@ -340,7 +342,9 @@ class _Actions extends StatelessWidget {
             style: FilledButton.styleFrom(
               backgroundColor: enabled ? cs.error : cs.surfaceContainerHighest,
               foregroundColor: enabled ? cs.onError : cs.onSurfaceVariant,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
               elevation: enabled ? 2 : 0,
               shadowColor: enabled ? cs.error.withValues(alpha: 0.4) : null,
             ),
@@ -351,7 +355,10 @@ class _Actions extends StatelessWidget {
                   const SizedBox(
                     width: 22,
                     height: 22,
-                    child: CircularProgressIndicator(strokeWidth: 2.5, color: Colors.white),
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2.5,
+                      color: Colors.white,
+                    ),
                   )
                 else
                   Icon(

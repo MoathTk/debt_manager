@@ -70,13 +70,15 @@ class AddDebtReview extends StatelessWidget {
           const SizedBox(height: 10),
           ItemsHeader(l10n: l10n, cs: cs, count: command.items.length),
           const SizedBox(height: 6),
-          ...command.items.asMap().entries.map((e) => ItemCard(
-                index: e.key,
-                item: e.value,
-                cs: cs,
-                l10n: l10n,
-                onRemove: onRemoveItem,
-              )),
+          ...command.items.asMap().entries.map(
+            (e) => ItemCard(
+              index: e.key,
+              item: e.value,
+              cs: cs,
+              l10n: l10n,
+              onRemove: onRemoveItem,
+            ),
+          ),
           const SizedBox(height: 8),
           TotalSection(l10n: l10n, cs: cs, total: command.totalAmount),
           if (command.dueDate != null) ...[

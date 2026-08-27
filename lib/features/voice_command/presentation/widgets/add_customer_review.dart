@@ -139,7 +139,8 @@ class _NameField extends StatelessWidget {
       textCapitalization: TextCapitalization.words,
       textInputAction: TextInputAction.next,
       style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
-      validator: (v) => (v == null || v.trim().isEmpty) ? l10n.nameRequired : null,
+      validator: (v) =>
+          (v == null || v.trim().isEmpty) ? l10n.nameRequired : null,
       decoration: InputDecoration(
         labelText: l10n.customerName,
         hintText: 'e.g. Ahmed',
@@ -170,8 +171,10 @@ class _NameField extends StatelessWidget {
           borderRadius: BorderRadius.circular(14),
           borderSide: BorderSide(color: cs.tertiary, width: 2),
         ),
-        contentPadding:
-            const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 16,
+        ),
       ),
     );
   }
@@ -236,8 +239,10 @@ class _PhoneField extends StatelessWidget {
           borderRadius: BorderRadius.circular(14),
           borderSide: BorderSide(color: cs.tertiary, width: 2),
         ),
-        contentPadding:
-            const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 16,
+        ),
       ),
     );
   }

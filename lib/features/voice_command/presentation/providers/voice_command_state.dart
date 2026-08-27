@@ -8,7 +8,7 @@
 library;
 
 import 'package:local_debt_management/features/customers/domain/entities/customer.dart';
-import '../../../../data/models/transaction.dart';
+import 'package:local_debt_management/features/debts/domain/entities/transaction.dart';
 import '../../domain/entities/voice_command.dart';
 
 enum VoiceCommandStatus {
@@ -112,8 +112,12 @@ class VoiceCommandState {
           ? null
           : (selectedDebtId ?? this.selectedDebtId),
       maxPayment: clearMaxPayment ? null : (maxPayment ?? this.maxPayment),
-      paymentWarning: clearPaymentWarning ? null : (paymentWarning ?? this.paymentWarning),
-      customerBalance: clearCustomerBalance ? null : (customerBalance ?? this.customerBalance),
+      paymentWarning: clearPaymentWarning
+          ? null
+          : (paymentWarning ?? this.paymentWarning),
+      customerBalance: clearCustomerBalance
+          ? null
+          : (customerBalance ?? this.customerBalance),
       transactionHistory: clearTransactionHistory
           ? null
           : (transactionHistory ?? this.transactionHistory),

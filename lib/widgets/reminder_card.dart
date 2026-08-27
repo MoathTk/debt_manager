@@ -6,7 +6,8 @@ import '../l10n/app_localizations.dart';
 import '../Providers/database_provider.dart';
 import '../Providers/mutations.dart';
 import '../data/models/debt_reminder.dart';
-import '../data/models/transaction.dart' as model;
+import 'package:local_debt_management/features/debts/domain/entities/transaction.dart'
+    as model;
 import 'reminder_action_btn.dart';
 
 String _fmt(double n) {

@@ -1,7 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:local_debt_management/features/customers/data/models/customer_model.dart';
 import '../data/database_helper.dart';
-import '../data/models/transaction.dart' as model;
+import 'package:local_debt_management/features/debts/data/models/transaction_model.dart'
+    as model;
 import '../data/models/debt_reminder.dart';
 
 class FirestoreSync {
@@ -54,7 +55,7 @@ class FirestoreSync {
     await _CustomerSyncRepo(_db).upsertFromCloud(records);
   }
 
-  Future<void> upsertTransactions(List<model.Transaction> records) async {
+  Future<void> upsertTransactions(List<model.TransactionModel> records) async {
     if (records.isEmpty) return;
     await _TransactionSyncRepo(_db).upsertFromCloud(records);
   }
@@ -245,10 +246,10 @@ class _TransactionSyncRepo {
   final DatabaseHelper _db;
   _TransactionSyncRepo(this._db);
 
-  Future<List<model.Transaction>> getUnsynced() async {
+  Future<List<model.TransactionModel>> getUnsynced() async {
     final db = await _db.database;
     final result = await db.query('transactions', where: 'is_synced = 0');
-    return result.map((m) => model.Transaction.fromMap(m)).toList();
+    return result.map((m) => model.TransactionModel.fromMap(m)).toList();
   }
 
   Future<void> markSynced(List<String> ids) async {
@@ -263,7 +264,7 @@ class _TransactionSyncRepo {
     );
   }
 
-  Future<void> upsertFromCloud(List<model.Transaction> records) async {
+  Future<void> upsertFromCloud(List<model.TransactionModel> records) async {
     final db = await _db.database;
     for (final t in records) {
       final existing = await _getById(t.id);
@@ -284,7 +285,7 @@ class _TransactionSyncRepo {
     }
   }
 
-  Future<model.Transaction?> _getById(String id) async {
+  Future<model.TransactionModel?> _getById(String id) async {
     final db = await _db.database;
     final result = await db.query(
       'transactions',
@@ -292,7 +293,7 @@ class _TransactionSyncRepo {
       whereArgs: [id],
     );
     if (result.isEmpty) return null;
-    return model.Transaction.fromMap(result.first);
+    return model.TransactionModel.fromMap(result.first);
   }
 }
 

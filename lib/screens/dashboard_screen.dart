@@ -5,8 +5,8 @@ import '../Providers/database_provider.dart';
 import '../Providers/mutations.dart';
 import '../core/theme/app_colors.dart';
 import '../widgets/stat_card.dart';
-import '../widgets/recent_transactions_list.dart';
-import 'all_transactions_screen.dart';
+import 'package:local_debt_management/features/debts/presentation/widgets/recent_transactions_list.dart';
+import 'package:local_debt_management/features/debts/presentation/screens/all_transactions_screen.dart';
 import 'analytics_screen.dart';
 
 class DashboardScreen extends ConsumerWidget {
@@ -133,7 +133,7 @@ class DashboardScreen extends ConsumerWidget {
         MaterialPageRoute(builder: (_) => const AnalyticsScreen()),
       ),
       child: Container(
-        margin: EdgeInsets.only(left: 3,right: 3),
+        margin: EdgeInsets.only(left: 3, right: 3),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           gradient: LinearGradient(

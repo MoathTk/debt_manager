@@ -6,7 +6,7 @@ library;
 import 'package:flutter/material.dart';
 import 'package:local_debt_management/l10n/app_localizations.dart';
 import 'package:local_debt_management/features/customers/domain/entities/customer.dart';
-import 'package:local_debt_management/data/repositories/transaction_repository.dart';
+import 'package:local_debt_management/features/debts/data/repositories/transaction_repository_impl.dart';
 import 'customer_tile.dart';
 import 'search_field.dart';
 
@@ -52,14 +52,14 @@ class _SearchSheetState extends State<SearchSheet> {
 
   Future<void> _loadDebtInfo() async {
     try {
-      final txRepo = TransactionRepository();
+      final txRepo = TransactionRepositoryImpl();
       final allTx = await txRepo.getAll();
       final counts = <String, int>{};
       final bals = <String, double>{};
       for (final tx in allTx) {
         counts[tx.customerId] = (counts[tx.customerId] ?? 0) + 1;
-        bals[tx.customerId] = (bals[tx.customerId] ?? 0) +
-            (tx.isDebt ? tx.amount : -tx.amount);
+        bals[tx.customerId] =
+            (bals[tx.customerId] ?? 0) + (tx.isDebt ? tx.amount : -tx.amount);
       }
       if (mounted) {
         setState(() {
@@ -137,23 +137,23 @@ class _SearchSheetState extends State<SearchSheet> {
                     ),
                   )
                 : _filtered.isEmpty
-                    ? _EmptyState(l10n: widget.l10n, cs: cs)
-                    : ListView.builder(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 4,
-                        ),
-                        itemCount: _filtered.length,
-                        itemBuilder: (_, i) => CustomerTile(
-                          customer: _filtered[i],
-                          cs: cs,
-                          isSelected: widget.selected?.id == _filtered[i].id,
-                          debtCount: _debtCounts[_filtered[i].id] ?? 0,
-                          balance: _balances[_filtered[i].id] ?? 0,
-                          isLoading: _loading,
-                          onTap: () => widget.onSelect(_filtered[i]),
-                        ),
-                      ),
+                ? _EmptyState(l10n: widget.l10n, cs: cs)
+                : ListView.builder(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 4,
+                    ),
+                    itemCount: _filtered.length,
+                    itemBuilder: (_, i) => CustomerTile(
+                      customer: _filtered[i],
+                      cs: cs,
+                      isSelected: widget.selected?.id == _filtered[i].id,
+                      debtCount: _debtCounts[_filtered[i].id] ?? 0,
+                      balance: _balances[_filtered[i].id] ?? 0,
+                      isLoading: _loading,
+                      onTap: () => widget.onSelect(_filtered[i]),
+                    ),
+                  ),
           ),
         ],
       ),
@@ -241,7 +241,11 @@ class _EmptyState extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(Icons.search_off_rounded, size: 48, color: cs.onSurfaceVariant.withValues(alpha: 0.3)),
+          Icon(
+            Icons.search_off_rounded,
+            size: 48,
+            color: cs.onSurfaceVariant.withValues(alpha: 0.3),
+          ),
           const SizedBox(height: 10),
           Text(
             l10n.noMatchFound,

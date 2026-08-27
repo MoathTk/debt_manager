@@ -73,15 +73,19 @@ class CustomerMatchChip extends StatelessWidget {
                     c.name,
                     style: TextStyle(
                       fontSize: 13,
-                      fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                      color: isSelected
-                          ? cs.onPrimaryContainer
-                          : cs.onSurface,
+                      fontWeight: isSelected
+                          ? FontWeight.w600
+                          : FontWeight.w500,
+                      color: isSelected ? cs.onPrimaryContainer : cs.onSurface,
                     ),
                   ),
                   if (isSelected) ...[
                     const SizedBox(width: 6),
-                    Icon(Icons.check_circle_rounded, size: 16, color: cs.primary),
+                    Icon(
+                      Icons.check_circle_rounded,
+                      size: 16,
+                      color: cs.primary,
+                    ),
                   ],
                 ],
               ),
@@ -123,7 +127,9 @@ class _Avatar extends StatelessWidget {
       height: 28,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: isSelected ? cs.primary.withValues(alpha: 0.2) : _bgColor.withValues(alpha: 0.2),
+        color: isSelected
+            ? cs.primary.withValues(alpha: 0.2)
+            : _bgColor.withValues(alpha: 0.2),
       ),
       child: Center(
         child: Text(
