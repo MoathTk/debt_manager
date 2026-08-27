@@ -7,6 +7,7 @@ import 'package:local_debt_management/widgets/action_bar.dart';
 import 'package:local_debt_management/widgets/balance_card.dart';
 import 'package:local_debt_management/widgets/empty_state.dart';
 import 'package:local_debt_management/widgets/transaction_tile.dart';
+import 'package:local_debt_management/widgets/unpaid_debts_sheet.dart';
 import '../providers/customer_providers.dart';
 import '../widgets/customer_header.dart';
 import '../widgets/edit_customer_sheet.dart';
@@ -77,7 +78,10 @@ class _Body extends ConsumerWidget {
         SliverToBoxAdapter(child: CustomerHeader(customer: customer)),
         SliverToBoxAdapter(
           child: balanceAsync.when(
-            data: (b) => BalanceCard(balance: b),
+            data: (b) => BalanceCard(
+              balance: b,
+              onTap: () => showUnpaidDebtsSheet(context, ref, customerId),
+            ),
             loading: () => const SizedBox(height: 80),
             error: (_, __) => const SizedBox(),
           ),
@@ -112,10 +116,9 @@ class _Body extends ConsumerWidget {
 
             final rMap = <String, double>{};
             debtsAsync.whenData((ds) {
-              for (final d in ds){
+              for (final d in ds) {
                 rMap[d['id'] as String] = (d['remaining'] as num).toDouble();
               }
-                
             });
             return SliverList.separated(
               itemCount: txns.length,

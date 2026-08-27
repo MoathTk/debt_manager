@@ -71,10 +71,7 @@ final debtsWithRemainingProvider =
     });
 
 final paymentsByDebtProvider =
-    FutureProvider.family<List<model.Transaction>, String>((
-      ref,
-      debtId,
-    ) async {
+    FutureProvider.family<List<model.Transaction>, String>((ref, debtId) async {
       final repo = ref.watch(transactionRepositoryProvider);
       return repo.getPaymentsByDebtId(debtId);
     });
@@ -98,10 +95,16 @@ final dashboardStatsProvider = FutureProvider<DashboardStats>((ref) async {
   final reminderRepo = ref.watch(debtReminderRepositoryProvider);
   final ownerId = ref.watch(_ownerIdProvider);
   final ownerFilter = ownerId.isEmpty ? null : ownerId;
-  final customerCount = await customerRepo.getCustomerCount(ownerId: ownerFilter);
+  final customerCount = await customerRepo.getCustomerCount(
+    ownerId: ownerFilter,
+  );
   final totalDebts = await transactionRepo.getTotalDebts(ownerId: ownerFilter);
-  final totalPayments = await transactionRepo.getTotalPayments(ownerId: ownerFilter);
-  final pendingReminders = await reminderRepo.getPendingCount(ownerId: ownerFilter);
+  final totalPayments = await transactionRepo.getTotalPayments(
+    ownerId: ownerFilter,
+  );
+  final pendingReminders = await reminderRepo.getPendingCount(
+    ownerId: ownerFilter,
+  );
   final periodic = await transactionRepo.getPeriodicData();
   final topDebtors = await transactionRepo.getTopDebtors(5);
   return DashboardStats(
@@ -149,3 +152,9 @@ final allRemindersProvider = FutureProvider<List<DebtReminder>>((ref) async {
   final ownerId = ref.watch(_ownerIdProvider);
   return repo.getAll(ownerId: ownerId.isEmpty ? null : ownerId);
 });
+
+final remindersByCustomerProvider = FutureProvider.autoDispose
+    .family<List<DebtReminder>, String>((ref, customerId) async {
+      final repo = ref.watch(debtReminderRepositoryProvider);
+      return repo.getByCustomer(customerId);
+    });
