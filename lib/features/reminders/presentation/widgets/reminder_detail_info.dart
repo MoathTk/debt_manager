@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:local_debt_management/core/theme/app_colors.dart';
-import '../l10n/app_localizations.dart';
+import 'package:local_debt_management/features/customers/presentation/providers/customer_providers.dart';
 import 'package:local_debt_management/features/debts/domain/entities/transaction.dart'
     as model;
-import '../Providers/database_provider.dart';
-import '../data/models/debt_reminder.dart';
-import 'info_row.dart';
+import 'package:local_debt_management/l10n/app_localizations.dart';
+import 'package:local_debt_management/widgets/info_row.dart';
+import '../../domain/entities/debt_reminder.dart';
 
 String fmt(double n) {
   final s = n % 1 == 0 ? n.toStringAsFixed(0) : n.toStringAsFixed(2);

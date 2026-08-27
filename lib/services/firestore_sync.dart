@@ -1,9 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:local_debt_management/features/customers/data/models/customer_model.dart';
-import '../data/database_helper.dart';
 import 'package:local_debt_management/features/debts/data/models/transaction_model.dart'
     as model;
-import '../data/models/debt_reminder.dart';
+import 'package:local_debt_management/features/reminders/data/datasources/debt_reminder_local_datasource.dart';
+import 'package:local_debt_management/features/reminders/data/models/debt_reminder_model.dart';
+import '../data/database_helper.dart';
 
 class FirestoreSync {
   final _db = DatabaseHelper.instance;
@@ -60,9 +61,9 @@ class FirestoreSync {
     await _TransactionSyncRepo(_db).upsertFromCloud(records);
   }
 
-  Future<void> upsertReminders(List<DebtReminder> records) async {
+  Future<void> upsertReminders(List<DebtReminderModel> records) async {
     if (records.isEmpty) return;
-    await _ReminderSyncRepo(_db).upsertFromCloud(records);
+    await DebtReminderLocalDatasource().upsertFromCloud(records);
   }
 
   // ======================== PUSH ========================
@@ -114,8 +115,8 @@ class FirestoreSync {
   }
 
   Future<void> _pushReminders(String uid) async {
-    final repo = _ReminderSyncRepo(_db);
-    final unsynced = await repo.getUnsynced();
+    final datasource = DebtReminderLocalDatasource();
+    final unsynced = await datasource.getUnsynced();
     if (unsynced.isEmpty) return;
     print('[PUSH] reminders: ${unsynced.length} unsynced');
     final col = _firestore.collection('${_userPath(uid)}/reminders');
@@ -132,7 +133,7 @@ class FirestoreSync {
       }
       await batch.commit();
     }
-    await repo.markSynced(ids);
+    await datasource.markSynced(ids);
   }
 
   // ======================== META ========================
@@ -294,60 +295,5 @@ class _TransactionSyncRepo {
     );
     if (result.isEmpty) return null;
     return model.TransactionModel.fromMap(result.first);
-  }
-}
-
-class _ReminderSyncRepo {
-  final DatabaseHelper _db;
-  _ReminderSyncRepo(this._db);
-
-  Future<List<DebtReminder>> getUnsynced() async {
-    final db = await _db.database;
-    final result = await db.query('debt_reminders', where: 'is_synced = 0');
-    return result.map((m) => DebtReminder.fromMap(m)).toList();
-  }
-
-  Future<void> markSynced(List<String> ids) async {
-    if (ids.isEmpty) return;
-    final db = await _db.database;
-    final ph = ids.map((_) => '?').join(',');
-    await db.update(
-      'debt_reminders',
-      {'is_synced': 1},
-      where: 'id IN ($ph)',
-      whereArgs: ids,
-    );
-  }
-
-  Future<void> upsertFromCloud(List<DebtReminder> records) async {
-    final db = await _db.database;
-    for (final r in records) {
-      final existing = await _getById(r.id);
-      if (existing == null) {
-        final map = r.toMap();
-        map['is_synced'] = 1;
-        await db.insert('debt_reminders', map);
-      } else if (r.updatedAt.compareTo(existing.updatedAt) > 0) {
-        final map = r.toMap();
-        map['is_synced'] = 1;
-        await db.update(
-          'debt_reminders',
-          map,
-          where: 'id = ?',
-          whereArgs: [r.id],
-        );
-      }
-    }
-  }
-
-  Future<DebtReminder?> _getById(String id) async {
-    final db = await _db.database;
-    final result = await db.query(
-      'debt_reminders',
-      where: 'id = ?',
-      whereArgs: [id],
-    );
-    if (result.isEmpty) return null;
-    return DebtReminder.fromMap(result.first);
   }
 }

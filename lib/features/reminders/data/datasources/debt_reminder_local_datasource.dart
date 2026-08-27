@@ -1,15 +1,34 @@
-import '../database_helper.dart';
-import '../models/debt_reminder.dart';
+/// REMINDERS FEATURE — DATA LAYER: LOCAL DATA SOURCE
+///
+/// Raw SQLite access to the `debt_reminders` table. This class is the only
+/// one that knows query strings and column names; higher layers work
+/// with [DebtReminderModel] and never touch SQL.
+///
+/// Soft deletes: rows are flagged `is_deleted = 1` and filtered out,
+/// so synced devices can pull the tombstone instead of resurrecting
+/// a deleted reminder.
+///
+/// The offline→online sync helpers live here too — the cloud sync
+/// service talks to the datasource directly, not through the domain
+/// repository interface.
+/// ---------------------------------------------------------------------------
+library;
 
-class DebtReminderRepository {
-  final DatabaseHelper _dbHelper = DatabaseHelper.instance;
+import '../../../../data/database_helper.dart';
+import '../models/debt_reminder_model.dart';
 
-  Future<int> insert(DebtReminder reminder) async {
+class DebtReminderLocalDatasource {
+  final DatabaseHelper _dbHelper;
+
+  DebtReminderLocalDatasource({DatabaseHelper? dbHelper})
+    : _dbHelper = dbHelper ?? DatabaseHelper.instance;
+
+  Future<int> insert(DebtReminderModel reminder) async {
     final db = await _dbHelper.database;
     return await db.insert('debt_reminders', reminder.toMap());
   }
 
-  Future<int> update(DebtReminder reminder) async {
+  Future<int> update(DebtReminderModel reminder) async {
     final db = await _dbHelper.database;
     return await db.update(
       'debt_reminders', reminder.toMap(),
@@ -17,6 +36,7 @@ class DebtReminderRepository {
     );
   }
 
+  /// Soft-delete a reminder row.
   Future<int> delete(String id) async {
     final db = await _dbHelper.database;
     final now = DateTime.now().toIso8601String();
@@ -27,6 +47,7 @@ class DebtReminderRepository {
     );
   }
 
+  /// Soft-delete several reminder rows.
   Future<void> deleteBatch(List<String> ids) async {
     if (ids.isEmpty) return;
     final db = await _dbHelper.database;
@@ -39,6 +60,7 @@ class DebtReminderRepository {
     );
   }
 
+  /// Soft-delete every reminder attached to a debt.
   Future<void> deleteByDebtId(String debtId) async {
     final db = await _dbHelper.database;
     final now = DateTime.now().toIso8601String();
@@ -49,6 +71,7 @@ class DebtReminderRepository {
     );
   }
 
+  /// Soft-delete every reminder attached to a customer.
   Future<void> deleteByCustomerId(String customerId) async {
     final db = await _dbHelper.database;
     final now = DateTime.now().toIso8601String();
@@ -59,7 +82,7 @@ class DebtReminderRepository {
     );
   }
 
-  Future<List<DebtReminder>> getAll({String? ownerId}) async {
+  Future<List<DebtReminderModel>> getAll({String? ownerId}) async {
     final db = await _dbHelper.database;
     final conditions = ['is_deleted = 0'];
     final args = <dynamic>[];
@@ -73,29 +96,29 @@ class DebtReminderRepository {
       whereArgs: args,
       orderBy: 'reminder_date ASC',
     );
-    return result.map((map) => DebtReminder.fromMap(map)).toList();
+    return result.map((map) => DebtReminderModel.fromMap(map)).toList();
   }
 
-  Future<DebtReminder?> getById(String id) async {
+  Future<DebtReminderModel?> getById(String id) async {
     final db = await _dbHelper.database;
     final result = await db.query(
       'debt_reminders', where: 'id = ? AND is_deleted = 0', whereArgs: [id],
     );
     if (result.isEmpty) return null;
-    return DebtReminder.fromMap(result.first);
+    return DebtReminderModel.fromMap(result.first);
   }
 
-  Future<List<DebtReminder>> getByCustomer(String customerId) async {
+  Future<List<DebtReminderModel>> getByCustomer(String customerId) async {
     final db = await _dbHelper.database;
     final result = await db.query(
       'debt_reminders',
       where: 'customer_id = ? AND is_deleted = 0', whereArgs: [customerId],
       orderBy: 'reminder_date ASC',
     );
-    return result.map((map) => DebtReminder.fromMap(map)).toList();
+    return result.map((map) => DebtReminderModel.fromMap(map)).toList();
   }
 
-  Future<List<DebtReminder>> getPending({String? ownerId}) async {
+  Future<List<DebtReminderModel>> getPending({String? ownerId}) async {
     final db = await _dbHelper.database;
     final conditions = ['is_completed = 0', 'is_deleted = 0'];
     final args = <dynamic>[];
@@ -109,10 +132,10 @@ class DebtReminderRepository {
       whereArgs: args,
       orderBy: 'reminder_date ASC',
     );
-    return result.map((map) => DebtReminder.fromMap(map)).toList();
+    return result.map((map) => DebtReminderModel.fromMap(map)).toList();
   }
 
-  Future<List<DebtReminder>> getCompleted({String? ownerId}) async {
+  Future<List<DebtReminderModel>> getCompleted({String? ownerId}) async {
     final db = await _dbHelper.database;
     final conditions = ['is_completed = 1', 'is_deleted = 0'];
     final args = <dynamic>[];
@@ -126,7 +149,7 @@ class DebtReminderRepository {
       whereArgs: args,
       orderBy: 'reminder_date DESC',
     );
-    return result.map((map) => DebtReminder.fromMap(map)).toList();
+    return result.map((map) => DebtReminderModel.fromMap(map)).toList();
   }
 
   Future<int> markCompleted(String id) async {
@@ -149,7 +172,7 @@ class DebtReminderRepository {
     );
   }
 
-  Future<List<DebtReminder>> getDueToday({String? date}) async {
+  Future<List<DebtReminderModel>> getDueToday({String? date}) async {
     final db = await _dbHelper.database;
     final now = (date ?? DateTime.now().toIso8601String().substring(0, 10));
     final result = await db.query(
@@ -158,7 +181,7 @@ class DebtReminderRepository {
       whereArgs: [now],
       orderBy: 'reminder_date ASC',
     );
-    return result.map((map) => DebtReminder.fromMap(map)).toList();
+    return result.map((map) => DebtReminderModel.fromMap(map)).toList();
   }
 
   Future<int> getPendingCount({String? ownerId}) async {
@@ -176,12 +199,14 @@ class DebtReminderRepository {
     return result.first['count'] as int;
   }
 
-  Future<List<DebtReminder>> getUnsynced() async {
+  // ======================== SYNC HELPERS ========================
+
+  Future<List<DebtReminderModel>> getUnsynced() async {
     final db = await _dbHelper.database;
     final result = await db.query(
       'debt_reminders', where: 'is_synced = 0',
     );
-    return result.map((map) => DebtReminder.fromMap(map)).toList();
+    return result.map((map) => DebtReminderModel.fromMap(map)).toList();
   }
 
   Future<void> markSynced(List<String> ids) async {
@@ -194,27 +219,36 @@ class DebtReminderRepository {
     );
   }
 
-  Future<void> upsertFromCloud(List<DebtReminder> records) async {
+  Future<void> upsertFromCloud(List<DebtReminderModel> records) async {
     final db = await _dbHelper.database;
     for (final r in records) {
-      final existingResult = await db.query(
-        'debt_reminders', where: 'id = ?', whereArgs: [r.id],
-      );
-      if (existingResult.isEmpty) {
+      final existing = await _getByIdIncludingDeleted(r.id);
+      if (existing == null) {
         final map = r.toMap();
         map['is_synced'] = 1;
         await db.insert('debt_reminders', map);
-      } else {
-        final existing = DebtReminder.fromMap(existingResult.first);
-        if (r.updatedAt.compareTo(existing.updatedAt) > 0) {
-          final map = r.toMap();
-          map['is_synced'] = 1;
-          await db.update(
-            'debt_reminders', map,
-            where: 'id = ?', whereArgs: [r.id],
-          );
-        }
+      } else if (r.updatedAt.compareTo(existing.updatedAt) > 0) {
+        final map = r.toMap();
+        map['is_synced'] = 1;
+        await db.update(
+          'debt_reminders', map,
+          where: 'id = ?', whereArgs: [r.id],
+        );
       }
     }
+  }
+
+  /// Raw by-id lookup used only by cloud upserts: soft-deleted rows are
+  /// deliberately included so a stale cloud record cannot resurrect a
+  /// locally deleted reminder.
+  Future<DebtReminderModel?> _getByIdIncludingDeleted(String id) async {
+    final db = await _dbHelper.database;
+    final result = await db.query(
+      'debt_reminders',
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+    if (result.isEmpty) return null;
+    return DebtReminderModel.fromMap(result.first);
   }
 }

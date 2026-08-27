@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:local_debt_management/features/customers/data/models/customer_model.dart';
 import 'package:local_debt_management/features/debts/data/models/transaction_model.dart'
     as model;
-import '../data/models/debt_reminder.dart';
+import 'package:local_debt_management/features/reminders/data/models/debt_reminder_model.dart';
 import '../services/auth_service.dart';
 import '../services/firestore_sync.dart';
 import '../services/connectivity_service.dart';
@@ -129,7 +129,7 @@ class SyncNotifier extends StateNotifier<SyncState> {
         .snapshots()
         .listen((snap) async {
           final records = snap.docs
-              .map((d) => DebtReminder.fromMap(d.data()))
+              .map((d) => DebtReminderModel.fromMap(d.data()))
               .toList();
           await _firestoreSync.upsertReminders(records);
           _ref.invalidate(allRemindersProvider);

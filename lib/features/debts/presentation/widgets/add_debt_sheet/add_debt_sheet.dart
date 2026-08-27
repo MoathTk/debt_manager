@@ -13,7 +13,7 @@ import 'processing_indicator.dart';
 import 'error_banner.dart';
 import 'field.dart';
 import '../amount_input_formatter.dart';
-import 'package:local_debt_management/widgets/reminder_date_picker.dart';
+import 'package:local_debt_management/features/reminders/presentation/widgets/reminder_date_picker.dart';
 
 void showAddDebtSheet(BuildContext context, WidgetRef ref, String customerId) {
   if (MutationGuard.checkBlocked(context, ref)) return;

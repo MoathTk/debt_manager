@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:local_debt_management/features/subscription/presentation/widgets/mutation_guard.dart';
-import 'package:local_debt_management/widgets/drawer/side_drawer.dart';
+import 'package:local_debt_management/core/drawer/side_drawer.dart';
 import 'package:local_debt_management/widgets/sync_status_indicator.dart';
 import '../l10n/app_localizations.dart';
 import '../Providers/database_provider.dart';
@@ -9,11 +9,11 @@ import '../Providers/sync_provider.dart';
 import '../features/subscription/presentation/widgets/subscription_status_icon.dart';
 import '../features/voice_command/presentation/widgets/voice_command_sheet.dart';
 import '../services/update_service.dart';
-import '../widgets/update/update_dialog.dart';
+import '../core/update/update_dialog.dart';
 
 import 'dashboard_screen.dart';
 import 'package:local_debt_management/features/customers/presentation/screens/customers_screen.dart';
-import 'reminders_screen.dart';
+import 'package:local_debt_management/features/reminders/presentation/screens/reminders_screen.dart';
 
 /// Main shell screen with bottom navigation bar and settings drawer.
 ///

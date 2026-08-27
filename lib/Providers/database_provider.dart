@@ -1,9 +1,16 @@
+// ============================================================================
+// LEGACY PROVIDER BARREL
+// ============================================================================
+// The customers, debts and reminders features now own their providers under
+// `lib/features/<feature>/presentation/providers/`. This file re-exports
+// them (so legacy callers keep compiling unchanged) and still hosts the
+// cross-feature dashboard stats that aggregate all three.
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:local_debt_management/features/customers/presentation/providers/customer_providers.dart';
 import 'package:local_debt_management/features/debts/presentation/providers/transaction_providers.dart';
+import 'package:local_debt_management/features/reminders/presentation/providers/debt_reminder_providers.dart';
 import '../data/database_helper.dart';
-import '../data/repositories/debt_reminder_repository.dart';
-import '../data/models/debt_reminder.dart';
 import '../services/auth_service.dart';
 import 'mutations.dart';
 
@@ -19,30 +26,21 @@ export 'package:local_debt_management/features/debts/presentation/providers/tran
         debtsWithRemainingProvider,
         paymentsByDebtProvider;
 
+export 'package:local_debt_management/features/reminders/presentation/providers/debt_reminder_providers.dart'
+    show
+        debtReminderRepositoryProvider,
+        allRemindersProvider,
+        pendingRemindersProvider,
+        dueTodayProvider,
+        remindersByCustomerProvider;
+
 final databaseProvider = Provider<DatabaseHelper>((ref) {
   return DatabaseHelper.instance;
-});
-
-final debtReminderRepositoryProvider = Provider<DebtReminderRepository>((ref) {
-  return DebtReminderRepository();
 });
 
 final _ownerIdProvider = Provider<String>((ref) {
   final user = ref.watch(authStateProvider).valueOrNull;
   return user?.uid ?? '';
-});
-
-final pendingRemindersProvider = FutureProvider<List<DebtReminder>>((
-  ref,
-) async {
-  final repo = ref.watch(debtReminderRepositoryProvider);
-  final ownerId = ref.watch(_ownerIdProvider);
-  return repo.getPending(ownerId: ownerId.isEmpty ? null : ownerId);
-});
-
-final dueTodayProvider = FutureProvider<List<DebtReminder>>((ref) async {
-  final repo = ref.watch(debtReminderRepositoryProvider);
-  return repo.getDueToday();
 });
 
 final dashboardStatsProvider = FutureProvider<DashboardStats>((ref) async {
@@ -74,13 +72,12 @@ final dashboardStatsProvider = FutureProvider<DashboardStats>((ref) async {
 });
 
 final periodicDataProvider =
-    FutureProvider.family<List<Map<String, dynamic>>, bool>((
-      ref,
-      isWeekly,
-    ) async {
-      final repo = ref.watch(transactionRepositoryProvider);
-      return repo.getPeriodicData(isWeekly: isWeekly);
-    });
+    FutureProvider.family<List<Map<String, dynamic>>, bool>(
+      (ref, isWeekly) async {
+        final repo = ref.watch(transactionRepositoryProvider);
+        return repo.getPeriodicData(isWeekly: isWeekly);
+      },
+    );
 
 final topDebtorsProvider =
     FutureProvider.autoDispose<List<Map<String, dynamic>>>((ref) async {
@@ -100,16 +97,4 @@ final totalsByDateRangeProvider = FutureProvider.autoDispose
       }
       final repo = ref.read(transactionRepositoryProvider);
       return repo.getTotalsByDateRange(parts[0], parts[1]);
-    });
-
-final allRemindersProvider = FutureProvider<List<DebtReminder>>((ref) async {
-  final repo = ref.watch(debtReminderRepositoryProvider);
-  final ownerId = ref.watch(_ownerIdProvider);
-  return repo.getAll(ownerId: ownerId.isEmpty ? null : ownerId);
-});
-
-final remindersByCustomerProvider = FutureProvider.autoDispose
-    .family<List<DebtReminder>, String>((ref, customerId) async {
-      final repo = ref.watch(debtReminderRepositoryProvider);
-      return repo.getByCustomer(customerId);
     });

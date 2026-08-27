@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../l10n/app_localizations.dart';
 import 'package:local_debt_management/features/debts/domain/entities/transaction.dart'
     as model;
-import '../Providers/database_provider.dart';
-import '../data/models/debt_reminder.dart';
+import 'package:local_debt_management/features/debts/presentation/providers/transaction_providers.dart';
+import 'package:local_debt_management/l10n/app_localizations.dart';
+import '../../domain/entities/debt_reminder.dart';
 import 'reminder_detail_info.dart';
 import 'reminder_detail_actions.dart';
 

@@ -7,15 +7,15 @@
 /// providers → schedules a cloud push.
 ///
 /// Reminder coordination (creating one with a debt, auto-completing one
-/// when a debt is settled) is composed here against the legacy reminders
-/// repository until the reminders feature is extracted.
+/// when a debt is settled) is composed here against the reminders feature's
+/// repository until the cross-feature actions are unified.
 /// ---------------------------------------------------------------------------
 library;
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:local_debt_management/Providers/database_provider.dart';
 import 'package:local_debt_management/Providers/sync_provider.dart';
-import 'package:local_debt_management/data/models/debt_reminder.dart';
+import 'package:local_debt_management/features/reminders/domain/entities/debt_reminder.dart';
 import 'package:local_debt_management/services/auth_service.dart';
 import 'package:local_debt_management/utils/sync_id.dart';
 import '../../domain/entities/transaction.dart';

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../l10n/app_localizations.dart';
+import 'package:local_debt_management/l10n/app_localizations.dart';
 
 /// Collapsible section header with icon, label, count badge, and delete-all.
 class ReminderSectionHeader extends StatelessWidget {

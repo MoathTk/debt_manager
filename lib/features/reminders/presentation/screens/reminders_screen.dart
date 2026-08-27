@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:local_debt_management/core/theme/app_colors.dart';
-import '../l10n/app_localizations.dart';
-import '../Providers/database_provider.dart';
-import '../data/models/debt_reminder.dart';
+import 'package:local_debt_management/features/customers/presentation/providers/customer_providers.dart';
+import 'package:local_debt_management/features/debts/presentation/providers/transaction_providers.dart';
+import 'package:local_debt_management/l10n/app_localizations.dart';
+import '../../domain/entities/debt_reminder.dart';
+import '../providers/debt_reminder_providers.dart';
 import '../widgets/reminder_filters.dart';
 import '../widgets/reminder_card.dart';
 import '../widgets/reminder_detail_sheet.dart';

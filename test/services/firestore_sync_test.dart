@@ -4,7 +4,7 @@ import 'package:local_debt_management/data/database_helper.dart';
 import 'package:local_debt_management/features/customers/data/models/customer_model.dart';
 import 'package:local_debt_management/features/debts/data/models/transaction_model.dart'
     as model;
-import 'package:local_debt_management/data/models/debt_reminder.dart';
+import 'package:local_debt_management/features/reminders/data/models/debt_reminder_model.dart';
 
 const _uid = 'test-user-uid';
 
@@ -107,8 +107,8 @@ void main() {
       expect(t.toMap()['is_deleted'], 1);
     });
 
-    test('DebtReminder toMap includes is_deleted', () {
-      final r = DebtReminder(
+    test('DebtReminderModel toMap includes is_deleted', () {
+      final r = DebtReminderModel(
         id: 'r1',
         customerId: 'c1',
         reminderDate: '2025-06-01',

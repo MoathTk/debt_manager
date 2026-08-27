@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../l10n/app_localizations.dart';
-import '../Providers/database_provider.dart';
-import '../Providers/mutations.dart';
-import '../data/models/debt_reminder.dart';
-import '../features/subscription/presentation/providers/subscription_provider.dart';
+import 'package:local_debt_management/Providers/database_provider.dart';
+import 'package:local_debt_management/features/subscription/presentation/providers/subscription_provider.dart';
+import 'package:local_debt_management/l10n/app_localizations.dart';
+import '../../domain/entities/debt_reminder.dart';
+import '../providers/reminder_actions.dart';
 
 void confirmToggle(
   BuildContext ctx,

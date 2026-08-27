@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../l10n/app_localizations.dart';
+import 'package:local_debt_management/l10n/app_localizations.dart';
 
 /// Optional date picker with quick-select chips for setting a debt reminder date.
 class ReminderDatePicker extends StatelessWidget {

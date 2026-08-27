@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:local_debt_management/core/theme/app_colors.dart';
-import '../l10n/app_localizations.dart';
+import 'package:local_debt_management/l10n/app_localizations.dart';
 
 /// Search bar for filtering reminders by customer name or message.
 class ReminderSearchBar extends StatefulWidget {

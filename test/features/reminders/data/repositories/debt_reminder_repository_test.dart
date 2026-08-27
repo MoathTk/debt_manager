@@ -2,8 +2,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:uuid/uuid.dart';
 import 'package:local_debt_management/data/database_helper.dart';
-import 'package:local_debt_management/data/models/debt_reminder.dart';
-import 'package:local_debt_management/data/repositories/debt_reminder_repository.dart';
+import 'package:local_debt_management/features/reminders/domain/entities/debt_reminder.dart';
+import 'package:local_debt_management/features/reminders/data/repositories/debt_reminder_repository_impl.dart';
 
 const _uuid = Uuid();
 
@@ -72,12 +72,12 @@ Future<String> _addCustomer() async {
 }
 
 void main() {
-  late DebtReminderRepository repo;
+  late DebtReminderRepositoryImpl repo;
 
   setUp(() async {
     _cid = 0;
     await _setupDb();
-    repo = DebtReminderRepository();
+    repo = DebtReminderRepositoryImpl();
   });
 
   tearDown(() async {

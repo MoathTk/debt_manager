@@ -1,4 +1,21 @@
-class DebtReminder {
+/// REMINDERS FEATURE — DATA LAYER: DEBT REMINDER MODEL
+///
+/// The persistence representation of a [DebtReminder]. This is the ONLY
+/// place that knows about the SQLite table columns and the Firestore
+/// document shape (map serialization, sync flags).
+///
+/// It exists because the domain entity stays pure — the model bridges
+/// domain ↔ storage:
+///   - [toMap]  → SQLite row / Firestore doc
+///   - [fromMap] → reverse direction
+///   - [toEntity] → domain entity
+///   - [fromEntity] → back to a persistable model
+/// ---------------------------------------------------------------------------
+library;
+
+import '../../domain/entities/debt_reminder.dart';
+
+class DebtReminderModel {
   final String id;
   final String customerId;
   final String? debtId;
@@ -10,7 +27,7 @@ class DebtReminder {
   final bool isDeleted;
   final String updatedAt;
 
-  const DebtReminder({
+  const DebtReminderModel({
     required this.id,
     required this.customerId,
     this.debtId,
@@ -22,8 +39,6 @@ class DebtReminder {
     this.isDeleted = false,
     this.updatedAt = '',
   });
-
-  bool get completed => isCompleted == 1;
 
   Map<String, dynamic> toMap() {
     return {
@@ -40,8 +55,8 @@ class DebtReminder {
     };
   }
 
-  factory DebtReminder.fromMap(Map<String, dynamic> map) {
-    return DebtReminder(
+  factory DebtReminderModel.fromMap(Map<String, dynamic> map) {
+    return DebtReminderModel(
       id: map['id'] as String,
       customerId: map['customer_id'] as String,
       debtId: map['debt_id'] as String?,
@@ -55,7 +70,7 @@ class DebtReminder {
     );
   }
 
-  DebtReminder copyWith({
+  DebtReminderModel copyWith({
     String? id,
     String? customerId,
     String? debtId,
@@ -67,7 +82,7 @@ class DebtReminder {
     bool? isDeleted,
     String? updatedAt,
   }) {
-    return DebtReminder(
+    return DebtReminderModel(
       id: id ?? this.id,
       customerId: customerId ?? this.customerId,
       debtId: debtId ?? this.debtId,
@@ -81,8 +96,33 @@ class DebtReminder {
     );
   }
 
-  @override
-  String toString() {
-    return 'DebtReminder(id: $id, customerId: $customerId, debtId: $debtId)';
+  DebtReminder toEntity() {
+    return DebtReminder(
+      id: id,
+      customerId: customerId,
+      debtId: debtId,
+      reminderDate: reminderDate,
+      isCompleted: isCompleted,
+      message: message,
+      ownerId: ownerId,
+      isSynced: isSynced,
+      isDeleted: isDeleted,
+      updatedAt: updatedAt,
+    );
+  }
+
+  factory DebtReminderModel.fromEntity(DebtReminder r) {
+    return DebtReminderModel(
+      id: r.id,
+      customerId: r.customerId,
+      debtId: r.debtId,
+      reminderDate: r.reminderDate,
+      isCompleted: r.isCompleted,
+      message: r.message,
+      ownerId: r.ownerId,
+      isSynced: r.isSynced,
+      isDeleted: r.isDeleted,
+      updatedAt: r.updatedAt,
+    );
   }
 }

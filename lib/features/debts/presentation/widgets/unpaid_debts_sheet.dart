@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:local_debt_management/core/theme/app_colors.dart';
-import 'package:local_debt_management/data/models/debt_reminder.dart';
+import 'package:local_debt_management/features/reminders/domain/entities/debt_reminder.dart';
 import 'package:local_debt_management/l10n/app_localizations.dart';
 import 'package:local_debt_management/Providers/database_provider.dart';
 import 'debt_detail_dialog.dart';
