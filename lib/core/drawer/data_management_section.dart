@@ -48,6 +48,62 @@ class DataManagementSection extends ConsumerWidget {
       ref.invalidate(dueTodayProvider);
     }
 
+    Future<void> seedStress(BuildContext context, int count) async {
+      if (MutationGuard.checkBlocked(context, ref)) return;
+      final uid = ref.read(authServiceProvider).ownerId;
+      final ok = await confirm(
+        'Seed stress data',
+        'This clears ALL local data, then inserts $count customers, '
+        '~${count * 6} transactions, ~${(count * 2.4).round()} reminders '
+        'and subscription rows. Proceed?',
+      );
+      if (ok != true || !context.mounted) return;
+
+      final navigator = Navigator.of(context, rootNavigator: true);
+      showDialog<void>(
+        context: context,
+        barrierDismissible: false,
+        builder: (_) => const Dialog(
+          child: Padding(
+            padding: EdgeInsets.all(24),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                SizedBox(
+                  width: 24,
+                  height: 24,
+                  child: CircularProgressIndicator(strokeWidth: 2.5),
+                ),
+                SizedBox(width: 16),
+                Flexible(child: Text('Seeding data…')),
+              ],
+            ),
+          ),
+        ),
+      );
+
+      try {
+        final result = await SeedDatabase.seedStressData(
+          ownerId: uid,
+          customerCount: count,
+        );
+        navigator.pop();
+        if (!context.mounted) return;
+        invalidateAll();
+        _showSeedResult(context, result);
+      } catch (e) {
+        navigator.pop();
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Seed failed: $e'),
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+        }
+      }
+    }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -87,6 +143,26 @@ class DataManagementSection extends ConsumerWidget {
                 },
                 icon: const Icon(Icons.dataset_outlined),
                 label: Center(child: Text(l10n.seedDemoData)),
+                style: FilledButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  alignment: Alignment.centerLeft,
+                ),
+              ),
+              const SizedBox(height: 12),
+              FilledButton.tonalIcon(
+                onPressed: () => seedStress(context, 500),
+                icon: const Icon(Icons.storage_rounded),
+                label: const Center(child: Text('Seed 500 stress records')),
+                style: FilledButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  alignment: Alignment.centerLeft,
+                ),
+              ),
+              const SizedBox(height: 12),
+              FilledButton.tonalIcon(
+                onPressed: () => seedStress(context, 2000),
+                icon: const Icon(Icons.data_usage_rounded),
+                label: const Center(child: Text('Seed 2,000 stress records')),
                 style: FilledButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 12),
                   alignment: Alignment.centerLeft,
@@ -233,6 +309,35 @@ class DataManagementSection extends ConsumerWidget {
           ),
         ),
       ],
+    );
+  }
+
+  void _showSeedResult(BuildContext context, SeedResult r) {
+    final sb = StringBuffer()
+      ..writeln('Inserted in ${r.insertMs} ms:')
+      ..writeln('• customers: ${r.customerCount}')
+      ..writeln('• transactions: ${r.transactionCount}')
+      ..writeln('• reminders: ${r.reminderCount}')
+      ..writeln('• subscriptions: ${r.subscriptionCount}')
+      ..writeln()
+      ..writeln(
+        'Verification (${r.checks['verify_ms'] ?? '?'} ms):',
+      );
+    r.checks.forEach((key, value) {
+      if (key != 'verify_ms') sb.writeln('• $key: $value');
+    });
+    showDialog<void>(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('Stress seed complete'),
+        content: SingleChildScrollView(child: Text(sb.toString())),
+        actions: [
+          FilledButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Close'),
+          ),
+        ],
+      ),
     );
   }
 }

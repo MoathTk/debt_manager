@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:local_debt_management/l10n/app_localizations.dart';
 import 'user_profile_header.dart';
 import 'sync_section.dart';
+import 'data_management_section.dart';
 import 'language_picker.dart';
 import 'theme_picker.dart';
 import 'drawer_footer.dart';
@@ -37,6 +38,8 @@ class SettingsDrawer extends ConsumerWidget {
                 ),
                 children: [
                   SyncSection(onClose: onClose),
+                  const SizedBox(height: 24),
+                  const DataManagementSection(),
                   const SizedBox(height: 24),
                   Text(
                     l10n.preferences,
