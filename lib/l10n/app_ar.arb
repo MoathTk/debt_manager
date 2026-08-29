@@ -144,6 +144,7 @@
   "verifyCode": "تحقق",
   "codeSent": "تم إرسال الرمز إلى هاتفك",
   "codeSentTo": "تم إرسال الرمز إلى {phone}",
+  "verificationCodeTo": "سنرسل رمز التحقق إلى {phone}",
   "otpHint": "أدخل الرمز المكون من6 أرقام",
   "resendCode": "إعادة إرسال الرمز",
   "resendIn": "إعادة الإرسال خلال {seconds} ثانية",

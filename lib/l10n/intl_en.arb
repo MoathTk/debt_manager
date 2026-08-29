@@ -145,6 +145,7 @@
   "verifyCode": "Verify",
   "codeSent": "Code sent to your phone",
   "codeSentTo": "Code sent to {phone}",
+  "verificationCodeTo": "We'll send a verification code to {phone}",
   "otpHint": "Enter 6-digit code",
   "resendCode": "Resend Code",
   "resendIn": "Resend in {seconds}s",

@@ -451,6 +451,11 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String verificationCodeTo(Object phone) {
+    return 'We\'ll send a verification code to $phone';
+  }
+
+  @override
   String get otpHint => 'Enter 6-digit code';
 
   @override

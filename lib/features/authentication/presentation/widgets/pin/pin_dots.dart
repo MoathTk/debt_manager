@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import 'package:local_debt_management/core/theme/app_type.dart';
 
 /// Modern PIN indicator — a row of large square cells reveal each typed digit.
 ///
@@ -149,6 +150,7 @@ class _Dot extends StatelessWidget {
               child: Text(
                 digit!,
                 style: TextStyle(
+                  fontFamily: AppType.bodyFamily,
                   color: digitColor,
                   fontSize: size * 0.42,
                   fontWeight: FontWeight.w700,

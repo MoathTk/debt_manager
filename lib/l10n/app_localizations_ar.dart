@@ -450,6 +450,11 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String verificationCodeTo(Object phone) {
+    return 'سنرسل رمز التحقق إلى $phone';
+  }
+
+  @override
   String get otpHint => 'أدخل الرمز المكون من6 أرقام';
 
   @override

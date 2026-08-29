@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../theme/app_colors.dart';
+import '../theme/app_type.dart';
 
 /// Theme provider managing light/dark mode toggle.
 final themeProvider = StateNotifierProvider<ThemeNotifier, ThemeMode>((ref) {
@@ -64,25 +65,15 @@ ThemeData get lightTheme {
     scaffoldBackgroundColor: cs.surface,
     useMaterial3: true,
     extensions: const [AppColors.light],
-    textTheme: const TextTheme().copyWith(
-      headlineLarge: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
-      headlineMedium: const TextStyle(
-        fontSize: 28,
-        fontWeight: FontWeight.bold,
-      ),
-      titleLarge: const TextStyle(fontSize: 22, fontWeight: FontWeight.w600),
-      titleMedium: const TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
-      bodyLarge: const TextStyle(fontSize: 18),
-      bodyMedium: const TextStyle(fontSize: 16),
-      bodySmall: const TextStyle(fontSize: 14),
-    ),
+    textTheme: _buildTextTheme(),
     appBarTheme: const AppBarTheme(
       backgroundColor: Colors.transparent,
       elevation: 0,
       scrolledUnderElevation: 0,
       titleTextStyle: TextStyle(
+        fontFamily: AppType.displayFamily,
         fontSize: 18,
-        fontWeight: FontWeight.w600,
+        fontWeight: FontWeight.w700,
         color: Color(0xFF0F1D3D),
       ),
       iconTheme: IconThemeData(color: Color(0xFF0F1D3D)),
@@ -125,7 +116,7 @@ ThemeData get lightTheme {
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: Color(0xFF0F1D3D), width: 1.5),
+        borderSide: const BorderSide(color: Color(0xFFC49A3C), width: 1.5),
       ),
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
     ),
@@ -181,25 +172,15 @@ ThemeData get darkTheme {
     scaffoldBackgroundColor: cs.surface,
     useMaterial3: true,
     extensions: const [AppColors.dark],
-    textTheme: const TextTheme().copyWith(
-      headlineLarge: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
-      headlineMedium: const TextStyle(
-        fontSize: 28,
-        fontWeight: FontWeight.bold,
-      ),
-      titleLarge: const TextStyle(fontSize: 22, fontWeight: FontWeight.w600),
-      titleMedium: const TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
-      bodyLarge: const TextStyle(fontSize: 18),
-      bodyMedium: const TextStyle(fontSize: 16),
-      bodySmall: const TextStyle(fontSize: 14),
-    ),
+    textTheme: _buildTextTheme(),
     appBarTheme: const AppBarTheme(
       backgroundColor: Colors.transparent,
       elevation: 0,
       scrolledUnderElevation: 0,
       titleTextStyle: TextStyle(
+        fontFamily: AppType.displayFamily,
         fontSize: 18,
-        fontWeight: FontWeight.w600,
+        fontWeight: FontWeight.w700,
         color: Color(0xFFB0C4E8),
       ),
       iconTheme: IconThemeData(color: Color(0xFFB0C4E8)),
@@ -254,5 +235,25 @@ ThemeData get darkTheme {
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
       ),
     ),
+  );
+}
+
+/// Shared type scale — [AppType] pairing (Cairo display / Tajawal body)
+/// applied across light and dark themes so both scripts render consistently.
+TextTheme _buildTextTheme() {
+  return const TextTheme(
+    displaySmall: AppType.displaySmall,
+    headlineLarge: AppType.headlineLarge,
+    headlineMedium: AppType.headlineMedium,
+    headlineSmall: AppType.headlineSmall,
+    titleLarge: AppType.titleLarge,
+    titleMedium: AppType.titleMedium,
+    titleSmall: AppType.titleSmall,
+    bodyLarge: AppType.bodyLarge,
+    bodyMedium: AppType.bodyMedium,
+    bodySmall: AppType.bodySmall,
+    labelLarge: AppType.labelLarge,
+    labelMedium: AppType.labelMedium,
+    labelSmall: AppType.labelSmall,
   );
 }

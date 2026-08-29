@@ -64,12 +64,20 @@ class LoginScreen extends ConsumerWidget {
                       const SizedBox(height: 32),
                       const WelcomeHeader(),
                       const SizedBox(height: 48),
-                      if (authState.error != null) ...[
-                        _ErrorBanner(message: authState.error!),
-                        const SizedBox(height: 16),
-                      ],
-                      PhoneNumberInput(
-                        onPhoneSubmitted: (phone) => notifier.sendOtp(phone),
+                      _Reveal(
+                        delay: const Duration(milliseconds: 250),
+                        child: Column(
+                          children: [
+                            if (authState.error != null) ...[
+                              _ErrorBanner(message: authState.error!),
+                              const SizedBox(height: 16),
+                            ],
+                            PhoneNumberInput(
+                              onPhoneSubmitted: (phone) =>
+                                  notifier.sendOtp(phone),
+                            ),
+                          ],
+                        ),
                       ),
                       const SizedBox(height: 24),
                       const LanguageSelector(),
@@ -84,6 +92,51 @@ class LoginScreen extends ConsumerWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+/// Delayed fade-and-rise reveal, sequencing the entrance after the header.
+class _Reveal extends StatefulWidget {
+  final Duration delay;
+  final Widget child;
+  const _Reveal({required this.delay, required this.child});
+
+  @override
+  State<_Reveal> createState() => _RevealState();
+}
+
+class _RevealState extends State<_Reveal> with SingleTickerProviderStateMixin {
+  late final AnimationController _ctrl;
+
+  @override
+  void initState() {
+    super.initState();
+    _ctrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 550),
+    );
+    Future.delayed(widget.delay, () {
+      if (mounted) _ctrl.forward();
+    });
+  }
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final fade = CurvedAnimation(parent: _ctrl, curve: Curves.easeOut);
+    final slide = Tween<Offset>(
+      begin: const Offset(0, 0.15),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeOutCubic));
+    return FadeTransition(
+      opacity: fade,
+      child: SlideTransition(position: slide, child: widget.child),
     );
   }
 }

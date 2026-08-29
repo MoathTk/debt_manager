@@ -968,6 +968,12 @@ abstract class AppLocalizations {
   /// **'Code sent to {phone}'**
   String codeSentTo(Object phone);
 
+  /// No description provided for @verificationCodeTo.
+  ///
+  /// In en, this message translates to:
+  /// **'We\'ll send a verification code to {phone}'**
+  String verificationCodeTo(Object phone);
+
   /// No description provided for @otpHint.
   ///
   /// In en, this message translates to:

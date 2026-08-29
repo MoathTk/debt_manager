@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:local_debt_management/core/theme/app_colors.dart';
+import 'package:local_debt_management/core/theme/app_type.dart';
+import 'package:local_debt_management/core/widgets/settled_stamp.dart';
 import 'package:local_debt_management/l10n/app_localizations.dart';
 
 /// Prominent balance card showing the customer's net balance with status color.
@@ -17,6 +19,7 @@ class BalanceCard extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     final isOwed = balance > 0;
     final isOverpaid = balance < 0;
+    final isSettled = balance == 0;
     final statusLabel = isOwed
         ? l10n.owes
         : isOverpaid
@@ -55,7 +58,7 @@ class BalanceCard extends StatelessWidget {
                     children: [
                       Text(
                         l10n.balance.toUpperCase(),
-                        style: TextStyle(
+                        style: AppType.labelMedium.copyWith(
                           fontSize: 13,
                           fontWeight: FontWeight.w700,
                           color: color.withValues(alpha: 0.7),
@@ -65,35 +68,37 @@ class BalanceCard extends StatelessWidget {
                       const SizedBox(height: 6),
                       Text(
                         _fmt(balance.abs()),
-                        style: TextStyle(
-                          fontSize: 32,
-                          fontWeight: FontWeight.w900,
-                          color: color,
+                        style: AppType.figures(
+                          size: 32,
+                          weight: FontWeight.w900,
                           letterSpacing: -1.0,
-                        ),
+                        ).copyWith(color: color),
                       ),
                     ],
                   ),
                 ),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 14,
-                    vertical: 8,
-                  ),
-                  decoration: BoxDecoration(
-                    color: color.withValues(alpha: 0.12),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Text(
-                    statusLabel.toUpperCase(),
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w800,
-                      color: color,
-                      letterSpacing: 0.8,
+                if (isSettled)
+                  SettledStamp(label: statusLabel)
+                else
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 14,
+                      vertical: 8,
+                    ),
+                    decoration: BoxDecoration(
+                      color: color.withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(
+                      statusLabel.toUpperCase(),
+                      style: AppType.labelSmall.copyWith(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w800,
+                        color: color,
+                        letterSpacing: 0.8,
+                      ),
                     ),
                   ),
-                ),
               ],
             ),
           ),
