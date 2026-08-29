@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:local_debt_management/utils/number_formatter.dart';
+import 'package:local_debt_management/core/utils/number_formatter.dart';
 
 void main() {
   group('NumberFormatter.compact', () {

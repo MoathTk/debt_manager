@@ -16,7 +16,7 @@ library;
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:local_debt_management/core/services/auth_service.dart';
-import '../../../../utils/sync_id.dart';
+import '../../../../core/utils/sync_id.dart';
 import '../../data/repositories/customer_repository_impl.dart';
 import '../../domain/entities/customer.dart';
 import '../../domain/repositories/customer_repository.dart';

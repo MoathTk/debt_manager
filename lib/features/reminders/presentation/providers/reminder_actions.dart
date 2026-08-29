@@ -19,7 +19,7 @@ import 'package:local_debt_management/core/sharedProviders/sync_provider.dart';
 import 'package:local_debt_management/features/debts/domain/entities/transaction.dart';
 import 'package:local_debt_management/features/debts/presentation/providers/transaction_providers.dart';
 import 'package:local_debt_management/core/services/auth_service.dart';
-import 'package:local_debt_management/utils/sync_id.dart';
+import 'package:local_debt_management/core/utils/sync_id.dart';
 import 'debt_reminder_providers.dart';
 
 String _getOwnerId(ProviderContainer container) {

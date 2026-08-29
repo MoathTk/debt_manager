@@ -10,7 +10,7 @@
 /// ---------------------------------------------------------------------------
 library;
 
-import 'package:local_debt_management/utils/sync_id.dart';
+import 'package:local_debt_management/core/utils/sync_id.dart';
 import '../entities/transaction.dart';
 import '../repositories/transaction_repository.dart';
 

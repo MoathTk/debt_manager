@@ -17,7 +17,7 @@ import 'package:local_debt_management/core/sharedProviders/database_provider.dar
 import 'package:local_debt_management/core/sharedProviders/sync_provider.dart';
 import 'package:local_debt_management/features/reminders/domain/entities/debt_reminder.dart';
 import 'package:local_debt_management/core/services/auth_service.dart';
-import 'package:local_debt_management/utils/sync_id.dart';
+import 'package:local_debt_management/core/utils/sync_id.dart';
 import '../../domain/entities/transaction.dart';
 import 'transaction_providers.dart';
 

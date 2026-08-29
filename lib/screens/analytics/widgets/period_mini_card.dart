@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../utils/number_formatter.dart';
+import '../../../core/utils/number_formatter.dart';
 import '../../../l10n/app_localizations.dart';
 
 class PeriodMiniCard extends StatelessWidget {
@@ -36,8 +36,12 @@ class PeriodMiniCard extends StatelessWidget {
           ),
           const SizedBox(height: 4),
           Text(
-            NumberFormatter.compact(value,
-              billion: l10n!.billion, million: l10n.million, thousand: l10n.thousand),
+            NumberFormatter.compact(
+              value,
+              billion: l10n!.billion,
+              million: l10n.million,
+              thousand: l10n.thousand,
+            ),
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w800,

@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:local_debt_management/core/sharedProviders/database_provider.dart';
 import 'package:local_debt_management/core/sharedProviders/sync_provider.dart';
 import 'package:local_debt_management/l10n/app_localizations.dart';
-import 'package:local_debt_management/utils/seed_database.dart';
+import 'package:local_debt_management/core/utils/seed_database.dart';
 import 'package:local_debt_management/core/services/auth_service.dart';
 import 'package:local_debt_management/core/services/firestore_sync.dart';
 import 'package:local_debt_management/features/subscription/presentation/widgets/mutation_guard.dart';

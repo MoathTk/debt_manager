@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'animated_counter.dart';
-import '../../../utils/number_formatter.dart';
+import '../../../core/utils/number_formatter.dart';
 import '../../../l10n/app_localizations.dart';
 
 /// Premium stat card for the dashboard grid.
@@ -29,9 +29,13 @@ class StatCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final compactFn = compact
-      ? (double v) => NumberFormatter.compact(v,
-          billion: l10n!.billion, million: l10n.million, thousand: l10n.thousand)
-      : null;
+        ? (double v) => NumberFormatter.compact(
+            v,
+            billion: l10n!.billion,
+            million: l10n.million,
+            thousand: l10n.thousand,
+          )
+        : null;
     return Material(
       color: Colors.transparent,
       child: InkWell(

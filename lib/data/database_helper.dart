@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
-import '../utils/sync_id.dart';
+import '../core/utils/sync_id.dart';
 
 class DatabaseHelper {
   static final DatabaseHelper instance = DatabaseHelper._init();

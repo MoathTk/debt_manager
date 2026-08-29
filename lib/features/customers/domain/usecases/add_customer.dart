@@ -11,7 +11,7 @@
 /// ---------------------------------------------------------------------------
 library;
 
-import 'package:local_debt_management/utils/sync_id.dart';
+import 'package:local_debt_management/core/utils/sync_id.dart';
 import '../entities/customer.dart';
 import '../exceptions/customer_exception.dart';
 import '../repositories/customer_repository.dart';
@@ -21,9 +21,12 @@ class AddCustomer {
   final String Function() createId;
   final DateTime Function() now;
 
-  AddCustomer(this.repo, {String Function()? createId, DateTime Function()? now})
-    : createId = createId ?? generateId,
-      now = now ?? DateTime.now;
+  AddCustomer(
+    this.repo, {
+    String Function()? createId,
+    DateTime Function()? now,
+  }) : createId = createId ?? generateId,
+       now = now ?? DateTime.now;
 
   Future<Customer> call({
     required String name,
