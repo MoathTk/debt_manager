@@ -198,10 +198,10 @@ class _PhoneNumberInputState extends State<PhoneNumberInput> {
                   keyboardType: TextInputType.phone,
                   textInputAction: TextInputAction.done,
                   autofillHints: const [AutofillHints.telephoneNumber],
-                  textAlign: TextAlign.center,
                   // Digits are inherently LTR — force it so an RTL
                   // (Arabic) locale never reorders the number.
                   textDirection: TextDirection.ltr,
+
                   enableSuggestions: false,
                   autocorrect: false,
                   inputFormatters: [
@@ -223,6 +223,14 @@ class _PhoneNumberInputState extends State<PhoneNumberInput> {
                       fontFeatures: const [FontFeature.tabularFigures()],
                     ),
                     border: InputBorder.none,
+                    prefixIcon: SizedBox(
+                      width: 48,
+                      child: Icon(
+                        Icons.phone_rounded,
+                        size: 20,
+                        color: cs.onSurfaceVariant.withValues(alpha: 0.6),
+                      ),
+                    ),
                     contentPadding: const EdgeInsets.symmetric(
                       horizontal: 16,
                       vertical: 18,
